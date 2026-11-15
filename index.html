@@ -86,7 +86,7 @@ const onSurface=()=>SURFACE.includes(state);
 // BV1 Step 1 (fly-in fix): bird-chamber had put the 29 MP basement JPEG into this all-or-nothing gate, so a slow or
 // failed basement load (phone memory / network) left the game on the last video frame with no fly-in. The basement now
 // loads on its own AFTER the opening gate, never blocks it, and a failure is logged instead of freezing the opening.
-const BASE_NAMES={under:'underground-map-hd.jpg',fog:'fog-overlay.png'},BASE_LOG=[];let basementReady=false;
+const BASE_NAMES={under:'underground-fog-map.jpg'},BASE_LOG=[];let basementReady=false;
 // HOTFIX-FLYIN (1): the 29 MP basement JPEG + grid used to start loading/decoding in the gate's .then, i.e. at the same
 // moment the landing could begin. It now starts only once the landing has finished (awaitClaim; dig start as a backup),
 // is decoded before use, and the descent waits for it (up to BASE_WAIT_S, then the old 'entered' fallback).
@@ -156,7 +156,7 @@ const vWatch=setInterval(()=>{if(videoDone||state!=='intro')return clearInterval
 // Muted inline autoplay on iPhone; if its power policy blocks autoplay, a touch resumes
 // the same opening, without adding text, a tutorial, or an alternate route.
 video.play().catch(()=>videoEnd('play-rejected'));video.addEventListener('pointerdown',()=>video.play().catch(()=>{}));
-function cameraBounds(){if(state==='underground'||state==='menu'){spp=START_SPP;lookX=BC.SPIRAL_W.x;lookY=BC.SPIRAL_W.y;return}   // BASE: downstairs camera is locked to the pocket arrival view
+function cameraBounds(){   // BASE: no camera lock underground — the player pans/zooms freely like upstairs.
  spp=clamp(spp,MIN_SPP,MAX_SPP);lookX=clamp(lookX,360/spp,WORLD.w-360/spp);lookY=clamp(lookY,640/spp,WORLD.h-640/spp)}
 function worldToCanvas(x,y){return {x:360+(x-lookX)*spp,y:640+(y-lookY)*spp}}
 function canvasToWorld(x,y){return {x:lookX+(x-360)/spp,y:lookY+(y-640)/spp}}
@@ -264,9 +264,8 @@ function drawSurface(current,t,now){
 }
 function drawUnderground(current,t,now,roomPan=pan){
 ctx.fillStyle='#000';ctx.fillRect(-8000,-8000,20000,20000);if(current==='menu'){pan=panTarget()*ease(clamp(t/.45));roomPan=pan;positionTarget()}ctx.save();ctx.translate(0,-roomPan);applyWorld();
-// BASE: the dirt map (full underground) + the rock-fog overlay, drawn at the arrival view rect so it pans with the world.
+// BASE: the fog map (dirt in the cleared pocket, rock fog everywhere else) covers the whole underground, so the player can pan/zoom freely like upstairs.
 if(art.under)ctx.drawImage(art.under,0,0,WORLD.w,WORLD.h);
-if(art.fog){const vw=720/START_SPP,vh=1280/START_SPP;ctx.drawImage(art.fog,BC.SPIRAL_W.x-vw/2,BC.SPIRAL_W.y-vh/2,vw,vh)}
 // BASE: the placed build items, in world space (drawn before the queen so she stays on top).
 if(window.BASE_ITEMS)BASE_ITEMS.draw();
 // Queen: comes out at the spiral's floor exit, steps down to just below it, then the locked downstairs idle
