@@ -276,10 +276,7 @@ queen.x=H.x+(APPEAR.x-H.x)*k;queen.y=H.y+(APPEAR.y-H.y)*k;if(emergeT0)sprite(art
 }
 // BV3 (Tester I4): where the drop ends. Phone: unchanged (spiral hex centre at START_SPP). When the visible screen band is too
 // short (wide desktop crop), zoom out just enough and centre so the spiral hex AND the standing queen are both fully on screen.
-function downEnd(){const r=game.getBoundingClientRect(),vh=r.height/view.s,hexH=HEX.w*Math.sqrt(3)/2,S=BC.SPIRAL_W;
- const tp=Math.min(S.y-hexH/2,APPEAR.y-QUEEN_UNDER_W*1.35),bot=S.y+hexH/2,need=(bot-tp)*1.12;
- if(need*START_SPP<=vh&&APPEAR.y-QUEEN_UNDER_W*1.35>=S.y-vh/START_SPP/2)return {spp:START_SPP,lookY:S.y};
- const s=Math.min(START_SPP,vh/need);return {spp:s,lookY:(tp+bot)/2}}
+function downEnd(){const dip=114/(spp*view.s),o={spp:spp,lookX:lookX,lookY:lookY+dip};const S={spp:spp,lookX:lookX,lookY:lookY};spp=o.spp;lookX=o.lookX;lookY=o.lookY;try{cameraBounds()}finally{Object.assign(o,{spp:spp,lookX:lookX,lookY:lookY});spp=S.spp;lookX=S.lookX;lookY=S.lookY}return o}   // BASE: from the other game — floor changes keep the zoom and the place: a straight 0.75-inch move down, no zoom back to the spiral.
 function floorRevealProgress(now=performance.now()){return ease(clamp((now-started)/1000/FLOOR_REVEAL_SECONDS))}
 function drawRevealingFloor(reveal,now,roomPan=0){
   if(reveal<=0){drawSurface('entered',0,now);return}
@@ -307,7 +304,7 @@ function render(now){
   if(current==='descending'||current==='ascending'){
     const p=floorRevealProgress(now),down=current==='descending',reveal=down?p:1-p;
     lookY=floorLookYStart+(down?1:-1)*floorDipWorld*p;
-    if(down&&floorFrom){spp=floorFrom.spp+((floorFrom.toSpp||START_SPP)-floorFrom.spp)*p;lookX=floorFrom.lookX+(BC.SPIRAL_W.x-floorFrom.lookX)*p}
+    if(down&&floorFrom){spp=floorFrom.spp+((floorFrom.toSpp||START_SPP)-floorFrom.spp)*p}
     drawRevealingFloor(reveal,now,down?0:floorPanStart*(1-p));
     if(t>=FLOOR_REVEAL_SECONDS)begin(down?'underground':'entered');
   }
