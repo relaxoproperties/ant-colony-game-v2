@@ -102,13 +102,12 @@
     var dz = document.getElementById('blDozer');
     if (dz) dz.addEventListener('click', function (e) {
       e.stopPropagation();
-      demolish = !demolish;
-      renderMenu();
+      // CHECKPOINT 1: no tapping/placing yet — placing is checkpoint 2.
     });
     tray.querySelectorAll('[data-build]').forEach(function (b) {
       b.addEventListener('click', function (e) {
         e.stopPropagation();
-        window.BASE_ITEMS.place(b.getAttribute('data-build'));
+        // CHECKPOINT 1: no tapping/placing yet — placing is checkpoint 2.
       });
     });
   }
