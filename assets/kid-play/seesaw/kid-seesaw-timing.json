@@ -1,0 +1,1100 @@
+{
+ "loop": "seesaw",
+ "fps": 12,
+ "frames": 48,
+ "seconds": 4.0,
+ "loops_seamlessly": true,
+ "crop_template_xyxy": [
+  296,
+  1048,
+  556,
+  1252
+ ],
+ "crop_on_v13_xyxy": [
+  3948,
+  2458,
+  4208,
+  2662
+ ],
+ "v13": "/workspace/ant-colony/big-chamber/v13-noants-2026-11-13/big-chamber-v13-noants-clean.jpg",
+ "v13_cell": [
+  1,
+  0
+ ],
+ "template_topleft_on_v13": [
+  3652,
+  1410
+ ],
+ "kid_sources_used": [
+  "idle_00.png",
+  "idle_01.png",
+  "idle_02.png",
+  "idle_03.png",
+  "idle_04.png",
+  "idle_05.png",
+  "idle_06.png",
+  "idle_07.png",
+  "idle_08.png",
+  "idle_09.png",
+  "idle_10.png"
+ ],
+ "notes": "The plank layer rotates whole about the fulcrum pivot bolt, from as-drawn (0 deg) to 28 deg clockwise and back, 4 s, eased. Draw order: shadow, frame-back, plank, kids, frame-front. Two kids stand on the leaf seats (no sitting art), feet on seat_left / seat_right carried round the pivot; both face the camera (riding, idle loop, second kid half a cycle out of phase).",
+ "timeline": [
+  {
+   "frame": 0,
+   "plank_angle_deg": -0.0,
+   "kid": [
+    {
+     "src": "idle_00.png",
+     "feet": [
+      346.3,
+      1180.8
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_07.png",
+     "feet": [
+      503.7,
+      1136.4
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 1,
+   "plank_angle_deg": -0.12,
+   "kid": [
+    {
+     "src": "idle_00.png",
+     "feet": [
+      346.28,
+      1180.6
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_08.png",
+     "feet": [
+      503.77,
+      1136.53
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 2,
+   "plank_angle_deg": -0.48,
+   "kid": [
+    {
+     "src": "idle_01.png",
+     "feet": [
+      346.21,
+      1180.02
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_09.png",
+     "feet": [
+      503.98,
+      1136.93
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 3,
+   "plank_angle_deg": -1.07,
+   "kid": [
+    {
+     "src": "idle_01.png",
+     "feet": [
+      346.12,
+      1179.06
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_09.png",
+     "feet": [
+      504.32,
+      1137.59
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 4,
+   "plank_angle_deg": -1.88,
+   "kid": [
+    {
+     "src": "idle_02.png",
+     "feet": [
+      346.0,
+      1177.73
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_10.png",
+     "feet": [
+      504.77,
+      1138.5
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 5,
+   "plank_angle_deg": -2.89,
+   "kid": [
+    {
+     "src": "idle_02.png",
+     "feet": [
+      345.88,
+      1176.06
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_10.png",
+     "feet": [
+      505.32,
+      1139.66
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 6,
+   "plank_angle_deg": -4.1,
+   "kid": [
+    {
+     "src": "idle_03.png",
+     "feet": [
+      345.78,
+      1174.07
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_00.png",
+     "feet": [
+      505.95,
+      1141.04
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 7,
+   "plank_angle_deg": -5.48,
+   "kid": [
+    {
+     "src": "idle_04.png",
+     "feet": [
+      345.72,
+      1171.81
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_00.png",
+     "feet": [
+      506.64,
+      1142.63
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 8,
+   "plank_angle_deg": -7.0,
+   "kid": [
+    {
+     "src": "idle_04.png",
+     "feet": [
+      345.71,
+      1169.3
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_00.png",
+     "feet": [
+      507.34,
+      1144.42
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 9,
+   "plank_angle_deg": -8.64,
+   "kid": [
+    {
+     "src": "idle_05.png",
+     "feet": [
+      345.77,
+      1166.6
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_00.png",
+     "feet": [
+      508.06,
+      1146.36
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 10,
+   "plank_angle_deg": -10.38,
+   "kid": [
+    {
+     "src": "idle_05.png",
+     "feet": [
+      345.92,
+      1163.75
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_00.png",
+     "feet": [
+      508.75,
+      1148.43
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 11,
+   "plank_angle_deg": -12.17,
+   "kid": [
+    {
+     "src": "idle_06.png",
+     "feet": [
+      346.17,
+      1160.8
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_00.png",
+     "feet": [
+      509.39,
+      1150.59
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 12,
+   "plank_angle_deg": -14.0,
+   "kid": [
+    {
+     "src": "idle_07.png",
+     "feet": [
+      346.52,
+      1157.82
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_00.png",
+     "feet": [
+      509.98,
+      1152.81
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 13,
+   "plank_angle_deg": -15.83,
+   "kid": [
+    {
+     "src": "idle_07.png",
+     "feet": [
+      346.96,
+      1154.84
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_00.png",
+     "feet": [
+      510.5,
+      1155.05
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 14,
+   "plank_angle_deg": -17.62,
+   "kid": [
+    {
+     "src": "idle_08.png",
+     "feet": [
+      347.49,
+      1151.93
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_01.png",
+     "feet": [
+      510.94,
+      1157.27
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 15,
+   "plank_angle_deg": -19.36,
+   "kid": [
+    {
+     "src": "idle_08.png",
+     "feet": [
+      348.08,
+      1149.14
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_01.png",
+     "feet": [
+      511.3,
+      1159.42
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 16,
+   "plank_angle_deg": -21.0,
+   "kid": [
+    {
+     "src": "idle_09.png",
+     "feet": [
+      348.72,
+      1146.52
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_02.png",
+     "feet": [
+      511.58,
+      1161.47
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 17,
+   "plank_angle_deg": -22.52,
+   "kid": [
+    {
+     "src": "idle_09.png",
+     "feet": [
+      349.39,
+      1144.1
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_02.png",
+     "feet": [
+      511.79,
+      1163.38
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 18,
+   "plank_angle_deg": -23.9,
+   "kid": [
+    {
+     "src": "idle_10.png",
+     "feet": [
+      350.04,
+      1141.93
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_03.png",
+     "feet": [
+      511.93,
+      1165.11
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 19,
+   "plank_angle_deg": -25.11,
+   "kid": [
+    {
+     "src": "idle_00.png",
+     "feet": [
+      350.66,
+      1140.04
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_04.png",
+     "feet": [
+      512.02,
+      1166.62
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 20,
+   "plank_angle_deg": -26.12,
+   "kid": [
+    {
+     "src": "idle_00.png",
+     "feet": [
+      351.2,
+      1138.46
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_04.png",
+     "feet": [
+      512.08,
+      1167.9
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 21,
+   "plank_angle_deg": -26.93,
+   "kid": [
+    {
+     "src": "idle_00.png",
+     "feet": [
+      351.66,
+      1137.21
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_05.png",
+     "feet": [
+      512.1,
+      1168.92
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 22,
+   "plank_angle_deg": -27.52,
+   "kid": [
+    {
+     "src": "idle_00.png",
+     "feet": [
+      352.01,
+      1136.3
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_05.png",
+     "feet": [
+      512.11,
+      1169.66
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 23,
+   "plank_angle_deg": -27.88,
+   "kid": [
+    {
+     "src": "idle_00.png",
+     "feet": [
+      352.22,
+      1135.75
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_06.png",
+     "feet": [
+      512.11,
+      1170.11
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 24,
+   "plank_angle_deg": -28.0,
+   "kid": [
+    {
+     "src": "idle_00.png",
+     "feet": [
+      352.29,
+      1135.57
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_07.png",
+     "feet": [
+      512.11,
+      1170.26
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 25,
+   "plank_angle_deg": -27.88,
+   "kid": [
+    {
+     "src": "idle_00.png",
+     "feet": [
+      352.22,
+      1135.75
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_07.png",
+     "feet": [
+      512.11,
+      1170.11
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 26,
+   "plank_angle_deg": -27.52,
+   "kid": [
+    {
+     "src": "idle_01.png",
+     "feet": [
+      352.01,
+      1136.3
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_08.png",
+     "feet": [
+      512.11,
+      1169.66
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 27,
+   "plank_angle_deg": -26.93,
+   "kid": [
+    {
+     "src": "idle_01.png",
+     "feet": [
+      351.66,
+      1137.21
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_08.png",
+     "feet": [
+      512.1,
+      1168.92
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 28,
+   "plank_angle_deg": -26.12,
+   "kid": [
+    {
+     "src": "idle_02.png",
+     "feet": [
+      351.2,
+      1138.46
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_09.png",
+     "feet": [
+      512.08,
+      1167.9
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 29,
+   "plank_angle_deg": -25.11,
+   "kid": [
+    {
+     "src": "idle_02.png",
+     "feet": [
+      350.66,
+      1140.04
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_09.png",
+     "feet": [
+      512.02,
+      1166.62
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 30,
+   "plank_angle_deg": -23.9,
+   "kid": [
+    {
+     "src": "idle_03.png",
+     "feet": [
+      350.04,
+      1141.93
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_10.png",
+     "feet": [
+      511.93,
+      1165.11
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 31,
+   "plank_angle_deg": -22.52,
+   "kid": [
+    {
+     "src": "idle_04.png",
+     "feet": [
+      349.39,
+      1144.1
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_00.png",
+     "feet": [
+      511.79,
+      1163.38
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 32,
+   "plank_angle_deg": -21.0,
+   "kid": [
+    {
+     "src": "idle_04.png",
+     "feet": [
+      348.72,
+      1146.52
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_00.png",
+     "feet": [
+      511.58,
+      1161.47
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 33,
+   "plank_angle_deg": -19.36,
+   "kid": [
+    {
+     "src": "idle_05.png",
+     "feet": [
+      348.08,
+      1149.14
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_00.png",
+     "feet": [
+      511.3,
+      1159.42
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 34,
+   "plank_angle_deg": -17.62,
+   "kid": [
+    {
+     "src": "idle_05.png",
+     "feet": [
+      347.49,
+      1151.93
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_00.png",
+     "feet": [
+      510.94,
+      1157.27
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 35,
+   "plank_angle_deg": -15.83,
+   "kid": [
+    {
+     "src": "idle_06.png",
+     "feet": [
+      346.96,
+      1154.84
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_00.png",
+     "feet": [
+      510.5,
+      1155.05
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 36,
+   "plank_angle_deg": -14.0,
+   "kid": [
+    {
+     "src": "idle_07.png",
+     "feet": [
+      346.52,
+      1157.82
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_00.png",
+     "feet": [
+      509.98,
+      1152.81
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 37,
+   "plank_angle_deg": -12.17,
+   "kid": [
+    {
+     "src": "idle_07.png",
+     "feet": [
+      346.17,
+      1160.8
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_00.png",
+     "feet": [
+      509.39,
+      1150.59
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 38,
+   "plank_angle_deg": -10.38,
+   "kid": [
+    {
+     "src": "idle_08.png",
+     "feet": [
+      345.92,
+      1163.75
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_01.png",
+     "feet": [
+      508.75,
+      1148.43
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 39,
+   "plank_angle_deg": -8.64,
+   "kid": [
+    {
+     "src": "idle_08.png",
+     "feet": [
+      345.77,
+      1166.6
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_01.png",
+     "feet": [
+      508.06,
+      1146.36
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 40,
+   "plank_angle_deg": -7.0,
+   "kid": [
+    {
+     "src": "idle_09.png",
+     "feet": [
+      345.71,
+      1169.3
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_02.png",
+     "feet": [
+      507.34,
+      1144.42
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 41,
+   "plank_angle_deg": -5.48,
+   "kid": [
+    {
+     "src": "idle_09.png",
+     "feet": [
+      345.72,
+      1171.81
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_02.png",
+     "feet": [
+      506.64,
+      1142.63
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 42,
+   "plank_angle_deg": -4.1,
+   "kid": [
+    {
+     "src": "idle_10.png",
+     "feet": [
+      345.78,
+      1174.07
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_03.png",
+     "feet": [
+      505.95,
+      1141.04
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 43,
+   "plank_angle_deg": -2.89,
+   "kid": [
+    {
+     "src": "idle_00.png",
+     "feet": [
+      345.88,
+      1176.06
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_04.png",
+     "feet": [
+      505.32,
+      1139.66
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 44,
+   "plank_angle_deg": -1.88,
+   "kid": [
+    {
+     "src": "idle_00.png",
+     "feet": [
+      346.0,
+      1177.73
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_04.png",
+     "feet": [
+      504.77,
+      1138.5
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 45,
+   "plank_angle_deg": -1.07,
+   "kid": [
+    {
+     "src": "idle_00.png",
+     "feet": [
+      346.12,
+      1179.06
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_05.png",
+     "feet": [
+      504.32,
+      1137.59
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 46,
+   "plank_angle_deg": -0.48,
+   "kid": [
+    {
+     "src": "idle_00.png",
+     "feet": [
+      346.21,
+      1180.02
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_05.png",
+     "feet": [
+      503.98,
+      1136.93
+     ],
+     "seat": "right"
+    }
+   ]
+  },
+  {
+   "frame": 47,
+   "plank_angle_deg": -0.12,
+   "kid": [
+    {
+     "src": "idle_00.png",
+     "feet": [
+      346.28,
+      1180.6
+     ],
+     "seat": "left"
+    },
+    {
+     "src": "idle_06.png",
+     "feet": [
+      503.77,
+      1136.53
+     ],
+     "seat": "right"
+    }
+   ]
+  }
+ ]
+}

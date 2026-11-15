@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"><meta name="theme-color" content="#3a291a"><title>Builder Opening</title><link rel="icon" href="data:,">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#281b12;overscroll-behavior:none}#game{position:relative;width:100%;height:100vh;height:100dvh;overflow:hidden}canvas,video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}video{z-index:2;opacity:1;transition:opacity 2.6s ease-in-out}video.hidden{opacity:0;pointer-events:none}#queenFly{z-index:3;pointer-events:none}canvas{touch-action:none}#buildMenu{position:absolute;z-index:3;left:0;right:0;bottom:0;height:24%;min-height:133px;max-height:33%;border:3px solid #82562f;border-bottom:0;border-radius:24px 24px 0 0;background:linear-gradient(110deg,#38271c,#583e28 48%,#302018);box-shadow:0 -6px 30px #120a0780,inset 0 2px 1px #bc9563;transform:translateY(105%);visibility:hidden;transition:transform .45s,visibility .45s;padding:22px 12px calc(16px + env(safe-area-inset-bottom,0px));}#buildMenu.open{transform:translateY(0);visibility:visible}#buildMenu:before{content:"";position:absolute;top:9px;left:calc(50% - 24px);width:48px;height:4px;border-radius:4px;background:#c3a07980}#trayScroll{height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;border:1px solid #1d100a;border-radius:14px;box-shadow:inset 0 3px 15px #08040299;background:linear-gradient(#1e130dbb,#302117cc);padding-bottom:calc(28px + env(safe-area-inset-bottom,0px));}#emptyTray{height:165%;min-height:340px}button#queenTarget{position:absolute;z-index:2;border:0;background:transparent;width:104px;height:104px;display:none;transform:translate(-50%,-65%);touch-action:manipulation;cursor:pointer}
+#floors{position:absolute;top:calc(10px + env(safe-area-inset-top,0px));right:calc(10px + env(safe-area-inset-right,0px));z-index:5;display:none;flex-direction:column;gap:6px;padding:6px;border-radius:16px;background:rgba(20,12,8,.62);box-shadow:0 2px 12px #00000059}#floors:not([hidden]){display:flex}#floors[hidden]{display:none!important}#floors button{touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;width:52px;height:52px;border:0;border-radius:12px;background:rgba(255,244,220,.16);color:#f3e6c8;font-size:28px;line-height:1;cursor:pointer}#floors button:disabled{opacity:.28;cursor:default}#floors button:not(:disabled):active{background:rgba(255,244,220,.32)}</style></head><body><main id="game"><canvas id="scene" aria-label="Ant mound and underground entrance"></canvas><video id="intro" src="assets/bird-intro.mp4" muted autoplay playsinline preload="auto" aria-label="Bird opening"></video><canvas id="queenFly" aria-hidden="true"></canvas><button id="queenTarget" aria-label="Open build menu"></button><section id="buildMenu" aria-label="Build menu"><div id="trayScroll" tabindex="0" aria-label="Empty build tray"><div id="emptyTray"></div></div></section><nav id="floors" aria-label="Change floors" hidden><button id="goUp" type="button" aria-label="Go upstairs" disabled>▲</button><button id="goDown" type="button" aria-label="Go downstairs">▼</button></nav></main>
+<link id="ag-css" rel="stylesheet" href="assets/minigame/arrow-game.css"><script src="assets/minigame/arrow-game.js"></script>
+<!-- BEGIN OUTSIDE-OPENING OFFLINE LOADER -->
+<script src="landing-path.js"></script>
+<script src="local-json.js"></script>
+<script src="offline-loader.js"></script>
+<!-- END OUTSIDE-OPENING OFFLINE LOADER -->
+<script>
+'use strict';
+// The approved HD world; programming hexes are never drawn.
+const TILE={id:'mound-entrance',hexes:[],rooms:[]};
+const floors=document.querySelector('#floors'),goUp=document.querySelector('#goUp'),goDown=document.querySelector('#goDown');
+const canvas=document.querySelector('canvas'),video=document.querySelector('video'),game=document.querySelector('#game'),menu=document.querySelector('#buildMenu'),queenTarget=document.querySelector('#queenTarget');
+// Landing queen flies in on her own canvas ABOVE the fading last video frame,
+// so only the grass/mound fades; she arrives fully visible from off-screen.
+const queenFly=document.querySelector('#queenFly'),flyCtx=queenFly.getContext('2d');let ctx=canvas.getContext('2d');const mainCtx=ctx;
+// BV1 Step 1: the opening gate is cf2783d5's own surface set again (no basement picture in it).
+const names={mound:'mound-plain.webp',moundDug:'mound-dug.webp',landing:'queen-landing.webp',dig:'queen-dig.webp',walk:'queen-walk.webp',wide:'ground-wide-feather.webp',map:'map-hd.jpg'},art={};
+// Surface: queen digs from behind at Q, then walks left into the black hole D at the front grass line.
+const Q={x:448,y:771},D={x:406,bottom:723,w:98,h:108};
+// Real approved flat-top programming hex, in HD-map coordinates.
+const HEX={cx:2812,cy:4999.5,w:136.8566720971564};
+// Downstairs: flipping floors without moving the camera puts the room's RED
+// ceiling exactly where the upstairs mound / green floor hex was (same world
+// hex), and the downstairs GREEN floor sits below it by the approved compose's
+// 473-pixel yellow-wall offset at its 790.9698687897874-pixel hex width.
+const CEILING_HEX={cx:HEX.cx,cy:HEX.cy,w:HEX.w};
+const FLOOR_HEX={cx:HEX.cx,cy:HEX.cy+(1075.5-602.5)*(HEX.w/790.9698687897874),w:HEX.w};
+// Regular underground cut at the entrance: through HEX left/right corners (world y=4999.5).
+const HORIZON_Y=HEX.cy;
+// Ceiling hexes of the rooms built on this floor. Only the entrance for now.
+const BUILT_CEILINGS=[CEILING_HEX];
+// Chamber photo placed so Chris's floor hex (center 509.1, 711.11, width 670.4191325829933)
+// lands on that map hex. Matches Background Artist's checked origin and size.
+const CHAMBER={x:2708.074368,y:4854.336857,s:209.035252};
+// Same sand-left-of-pipe red-X as the current chamber idle, in photo pixels.
+const PHOTO_X={x:695.562151614728,y:748.0661272587442};
+// Square-photo clipping cut off the pipe and put wall/floor joins inside the
+// floor. Draw the EXISTING approved, already-fitted room (never regenerate it).
+const ROOM_SCALE=HEX.w/790.9698687897874;
+const ROOM_COMPOSE={x:HEX.cx-540*ROOM_SCALE,y:HEX.cy-602.5*ROOM_SCALE,w:1080*ROOM_SCALE,h:1680*ROOM_SCALE};
+// Same source-photo red-X, mapped through the approved floor's piecewise affine
+// correspondence: sand immediately left of the pipe, not its opening.
+const COMPOSE_X={x:703.1128419956605,y:1135.9827313945743};
+const APPEAR_OLD={x:ROOM_COMPOSE.x+COMPOSE_X.x*ROOM_SCALE,y:ROOM_COMPOSE.y+COMPOSE_X.y*ROOM_SCALE};   // old room's red X (unused by BC)
+// ---- BC (bird-chamber, Nov 13): the new big-chamber basement replaces the old entrance hex picture ----
+// big-chamber-v13-noants (7198x4043, HW 791 flat-top, 23 hexes; geometry from v13-noants.py = LOCKED v13.py lines 1-44).
+// The image sits in the same world at one hex = HEX.w, so at START_SPP its hex is the mound hex's on-screen width.
+// Its spiral hex (top hex of the middle column) is placed straight below the locked start view by the locked
+// 114-phone-px dip (at 390x844), so the unchanged straight drop lands centred on it.
+const MAP_RECT_Y0=4850.2,START_SPP0=720/168;   // = MAP_RECT.y, START_SPP below (locked values)
+const BC=(()=>{const q=new URLSearchParams(location.search),IMG={w:7198,h:4043,HW:791},K=HEX.w/IMG.HW,SPIRAL={x:3599,y:2142.79-791*Math.sqrt(3)/2},HOLE={x:3649.5729715826847,y:1115.2509585619137};
+ const SPIRAL_W={x:HEX.cx,y:MAP_RECT_Y0+1280/2*(168/720)+114/(START_SPP0*Math.max(390/720,844/1280))};
+ const RECT={x:SPIRAL_W.x-SPIRAL.x*K,y:SPIRAL_W.y-SPIRAL.y*K,w:IMG.w*K,h:IMG.h*K};
+ const toW=(ix,iy)=>({x:RECT.x+ix*K,y:RECT.y+iy*K});
+ const QK=q.get('qunder')==='1'?1:1.25;   // Chris Nov 11 4:00 AM: queen 1.25x underground vs outside; ?qunder=1 = the locked 1x
+ return {IMG,K,SPIRAL,HOLE,SPIRAL_W,RECT,toW,QK,GRID:q.get('grid')==='1',HOLE_W:toW(HOLE.x,HOLE.y),STAND_DY:92,EMERGE_SECONDS:1.1}})();
+const DIG_SECONDS=10;let floorFrom=null,emergeT0=0,pan=0,floorPanStart=0,floorLookYStart=0,floorDipWorld=0,lastDownDipWorld=0;
+// Close-up mound-plain.webp lined up on the last bird-video frame (the far/out view).
+const FAR={ox:145.8,oy:293.8,s:0.62};
+const WORLD={w:5625,h:10000},START_SPP=720/168,MAP_RECT={x:2728,y:4850.2,w:168,h:1280/START_SPP};
+// Same authored queen width and idle bob on either floor, converted from plain to world units.
+const QUEEN_DOWN_W=190*FAR.s/START_SPP,QUEEN_DOWN_BOB=1.2*FAR.s/START_SPP;
+// BC: where she stands (just below the spiral's floor exit, inside the spiral hex) and her drawn size down here.
+const APPEAR=BC.toW(BC.HOLE.x,BC.HOLE.y+BC.STAND_DY),QUEEN_UNDER_W=QUEEN_DOWN_W*BC.QK;
+const VIDEO_FADE_SECONDS=2.6,LANDING_FPS=24,LANDING_SECONDS=126/LANDING_FPS,FLOOR_REVEAL_SECONDS=1.4;
+const INITIAL={spp:START_SPP,lookX:2812,lookY:MAP_RECT.y+MAP_RECT.h/2};
+let spp=INITIAL.spp,lookX=INITIAL.lookX,lookY=INITIAL.lookY;
+const MIN_SPP=Math.max(720/WORLD.w,1280/WORLD.h),MAX_SPP=START_SPP/FAR.s;
+// Uniform 5.8 sent the early path high and right, so a phone side-crop and a wide
+// desktop top-crop hid the entrance and she first read as already on the dirt ring.
+// Stretch X so frame 0 starts fully off the right; keep Y flatter so she enters
+// from the right inside a typical desktop crop. Lands at Q.
+const LAND_PATH_SCALE_X=4.75,LAND_PATH_SCALE_Y=2.3;
+// cam 0 = stay on that far frame (no auto-zoom). cam 1 = the old close-up fill. Player pinches to zoom.
+
+let state='intro',started=performance.now(),landingPath=[],ready=false,queen={x:410,y:1108},view={w:720,h:1280,s:1,x:0,y:0};
+const clamp=(v,a=0,b=1)=>Math.min(b,Math.max(a,v)),ease=t=>t*t*(3-2*t);
+const SURFACE=['landing','awaitClaim','digging','walkingIn','entered'];
+const onSurface=()=>SURFACE.includes(state);
+// BC: the grid overlay is loaded only when it can show (?grid=1 here; cf2783d5 has no build-placement step).
+// BV1 Step 1 (fly-in fix): bird-chamber had put the 29 MP basement JPEG into this all-or-nothing gate, so a slow or
+// failed basement load (phone memory / network) left the game on the last video frame with no fly-in. The basement now
+// loads on its own AFTER the opening gate, never blocks it, and a failure is logged instead of freezing the opening.
+const BASE_NAMES={under:'underground-map-hd.jpg',fog:'fog-overlay.png'},BASE_LOG=[];let basementReady=false;
+// HOTFIX-FLYIN (1): the 29 MP basement JPEG + grid used to start loading/decoding in the gate's .then, i.e. at the same
+// moment the landing could begin. It now starts only once the landing has finished (awaitClaim; dig start as a backup),
+// is decoded before use, and the descent waits for it (up to BASE_WAIT_S, then the old 'entered' fallback).
+const OPEN_LOG=[],olog=m=>OPEN_LOG.push(Math.round(performance.now())+' ms '+m);let basementStarted=false,basementSettled=false;const BASE_WAIT_S=8;
+function loadBasement(){if(basementStarted)return;basementStarted=true;olog('basement load start (stage '+state+')');const ps=Object.entries(BASE_NAMES).map(([key,name])=>new Promise(ok=>{const im=new Image;im.onload=()=>{const fin=()=>{art[key]=im;olog('basement decoded '+name);ok(true)};(im.decode?im.decode():Promise.resolve()).then(fin,fin)};im.onerror=()=>{BASE_LOG.push('failed '+name);olog('basement failed '+name);ok(false)};im.src='assets/'+name}));
+ Promise.all(ps).then(()=>{basementSettled=true;basementReady=!!art.under;syncFloors()})}
+// HOTFIX-FLYIN (2): a failed opening file is logged (one retry), then replaced by an empty stand-in so the game carries on;
+// the gate has a .catch, so ready always becomes true.
+const blankArt=()=>{const c=document.createElement('canvas');c.width=c.height=1;return c};
+const loadOne=(key,name,retry=1)=>new Promise(ok=>{const im=new Image;im.onload=()=>{art[key]=im;if(key==='map'&&im.decode){const t0=performance.now();im.decode().then(()=>{olog('map-hd decode() '+Math.round(performance.now()-t0)+' ms');ok()},()=>ok())}else ok()};im.onerror=()=>{olog('opening image failed '+name+(retry?' (retrying)':' (carrying on without it)'));if(retry)setTimeout(()=>loadOne(key,name,0).then(ok),800);else{art[key]=blankArt();ok()}};im.src='assets/'+name+(retry?'':'?retry=1')});
+const loads=Object.entries(names).map(([key,name])=>loadOne(key,name));
+loads.push(fetch('assets/landing-path.json').then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}).then(d=>landingPath=d.frames).catch(e=>{olog('landing-path.json failed ('+e.message+'): queen shown landed');landingPath=Array.from({length:126},()=>[0,0])}));
+// HOTFIX-FLYIN option B (1): map-hd.jpg (56 MP) is decode()d on load and drawn once here, on the main canvas that is still
+// hidden under the opaque video, so its first-draw cost (0.8-1.2 s headless, more on a phone) is paid before the flight.
+let gateWarm=false;
+function warmMap(){if(!(art.map&&art.map.width>1))return;const t0=performance.now(),d=view.d;ctx.save();ctx.setTransform(d,0,0,d,0,0);ctx.translate(view.x,view.y);ctx.scale(view.s,view.s);applyWorld();ctx.drawImage(art.map,0,0,WORLD.w,WORLD.h);ctx.restore();olog('map-hd first draw under the video '+Math.round(performance.now()-t0)+' ms')}
+const gateOpen=()=>{if(ready||gateWarm)return;gateWarm=true;warmMap();requestAnimationFrame(()=>{ready=true;olog('opening gate ready');if(video.ended)videoDone=true;if(videoDone&&state==='intro')begin('landing')})};
+Promise.all(loads).then(gateOpen).catch(e=>{olog('opening gate error '+(e&&e.message));gateOpen()});
+function syncFloors(){
+  // No floor arrows until the hole exists and control is back (after she walks in).
+  // BV1 Step 1 (arrow fix): the nav used to vanish for the whole 1.4 s floor change (descending/ascending were not
+  // 'ready'), so the button disappeared under the finger and blinked back. It now stays on screen from the moment the
+  // hole is dug, with both arrows disabled while a floor change runs (also a re-entry guard against double taps).
+  const shown=state==='entered'||state==='underground'||state==='menu'||state==='descending'||state==='ascending';
+  floors.hidden=!shown;
+  if(!shown)return;
+  const moving=state==='descending'||state==='ascending'||(window.BV&&BV.busyFloors&&BV.busyFloors());
+  const upstairs=state==='entered';
+  goUp.disabled=moving||upstairs;
+  goDown.disabled=moving||!upstairs||!basementReady;
+}
+function begin(next){
+  state=next;started=performance.now();game.dataset.stage=next;if(next==='landing'){landLast=started;landLag=0}
+  // Leave the ended video mounted on its last frame; CSS fades it over the live canvas.
+  if(next!=='intro')video.classList.add('hidden');
+  if(next==='landing')olog('landing start');if(next==='awaitClaim')olog('landing end');if(next!=='intro'&&next!=='landing')loadBasement()   // HOTFIX-FLYIN (1)
+  if(next==='descending'||next==='ascending'){
+    floorPanStart=next==='ascending'?pan:0;
+    floorLookYStart=lookY;
+    // 0.75 phone inches, computed from the live camera; never recenter or clamp mid-reveal.
+    floorDipWorld=next==='descending'?114/(spp*view.s):(lastDownDipWorld||114/(spp*view.s));
+    // BC: the drop ends centred on the spiral hex at START_SPP (a straight move down from the locked start view).
+    floorFrom={spp,lookX};if(next==='descending'){const E=downEnd();floorFrom.toSpp=E.spp;floorDipWorld=E.lookY-lookY;lastDownDipWorld=floorDipWorld}
+    if(next==='descending')lastDownDipWorld=floorDipWorld;
+    pan=0;queenTarget.style.display='none';menu.classList.remove('open');if(next==='descending'&&!(window.BV&&BV.started))emergeT0=0;
+    pointers.clear();gesture=null;tapCandidate=null;
+  }
+  if(next==='underground'){if(!emergeT0)emergeT0=performance.now();pan=0;if(!(window.BV&&BV.started)){queen.x=APPEAR.x;queen.y=APPEAR.y}queenTarget.style.width='72px';queenTarget.style.height='72px';queenTarget.style.display='block';positionTarget();queenTarget.click()}   // BASE: the build menu opens by itself when she gets downstairs, and stays on
+  if(next==='entered'){pan=0;queenTarget.style.display='none';menu.classList.remove('open')}
+  syncFloors();
+}
+// BV3 (Tester I7): stall fallback. If the bird film stops advancing for ~3 s (or errors / is aborted / play() is refused),
+// the opening goes on to the landing exactly as if the film had ended. videoDone guards it so it runs only once.
+let videoDone=false,videoWhy='',vLastT=-1,vLastAt=performance.now();const VIDEO_STALL_MS=3000,VIDEO_NODATA_MS=8000,T0V=performance.now();
+function videoEnd(why){if(videoDone)return;videoDone=true;videoWhy=why;clearInterval(vWatch);if(why!=='ended')try{video.pause()}catch(e){}if(ready&&state==='intro')begin('landing')}
+video.addEventListener('ended',()=>videoEnd('ended'));
+['stalled','abort','waiting','playing','pause','loadeddata','canplaythrough','error'].forEach(t=>video.addEventListener(t,()=>olog('video '+t+' t='+(+video.currentTime||0).toFixed(2))));   // debug log only
+// ?debug=1: hidden state / event timeline for a real phone (nothing is added without the flag).
+const DBG=/[?&]debug=1\b/.test(location.search);let dbgEl=null,dbgAt=0;
+function dbgTick(now){if(now-dbgAt<250)return;dbgAt=now;if(!dbgEl){dbgEl=document.createElement('pre');dbgEl.id='openDebug';dbgEl.style.cssText='position:fixed;left:4px;right:4px;bottom:4px;max-height:46%;overflow:auto;margin:0;padding:6px;font:10px/1.25 ui-monospace,Menlo,monospace;color:#cfe;background:rgba(0,0,0,.72);z-index:99;pointer-events:auto;white-space:pre-wrap;border-radius:6px';document.body.appendChild(dbgEl)}
+ const v=video;dbgEl.textContent='stage '+state+'  ready '+ready+'  videoWhy '+(videoWhy||'-')+'\nvideo t '+(+v.currentTime||0).toFixed(2)+'/'+(+v.duration||0).toFixed(2)+'  rs '+v.readyState+'  ns '+v.networkState+'  paused '+v.paused+'  opacity '+getComputedStyle(v).opacity+'\nflight frames '+LAND.seen.size+'/126 in '+LAND.n+' paints  stalls absorbed '+Math.round(landLag)+' ms  dpr '+devicePixelRatio+'  css '+innerWidth+'x'+innerHeight+'  canvas '+canvas.width+'x'+canvas.height+'  fly '+queenFly.width+'x'+queenFly.height+'\nbasement '+basementReady+(BASE_LOG.length?' '+BASE_LOG.join(', '):'')+'\n'+OPEN_LOG.slice().reverse().join('\n')}
+['error','stalled','abort'].forEach(t=>video.addEventListener(t,()=>{if(!video.ended)videoEnd(t)}));
+const vWatch=setInterval(()=>{if(videoDone||state!=='intro')return clearInterval(vWatch);const now=performance.now(),ct=video.currentTime;
+ if(ct!==vLastT){vLastT=ct;vLastAt=now;return}
+ if(video.ended)return videoEnd('ended');
+ if(video.readyState>=2?now-vLastAt>=VIDEO_STALL_MS:now-T0V>=VIDEO_NODATA_MS)videoEnd(video.readyState>=2?'stall':'nodata')},250);   // no frame data at all: 8 s grace for a slow first load (FLAGGED)
+// Muted inline autoplay on iPhone; if its power policy blocks autoplay, a touch resumes
+// the same opening, without adding text, a tutorial, or an alternate route.
+video.play().catch(()=>videoEnd('play-rejected'));video.addEventListener('pointerdown',()=>video.play().catch(()=>{}));
+function cameraBounds(){if(state==='underground'||state==='menu'){spp=START_SPP;lookX=BC.SPIRAL_W.x;lookY=BC.SPIRAL_W.y;return}   // BASE: downstairs camera is locked to the pocket arrival view
+ spp=clamp(spp,MIN_SPP,MAX_SPP);lookX=clamp(lookX,360/spp,WORLD.w-360/spp);lookY=clamp(lookY,640/spp,WORLD.h-640/spp)}
+function worldToCanvas(x,y){return {x:360+(x-lookX)*spp,y:640+(y-lookY)*spp}}
+function canvasToWorld(x,y){return {x:lookX+(x-360)/spp,y:lookY+(y-640)/spp}}
+function applyWorld(){ctx.translate(360,640);ctx.scale(spp,spp);ctx.translate(-lookX,-lookY)}
+// Preserve the locked video-end and all authored sprite/dig coordinates exactly.
+function applyCam(){applyWorld();ctx.translate(MAP_RECT.x,MAP_RECT.y);ctx.scale(1/START_SPP,1/START_SPP)}
+function enterPlain(){ctx.translate(FAR.ox,FAR.oy);ctx.scale(FAR.s,FAR.s)}
+function eventCanvas(e){const r=canvas.getBoundingClientRect();return {x:(e.clientX-r.left-view.x)/view.s,y:(e.clientY-r.top-view.y)/view.s}}
+function pointerToPlain(e){const c=eventCanvas(e),p=canvasToWorld(c.x,c.y);return {x:((p.x-MAP_RECT.x)*START_SPP-FAR.ox)/FAR.s,y:((p.y-MAP_RECT.y)*START_SPP-FAR.oy)/FAR.s}}
+function plainToCanvas(px,py){return worldToCanvas(MAP_RECT.x+(FAR.ox+px*FAR.s)/START_SPP,MAP_RECT.y+(FAR.oy+py*FAR.s)/START_SPP)}
+function hexVertex(cx,cy,w,i){const a=i*Math.PI/3,r=w/2;return {x:cx+r*Math.cos(a),y:cy+r*Math.sin(a)}}
+function hexPath(cx,cy,w){for(let i=0;i<6;i++){const p=hexVertex(cx,cy,w,i);if(i===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y)}ctx.closePath()}
+function roomSilhouettePath(){
+  // Ceiling TL, TR, R; floor R, BR, BL, L; ceiling L. No new hex geometry.
+  const vertices=[[CEILING_HEX,4],[CEILING_HEX,5],[CEILING_HEX,0],[FLOOR_HEX,0],[FLOOR_HEX,1],[FLOOR_HEX,2],[FLOOR_HEX,3],[CEILING_HEX,3]];
+  vertices.forEach(([h,i],n)=>{const p=hexVertex(h.cx,h.cy,h.w,i);if(n===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y)});
+  ctx.closePath();
+}
+// Underground screen cut. It follows the built hexagons, not one permanent
+// straight line through the game. Each built room on the cut is crossed at its
+// own left/right corners (flat-top i=3 and i=0, at that hex's cy); across empty
+// ground the cut runs at the regular entrance horizon (HEX L/R, y=4999.5).
+// Entrance only: horizon -> HEX L -> HEX R -> horizon. A later classroom in the
+// upper-left hexagon would be met at its L and R corners, then the cut returns
+// along the entrance's edge to this same entrance horizon through HEX L/R.
+// Rooms themselves stay visible (their silhouette is punched out of the grass).
+function horizonPath(){
+  const E=1e-6,ht=h=>h.w*Math.sqrt(3)/4,near=(a,b)=>Math.abs(Math.hypot(a.cx-b.cx,a.cy-b.cy)-2*ht(a))<E;
+  const V=(h,i)=>hexVertex(h.cx,h.cy,h.w,((i%6)+6)%6),same=(p,q)=>Math.abs(p.x-q.x)<E&&Math.abs(p.y-q.y)<E;
+  // Rooms on the cut: the ones it passes through, plus hexes joined to them edge-to-edge.
+  const on=BUILT_CEILINGS.filter(h=>h.cy-ht(h)<=HORIZON_Y+E&&h.cy+ht(h)>=HORIZON_Y-E);
+  for(let grew=true;grew;){grew=false;for(const h of BUILT_CEILINGS)if(!on.includes(h)&&on.some(o=>near(o,h))){on.push(h);grew=true}}
+  on.sort((a,b)=>a.cx-b.cx);
+  const pts=[{x:-1e6,y:HORIZON_Y}],add=p=>{if(!same(pts[pts.length-1],p))pts.push({x:p.x,y:p.y})};
+  const idx=(h,p)=>{for(let i=0;i<6;i++)if(same(V(h,i),p))return i;return -1};
+  // Walk a hex's own edges between two of its corners (shorter way; on a tie, the lower side).
+  const walk=(h,i,j)=>{const f=(j-i+6)%6,b=(i-j+6)%6,lowF=[1,2].includes((i+1)%6);const dir=f<b||(f===b&&lowF)?1:-1;for(let k=i;k!==j;){k=(k+dir+6)%6;add(V(h,k))}};
+  const onHorizon=(h,minX)=>[0,1,2,3,4,5].filter(i=>Math.abs(V(h,i).y-HORIZON_Y)<E&&V(h,i).x>=minX-E).sort((a,b)=>V(h,a).x-V(h,b).x);
+  for(const h of on){
+    const cur=pts[pts.length-1];let i=idx(h,cur);
+    if(i<0){const hz=onHorizon(h,cur.x);if(hz.length){add(V(h,hz[0]));i=hz[0]}else{add(V(h,3));i=3}}
+    walk(h,i,3);add(V(h,0));
+  }
+  const last=on[on.length-1],cur=pts[pts.length-1];
+  if(last&&Math.abs(cur.y-HORIZON_Y)>E){const hz=onHorizon(last,cur.x);if(hz.length)walk(last,idx(last,cur),hz[0])}
+  add({x:1e6,y:HORIZON_Y});
+  return pts;
+}
+function aboveCutPath(){const pts=horizonPath();ctx.moveTo(-1e6,-1e6);pts.forEach(p=>ctx.lineTo(p.x,p.y));ctx.lineTo(1e6,-1e6);ctx.closePath()}
+function resize(){const r=game.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);canvas.width=r.width*d;canvas.height=r.height*d;queenFly.width=r.width*d;queenFly.height=r.height*d;view.s=Math.max(r.width/720,r.height/1280);view.x=(r.width-720*view.s)/2;view.y=(r.height-1280*view.s)/2;view.d=d;if(typeof olog==='function')olog('canvas '+canvas.width+'x'+canvas.height+' (css '+Math.round(r.width)+'x'+Math.round(r.height)+', dpr '+devicePixelRatio+' capped '+d+')');positionTarget()}
+function positionTarget(){if(onSurface()){const p=plainToCanvas(queen.x,queen.y);queenTarget.style.left=(view.x+p.x*view.s)+'px';queenTarget.style.top=(view.y+p.y*view.s)+'px'}else{const p=worldToCanvas(queen.x,queen.y),s=QUEEN_UNDER_W*spp;queenTarget.style.left=(view.x+p.x*view.s)+'px';queenTarget.style.top=(view.y+(p.y-pan)*view.s)+'px';queenTarget.style.width=(72/70*s*view.s)+'px';queenTarget.style.height=(72/70*s*view.s)+'px'}}
+// When the tray opens, lift the room so the standing queen stays visible above it.
+function panTarget(){const gh=game.getBoundingClientRect().height,top=gh-menu.offsetHeight,want=(top-28-view.y)/view.s;const p=worldToCanvas(queen.x,queen.y);return Math.max(0,p.y-want)}
+window.addEventListener('resize',resize);resize();
+function sprite(im,frame,cols,x,y,width=190,alpha=1,flip=false,ay=120){ctx.save();ctx.globalAlpha=alpha;ctx.translate(x,y);if(flip)ctx.scale(-1,1);const scale=width/200;ctx.drawImage(im,(frame%cols)*200,Math.floor(frame/cols)*170,200,170,-width/2,-ay*scale,width,170*scale);ctx.restore()}
+let dugStamp=null;
+function getDugStamp(){
+  if(dugStamp)return dugStamp;
+  const c=document.createElement('canvas');
+  c.width=720;c.height=1280;
+  const g=c.getContext('2d');
+  g.drawImage(art.moundDug,0,0,720,1280);
+  g.save();
+  g.translate(360,530);
+  g.scale(310,300);
+  const rg=g.createRadialGradient(0,0,0,0,0,1);
+  rg.addColorStop(0,'#000');
+  rg.addColorStop(0.58,'#000');
+  rg.addColorStop(0.78,'rgba(0,0,0,0.5)');
+  rg.addColorStop(1,'rgba(0,0,0,0)');
+  g.globalCompositeOperation='destination-in';
+  g.fillStyle=rg;
+  g.beginPath();g.arc(0,0,1,0,Math.PI*2);g.fill();
+  g.restore();
+  dugStamp=c;
+  return c;
+}
+function moundOverlay(dug){
+  // Do not fade in the close-up mound-plain photo while zooming — its rectangle
+  // shows as a boxed patch on the wide grass. Zoom the video-end frame itself.
+  // Stamp mound-dug with a soft oval so the dug patch does not sit in a crisp ring.
+  if(dug<=0.01)return;
+  ctx.save();
+  enterPlain();
+  ctx.globalAlpha=dug;
+  ctx.drawImage(getDugStamp(),0,0,720,1280);
+  ctx.restore();
+}
+function dust(t){const fade=Math.min(1,t/.3,(DIG_SECONDS-t)/.45);ctx.save();for(let i=0;i<25;i++){let p=((t*.65+i*.137)%1),a=i*2.399;let x=(D.x+Q.x)/2+Math.cos(a)*p*120,y=D.bottom-50-Math.sin(p*Math.PI)*80+(i%4)*7;let r=(20+p*22)*(1-p*.3);ctx.globalAlpha=clamp(fade)*(.16+.18*(1-p));ctx.fillStyle=['#bc9869','#c9ac7e','#9b784c'][i%3];ctx.beginPath();ctx.ellipse(x,y,r,r*.75,0,0,Math.PI*2);ctx.fill()}
+ // dirt kicked back behind the digging queen (she faces left, so behind = right)
+ for(let i=0;i<18;i++){let p=(t*1.4+i*.231)%1;ctx.globalAlpha=clamp(fade)*(1-p);ctx.fillStyle=i%2?'#76502c':'#c09b61';ctx.beginPath();ctx.ellipse(Q.x+10+p*(70+(i%5)*22),Q.y-30-p*(90+(i%3)*25)+p*p*170,3+i%4,2+i%3,i,0,7);ctx.fill()}ctx.restore()}
+// Same view transform as the main canvas (dpr, view.x/s, applyCam, enterPlain), full opacity.
+function drawFlyingQueen(f){const d=view.d;ctx=flyCtx;try{ctx.save();ctx.setTransform(d,0,0,d,0,0);ctx.translate(view.x,view.y);ctx.scale(view.s,view.s);applyCam();enterPlain();sprite(art.landing,f,12,queen.x,queen.y,190);ctx.restore()}finally{ctx=mainCtx}}
+function drawSurface(current,t,now){
+ ctx.save();applyWorld();ctx.drawImage(art.map,0,0,WORLD.w,WORLD.h);ctx.restore();
+ ctx.save();applyCam();ctx.drawImage(art.wide,0,0,720,1280);
+ let dug=0;if(current==='digging'&&t>2.3)dug=ease(clamp((t-2.3)/1.9));if(current==='walkingIn'||current==='entered')dug=1;
+ moundOverlay(dug);enterPlain();
+ if(current==='landing'){t=landingT(now);let f=Math.max(0,Math.min(125,Math.floor(t*LANDING_FPS))),p=landingPath[f],last=landingPath[125];queen.x=Q.x+(p[0]-last[0])*LAND_PATH_SCALE_X;queen.y=Q.y+(p[1]-last[1])*LAND_PATH_SCALE_Y;drawFlyingQueen(f);if(LAND.f0===null){LAND.f0=f;olog('first flight frame '+f)}LAND.n++;LAND.seen.add(f);if(LAND.trace)LAND.trace.push([f,+getComputedStyle(video).opacity,Math.round(now)]);if(t>=LANDING_SECONDS){olog('landed: '+LAND.seen.size+'/126 flight frames shown in '+LAND.n+' paints, '+Math.round(landLag)+' ms of stalls absorbed');begin('awaitClaim')}}
+ if(current==='awaitClaim'){queen.x=Q.x;queen.y=Q.y;sprite(art.landing,125,12,Q.x,Q.y+Math.sin(now/650)*1.2,190)}
+ if(current==='digging'){sprite(art.dig,Math.floor(t*8)%6,6,Q.x,Q.y,190);dust(t);if(t>=DIG_SECONDS)begin('walkingIn')}
+ if(current==='walkingIn'){const p=ease(clamp(t/1.6));const x=Q.x+(D.x-Q.x)*p,y=Q.y+(D.bottom-28-Q.y)*p;const fade=1-clamp((p-.82)/.18);const frame=Math.floor(t*22)%16;queen.x=x;queen.y=y;sprite(art.walk,frame,16,x,y,190,fade);if(p>=0.72)ctx.drawImage(getDugStamp(),0,0,720,1280);if(t>=1.6){if(basementReady)begin('descending');else if(basementSettled||t>=1.6+BASE_WAIT_S){olog('descent fallback: basement '+(basementSettled?'failed':'not ready after '+BASE_WAIT_S+' s'));begin('entered')}}}   // Never reveal an unloaded/failed basement; the dug surface and disabled down arrow remain usable.
+ ctx.restore();
+ if(current==='entered'&&window.BV&&BV.started){ctx.save();applyWorld();BV.drawUp(now);ctx.restore()}   // BV1: scouts upstairs
+}
+function drawUnderground(current,t,now,roomPan=pan){
+ctx.fillStyle='#000';ctx.fillRect(-8000,-8000,20000,20000);if(current==='menu'){pan=panTarget()*ease(clamp(t/.45));roomPan=pan;positionTarget()}ctx.save();ctx.translate(0,-roomPan);applyWorld();
+// BASE: the dirt map (full underground) + the rock-fog overlay, drawn at the arrival view rect so it pans with the world.
+if(art.under)ctx.drawImage(art.under,0,0,WORLD.w,WORLD.h);
+if(art.fog){const vw=720/START_SPP,vh=1280/START_SPP;ctx.drawImage(art.fog,BC.SPIRAL_W.x-vw/2,BC.SPIRAL_W.y-vh/2,vw,vh)}
+// BASE: the placed build items, in world space (drawn before the queen so she stays on top).
+if(window.BASE_ITEMS)BASE_ITEMS.draw();
+// Queen: comes out at the spiral's floor exit, steps down to just below it, then the locked downstairs idle
+// (landing frame 125 + breathe), drawn at QUEEN_UNDER_W (1.25x; ?qunder=1 = 1x). Locked art scaled at draw time only.
+const e=emergeT0?clamp((now-emergeT0)/1000/BC.EMERGE_SECONDS):0,k=ease(e),H=BC.HOLE_W;
+const breathe=e>=1?Math.sin(now/650):0;
+queen.x=H.x+(APPEAR.x-H.x)*k;queen.y=H.y+(APPEAR.y-H.y)*k;if(emergeT0)sprite(art.landing,125,12,queen.x,queen.y+breathe*QUEEN_DOWN_BOB*BC.QK,QUEEN_UNDER_W,clamp(e/.35));ctx.restore()
+}
+// BV3 (Tester I4): where the drop ends. Phone: unchanged (spiral hex centre at START_SPP). When the visible screen band is too
+// short (wide desktop crop), zoom out just enough and centre so the spiral hex AND the standing queen are both fully on screen.
+function downEnd(){const r=game.getBoundingClientRect(),vh=r.height/view.s,hexH=HEX.w*Math.sqrt(3)/2,S=BC.SPIRAL_W;
+ const tp=Math.min(S.y-hexH/2,APPEAR.y-QUEEN_UNDER_W*1.35),bot=S.y+hexH/2,need=(bot-tp)*1.12;
+ if(need*START_SPP<=vh&&APPEAR.y-QUEEN_UNDER_W*1.35>=S.y-vh/START_SPP/2)return {spp:START_SPP,lookY:S.y};
+ const s=Math.min(START_SPP,vh/need);return {spp:s,lookY:(tp+bot)/2}}
+function floorRevealProgress(now=performance.now()){return ease(clamp((now-started)/1000/FLOOR_REVEAL_SECONDS))}
+function drawRevealingFloor(reveal,now,roomPan=0){
+  if(reveal<=0){drawSurface('entered',0,now);return}
+  // One registered world: the basement is already underneath, never entering from an edge.
+  ctx.save();ctx.translate(0,-roomPan);
+  drawUnderground('underground',0,now,0);
+  // BC: the surface (map, wide grass, dug mound) fades away in place over the chamber.
+  ctx.save();applyWorld();ctx.globalAlpha=1-reveal;ctx.drawImage(art.map,0,0,WORLD.w,WORLD.h);ctx.restore();
+  ctx.save();applyCam();ctx.globalAlpha=1-reveal;ctx.drawImage(art.wide,0,0,720,1280);
+  moundOverlay(1-reveal);ctx.restore();ctx.restore();
+}
+// HOTFIX-FLYIN option B (2): landing time = cf2783d5's wall clock (now - started) minus the part of any frame longer than one
+// landing frame (1/24 s). At >= 24 fps nothing is subtracted, so the flight is frame-for-frame cf2783d5; a stall (decode,
+// slow phone, rAF throttling) delays her by the stall instead of skipping frames.
+const LANDING_STEP_MAX_MS=1000/LANDING_FPS,LAND={f0:null,n:0,seen:new Set(),trace:null};let landLag=0,landLast=0;
+function landingT(now){const dl=now-landLast;if(dl>LANDING_STEP_MAX_MS)landLag+=LAND.n?dl-LANDING_STEP_MAX_MS:dl;   // a late FIRST paint still shows frame 0
+ if(now>landLast)landLast=now;return (now-started-landLag)/1000}
+function render(now){
+  requestAnimationFrame(render);if(DBG)dbgTick(now);if(!ready)return;if(window.BV)BV.frame(now);
+  flyCtx.setTransform(1,0,0,1,0,0);flyCtx.clearRect(0,0,queenFly.width,queenFly.height);
+  const d=view.d;ctx.setTransform(d,0,0,d,0,0);ctx.fillStyle='#291a10';ctx.fillRect(0,0,canvas.width/d,canvas.height/d);ctx.translate(view.x,view.y);ctx.scale(view.s,view.s);
+  const t=(now-started)/1000,current=state;
+  if(SURFACE.includes(current))drawSurface(current,t,now);
+  if(['underground','menu'].includes(current))drawUnderground(current,t,now);
+  if(current==='descending'||current==='ascending'){
+    const p=floorRevealProgress(now),down=current==='descending',reveal=down?p:1-p;
+    lookY=floorLookYStart+(down?1:-1)*floorDipWorld*p;
+    if(down&&floorFrom){spp=floorFrom.spp+((floorFrom.toSpp||START_SPP)-floorFrom.spp)*p;lookX=floorFrom.lookX+(BC.SPIRAL_W.x-floorFrom.lookX)*p}
+    drawRevealingFloor(reveal,now,down?0:floorPanStart*(1-p));
+    if(t>=FLOOR_REVEAL_SECONDS)begin(down?'underground':'entered');
+  }
+}
+requestAnimationFrame(render);
+const pointers=new Map();let gesture=null,tapCandidate=null;
+const canNavigate=()=>onSurface()||state==='underground'||state==='menu';
+function zoomAt(next,anchor,target=anchor){const p=canvasToWorld(anchor.x,anchor.y);spp=clamp(next,MIN_SPP,MAX_SPP);lookX=p.x-(target.x-360)/spp;lookY=p.y-(target.y-640)/spp;cameraBounds();positionTarget()}
+canvas.addEventListener('pointerdown',e=>{
+ if(!canNavigate())return;
+ canvas.setPointerCapture?.(e.pointerId);
+ const p=eventCanvas(e);pointers.set(e.pointerId,p);
+ if(pointers.size===1){tapCandidate={id:e.pointerId,x:p.x,y:p.y,moved:false};gesture=null}
+ if(pointers.size>=2){if(tapCandidate)tapCandidate.moved=true;const [a,b]=[...pointers.values()];gesture={dist:Math.hypot(a.x-b.x,a.y-b.y),mid:{x:(a.x+b.x)/2,y:(a.y+b.y)/2}}}
+});
+canvas.addEventListener('pointermove',e=>{
+ if(!canNavigate()||!pointers.has(e.pointerId))return;
+ const old=pointers.get(e.pointerId),p=eventCanvas(e);pointers.set(e.pointerId,p);
+ if(tapCandidate&&Math.hypot(p.x-tapCandidate.x,p.y-tapCandidate.y)>8)tapCandidate.moved=true;
+ if(pointers.size===2&&gesture){const [a,b]=[...pointers.values()],mid={x:(a.x+b.x)/2,y:(a.y+b.y)/2},dist=Math.hypot(a.x-b.x,a.y-b.y);if(gesture.dist>8)zoomAt(spp*dist/gesture.dist,gesture.mid,mid);gesture={dist,mid}}
+ else if(pointers.size===1){lookX-=(p.x-old.x)/spp;lookY-=(p.y-old.y)/spp;cameraBounds();positionTarget()}
+});
+function endPtr(e){if(!pointers.has(e.pointerId))return;const tap=e.type!=='pointercancel'&&tapCandidate?.id===e.pointerId&&!tapCandidate.moved&&pointers.size===1;pointers.delete(e.pointerId);gesture=null;if(!pointers.size)tapCandidate=null;if(tap&&state==='awaitClaim'){const p=pointerToPlain(e);if(p.x>170&&p.x<550&&p.y>430&&p.y<870)begin('digging')}
+ if(tap&&(state==='underground'||state==='menu')&&window.BV&&BV.started){const c=eventCanvas(e);BV.tap(canvasToWorld(c.x,c.y+pan),e)}}
+canvas.addEventListener('pointerup',endPtr);canvas.addEventListener('pointercancel',endPtr);
+canvas.addEventListener('wheel',e=>{if(!canNavigate())return;e.preventDefault();zoomAt(spp*Math.exp(-e.deltaY*.0015),eventCanvas(e))},{passive:false});
+queenTarget.addEventListener('click',()=>{if(window.BV&&BV.placing)return;if(state==='underground'||state==='menu'){state='menu';started=performance.now();game.dataset.stage='menu';menu.classList.add('open');syncFloors();if(window.BV)BV.onMenuOpen()}});
+goDown.addEventListener('click',e=>{e.preventDefault();if(state==='entered'&&basementReady&&!goDown.disabled)begin('descending')});
+goUp.addEventListener('click',e=>{e.preventDefault();if((state==='underground'||state==='menu')&&!goUp.disabled)begin('ascending')});
+// Read-only diagnostics for verification; no visible debug UI and no autoplay shortcuts.
+window.openingDemo={get openLog(){return OPEN_LOG.slice()},get land(){return {f0:LAND.f0,n:LAND.n,seen:LAND.seen.size,lag:landLag,trace:LAND.trace}},traceLanding(){LAND.trace=[]},get basementReady(){return basementReady},get stage(){return state},get videoWhy(){return videoWhy},downEnd:()=>downEnd(),get queen(){return {...queen}},get tile(){return TILE},get spp(){return spp},get lookX(){return lookX},get lookY(){return lookY},HEX,CEILING_HEX,FLOOR_HEX,HORIZON_Y,BUILT_CEILINGS,horizonPath,CHAMBER,ROOM_COMPOSE,COMPOSE_X,APPEAR,QUEEN_DOWN_W,QUEEN_DOWN_BOB,VIDEO_FADE_SECONDS,LANDING_FPS,LANDING_SECONDS,FLOOR_REVEAL_SECONDS,get revealProgress(){return floorRevealProgress()},get panProgress(){return floorRevealProgress()},get dip(){return {startLookY:floorLookYStart,world:floorDipWorld,phonePx:floorDipWorld*spp*view.s,lastDownWorld:lastDownDipWorld}},get menuPan(){return pan},BC,APPEAR,QUEEN_UNDER_W,get view(){return {...view}},get hexCss(){return HEX.w*spp*view.s},get spiralCss(){const c=worldToCanvas(BC.SPIRAL_W.x,BC.SPIRAL_W.y);return {x:view.x+c.x*view.s,y:view.y+(c.y-pan)*view.s}},get queenDrawn(){return {...queen,w:QUEEN_UNDER_W,emerge:emergeT0?clamp((performance.now()-emergeT0)/1000/BC.EMERGE_SECONDS):0}},INITIAL,MAP_RECT,MIN_SPP,MAX_SPP,worldToCanvas,plainToCanvas,setView(v){spp=v.spp??spp;lookX=v.lookX??lookX;lookY=v.lookY??lookY;cameraBounds();positionTarget()},jump(next){begin(next)},seek(seconds){started=performance.now()-seconds*1000}};
+</script>
+<script src="base-layer.js"></script>
+</body></html>

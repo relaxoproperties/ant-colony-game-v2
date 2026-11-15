@@ -1,0 +1,5475 @@
+{
+ "room": "Farm (Garden) furniture - concept option B \"horseshoe ring terraces\", picked by Chris 10:10 AM ET (per Game Manager) - furniture only, no walls/background",
+ "created": "2026-11-13 (ET)",
+ "canvas": [
+  1080,
+  1680
+ ],
+ "template": {
+  "name": "LOCKED 3-D hex template",
+  "lock": "/workspace/kit/approved/NOTE-entrance-room-hex-LOCKED-2026-11-07.json",
+  "compose": "/workspace/ant-colony/underground/rooms/_tools/compose_room_hex.py",
+  "outline_overlay": "/workspace/builder-opening/shots/hex-3d-outline-color.jpg",
+  "outline_overlay_md5": "6e299814ac5b4c5bc595ac6a2117ecb0",
+  "dst_floor_green": [
+   [
+    342.2575,
+    733
+   ],
+   [
+    737.7425,
+    733
+   ],
+   [
+    935.4849,
+    1075.5
+   ],
+   [
+    737.7425,
+    1418
+   ],
+   [
+    342.2575,
+    1418
+   ],
+   [
+    144.5151,
+    1075.5
+   ]
+  ],
+  "dst_ceil_red_y": [
+   260,
+   602.5,
+   945
+  ],
+  "floor_wall_back_line_y": 733,
+  "floor_hex_width_px": 790.9698687897874,
+  "floor_hex_height_px": 685
+ },
+ "scale": {
+  "in_game_hex_width_px": 791,
+  "source_of_791": "v13.py HW=791 (/workspace/ant-colony/big-chamber/LOCKED-v13-2026-11-13/v13.py md5 10aaea375545c0f5a6bc25b148cfaaf0)",
+  "template_to_791": 1.0000380940050961,
+  "template_to_791_note": "template floor hex = 935.4849-144.5151 = 790.96987 px; 791/790.96987 = 1.000038, i.e. 1 template px = 1 in-game px at hex 791 (used 1:1)",
+  "HEX.w_world": 136.8566720971564,
+  "ROOM_SCALE_world_per_px": 0.17302387549421078,
+  "px_per_world": 5.779549193102308,
+  "source": "/workspace/notes-pass-5-fix3/index.html (md5 dfc7b054e1958c6a5b9e6ed1bfb13f8e): HEX={cx:2812,cy:4999.5,w:136.8566720971564}; ROOM_SCALE=HEX.w/790.9698687897874; ROOM_COMPOSE={x:HEX.cx-540*ROOM_SCALE,y:HEX.cy-602.5*ROOM_SCALE,...}; FLOOR_HEX.cy=HEX.cy+(1075.5-602.5)*ROOM_SCALE",
+  "note_HEX_centre": "game HEX centre is the RED/ceiling centre (540,602.5); floor (green) centre is (540,1075.5). Offsets given from both."
+ },
+ "sizing": {
+  "albert_underground": {
+   "height_px": 130,
+   "source": "v13.py ANT_H=130, ANT_W=94 at HW=791",
+   "scale_check_ant": "locked idle frame 0 (LOCKED-WALKS-2026-11-09/idle-facing-camera/ant-idle-transparent.gif md5 cde49ea6..., Character Artist cutout ant-idle_00.png via _tools/ant_locked.py), visible 287 px -> x0.452962 = 130 px",
+   "scale_check_bbox": [
+    580,
+    1058,
+    671,
+    1185
+   ],
+   "FLAG": "game-derived worker underground size = classroom-loop 44x62 room px x UNDER_K 2 = ~88x124 px; v13.py says 130. Used 130 as instructed.",
+   "scale_check_feet": [
+    625,
+    1185
+   ]
+  },
+  "queen_underground": {
+   "scale": "QUEEN_UNDER_K 1.25",
+   "room_px_per_queen_px": 0.7121334648300934,
+   "cell_px": [
+    284.853,
+    299.096
+   ],
+   "visible_px_approx": [
+    102.5,
+    143.1
+   ],
+   "anchor_feet": [
+    200,
+    395
+   ],
+   "scale_check_bbox": [
+    412,
+    1021,
+    515,
+    1164
+   ],
+   "scale_check_feet": [
+    470,
+    1160
+   ],
+   "source": "derived from game constants in notes-pass-5-fix3/index.html: FAR.s 0.62, START_SPP 720/168, QUEEN_DOWN_W=190*FAR.s/START_SPP=27.4867 world, Q3 cell 400x420 anchor (200,395), Q3_BODY_MATCH=(104/200)/(145/400) -> QUEEN_Q3_CELL_W 39.4291 world; x1.25 /ROOM_SCALE -> 284.85 px cell; queen asset assets/queen/queen_idle_front_strip_v1.png md5 551e7661af78d596e8a53017459d6193 frame 0",
+   "FLAG": "no single written \"queen underground px\" spec exists; size is computed from game constants (x1 = 227.88x239.28 cell matches the accepted scale-v1 check). She fits inside the bed (bed 160x154) and under the canopy opening.",
+   "body_width_check": {
+    "formula": "QUEEN_DOWN_W 27.4867 world x (104/200) x QUEEN_UNDER_K 1.25 = 17.866 world",
+    "px": 103.3,
+    "drawn_visible_width_px": 103,
+    "note": "Game Manager confirmed from NP5 code (~17.9 world); matches the Royal check"
+   }
+  }
+ },
+ "draw_order": [
+  {
+   "order": 0,
+   "name": "tool-rack",
+   "files": [
+    "tool-rack.png"
+   ]
+  },
+  {
+   "order": 1,
+   "name": "water-barrel",
+   "files": [
+    "water-barrel.png"
+   ]
+  },
+  {
+   "order": 2,
+   "name": "watering-can",
+   "files": [
+    "watering-can.png"
+   ]
+  },
+  {
+   "order": 3,
+   "name": "lantern-post-left",
+   "files": [
+    "lantern-post-left.png"
+   ]
+  },
+  {
+   "order": 4,
+   "name": "lantern-post-right",
+   "files": [
+    "lantern-post-right.png"
+   ]
+  },
+  {
+   "order": 5,
+   "name": "mushroom-stump-left",
+   "files": [
+    "mushroom-stump-left.png"
+   ]
+  },
+  {
+   "order": 6,
+   "name": "seed-sacks",
+   "files": [
+    "seed-sacks.png"
+   ]
+  },
+  {
+   "order": 7,
+   "name": "glow-toadstools",
+   "files": [
+    "glow-toadstools.png"
+   ]
+  },
+  {
+   "order": 8,
+   "name": "mushroom-stump-right",
+   "files": [
+    "mushroom-stump-right.png"
+   ]
+  },
+  {
+   "order": 9,
+   "name": "courtyard-path",
+   "files": [
+    "courtyard-path.png"
+   ]
+  },
+  {
+   "order": 10,
+   "name": "stone-retaining-wall",
+   "files": [
+    "stone-retaining-wall.png"
+   ]
+  },
+  {
+   "order": 11,
+   "name": "bed-1-back-left",
+   "files": [
+    "bed-1-back-left-dirt.png",
+    "bed-1-back-left-plowed.png",
+    "bed-1-back-left-seeded.png",
+    "bed-1-back-left-sprout.png",
+    "bed-1-back-left-weeds.png",
+    "bed-1-back-left-grown.png",
+    "bed-1-back-left-harvest.png"
+   ]
+  },
+  {
+   "order": 12,
+   "name": "bed-2-back-right",
+   "files": [
+    "bed-2-back-right-dirt.png",
+    "bed-2-back-right-plowed.png",
+    "bed-2-back-right-seeded.png",
+    "bed-2-back-right-sprout.png",
+    "bed-2-back-right-weeds.png",
+    "bed-2-back-right-grown.png",
+    "bed-2-back-right-harvest.png"
+   ]
+  },
+  {
+   "order": 13,
+   "name": "bed-3-front-left",
+   "files": [
+    "bed-3-front-left-dirt.png",
+    "bed-3-front-left-plowed.png",
+    "bed-3-front-left-seeded.png",
+    "bed-3-front-left-sprout.png",
+    "bed-3-front-left-weeds.png",
+    "bed-3-front-left-grown.png",
+    "bed-3-front-left-harvest.png"
+   ]
+  },
+  {
+   "order": 14,
+   "name": "bed-4-front-right",
+   "files": [
+    "bed-4-front-right-dirt.png",
+    "bed-4-front-right-plowed.png",
+    "bed-4-front-right-seeded.png",
+    "bed-4-front-right-sprout.png",
+    "bed-4-front-right-weeds.png",
+    "bed-4-front-right-grown.png",
+    "bed-4-front-right-harvest.png"
+   ]
+  }
+ ],
+ "draw_rule": "for each entry in order: draw its -shadow.png at shadow.topleft, then the piece at topleft_in_1080x1680. Beds: draw exactly ONE state file per bed (swap_group); all 7 states share topleft, size, alpha and shadow.",
+ "bed_slots": {
+  "bed-1-back-left": {
+   "topleft": [
+    197,
+    764
+   ],
+   "size": [
+    333,
+    311
+   ],
+   "states": {
+    "dirt": "bed-1-back-left-dirt.png",
+    "plowed": "bed-1-back-left-plowed.png",
+    "seeded": "bed-1-back-left-seeded.png",
+    "sprout": "bed-1-back-left-sprout.png",
+    "weeds": "bed-1-back-left-weeds.png",
+    "grown": "bed-1-back-left-grown.png",
+    "harvest": "bed-1-back-left-harvest.png"
+   }
+  },
+  "bed-2-back-right": {
+   "topleft": [
+    550,
+    764
+   ],
+   "size": [
+    335,
+    309
+   ],
+   "states": {
+    "dirt": "bed-2-back-right-dirt.png",
+    "plowed": "bed-2-back-right-plowed.png",
+    "seeded": "bed-2-back-right-seeded.png",
+    "sprout": "bed-2-back-right-sprout.png",
+    "weeds": "bed-2-back-right-weeds.png",
+    "grown": "bed-2-back-right-grown.png",
+    "harvest": "bed-2-back-right-harvest.png"
+   }
+  },
+  "bed-3-front-left": {
+   "topleft": [
+    197,
+    1076
+   ],
+   "size": [
+    331,
+    316
+   ],
+   "states": {
+    "dirt": "bed-3-front-left-dirt.png",
+    "plowed": "bed-3-front-left-plowed.png",
+    "seeded": "bed-3-front-left-seeded.png",
+    "sprout": "bed-3-front-left-sprout.png",
+    "weeds": "bed-3-front-left-weeds.png",
+    "grown": "bed-3-front-left-grown.png",
+    "harvest": "bed-3-front-left-harvest.png"
+   }
+  },
+  "bed-4-front-right": {
+   "topleft": [
+    553,
+    1066
+   ],
+   "size": [
+    332,
+    326
+   ],
+   "states": {
+    "dirt": "bed-4-front-right-dirt.png",
+    "plowed": "bed-4-front-right-plowed.png",
+    "seeded": "bed-4-front-right-seeded.png",
+    "sprout": "bed-4-front-right-sprout.png",
+    "weeds": "bed-4-front-right-weeds.png",
+    "grown": "bed-4-front-right-grown.png",
+    "harvest": "bed-4-front-right-harvest.png"
+   }
+  }
+ },
+ "state_map_to_game": {
+  "dirt": "dirt",
+  "plowed": "plowed",
+  "seeded": "seeded",
+  "sprout": "sprout (growing <50%)",
+  "weeds": "sprout look + Garden v2 weed sprites",
+  "grown": "leafy (growing >=50%)",
+  "harvest": "ripe",
+  "watered": "NOT drawn (game state; could be plowed/seeded darkened like plot_04)"
+ },
+ "footprint_check": {
+  "bed-1-back-left": {
+   "size": [
+    333,
+    311
+   ],
+   "topleft": [
+    197,
+    764
+   ],
+   "same_size": true,
+   "same_topleft": true,
+   "alpha_byte_identical_all_7": true,
+   "shadow_identical": true,
+   "opaque_px": 49410,
+   "rim_pixels_changed_vs_plowed": {
+    "dirt": 8462,
+    "plowed": 0,
+    "seeded": 0,
+    "sprout": 64,
+    "weeds": 64,
+    "grown": 151,
+    "harvest": 500
+   }
+  },
+  "bed-2-back-right": {
+   "size": [
+    335,
+    309
+   ],
+   "topleft": [
+    550,
+    764
+   ],
+   "same_size": true,
+   "same_topleft": true,
+   "alpha_byte_identical_all_7": true,
+   "shadow_identical": true,
+   "opaque_px": 49687,
+   "rim_pixels_changed_vs_plowed": {
+    "dirt": 8385,
+    "plowed": 0,
+    "seeded": 0,
+    "sprout": 184,
+    "weeds": 191,
+    "grown": 985,
+    "harvest": 2050
+   }
+  },
+  "bed-3-front-left": {
+   "size": [
+    331,
+    316
+   ],
+   "topleft": [
+    197,
+    1076
+   ],
+   "same_size": true,
+   "same_topleft": true,
+   "alpha_byte_identical_all_7": true,
+   "shadow_identical": true,
+   "opaque_px": 54263,
+   "rim_pixels_changed_vs_plowed": {
+    "dirt": 8361,
+    "plowed": 0,
+    "seeded": 0,
+    "sprout": 122,
+    "weeds": 122,
+    "grown": 55,
+    "harvest": 359
+   }
+  },
+  "bed-4-front-right": {
+   "size": [
+    332,
+    326
+   ],
+   "topleft": [
+    553,
+    1066
+   ],
+   "same_size": true,
+   "same_topleft": true,
+   "alpha_byte_identical_all_7": true,
+   "shadow_identical": true,
+   "opaque_px": 54010,
+   "rim_pixels_changed_vs_plowed": {
+    "dirt": 8084,
+    "plowed": 0,
+    "seeded": 5,
+    "sprout": 286,
+    "weeds": 346,
+    "grown": 819,
+    "harvest": 1693
+   }
+  }
+ },
+ "outputs": {
+  "farm-furniture.png": {
+   "md5": "a6d70fb806bccb88d545034c20e8d02b",
+   "size": [
+    1080,
+    1680
+   ]
+  },
+  "farm-furniture-programming.png": {
+   "md5": "27aeb5fcaa7a364084504c8311fef208",
+   "size": [
+    1080,
+    1680
+   ]
+  },
+  "farm-furniture-programming-view.jpg": {
+   "md5": "0f9f872da3c3e17561933f8ed8fbb057",
+   "size": [
+    1080,
+    1680
+   ]
+  },
+  "farm-furniture-scale-check.jpg": {
+   "md5": "a872effa5c6191f6f5b49ce53d55a614",
+   "size": [
+    1080,
+    1680
+   ]
+  }
+ },
+ "pieces": [
+  {
+   "name": "tool-rack",
+   "draw_order": 0,
+   "file": "tool-rack.png",
+   "md5": "1d42c873fc77a93120e2526240ab9382",
+   "png_size": [
+    165,
+    180
+   ],
+   "topleft_in_1080x1680": [
+    362,
+    566
+   ],
+   "png_box_xyxy": [
+    362,
+    566,
+    527,
+    746
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    362,
+    566,
+    527,
+    746
+   ],
+   "visible_size": [
+    165,
+    180
+   ],
+   "visible_size_world": [
+    28.5489,
+    31.1443
+   ],
+   "bbox_centre": [
+    444.5,
+    656.0
+   ],
+   "foot_bottom_centre": [
+    445,
+    746
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -95.5,
+      -419.5
+     ],
+     "world": [
+      -16.5238,
+      -72.5835
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.12074,
+      -0.53036
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -95.5,
+      53.5
+     ],
+     "world": [
+      -16.5238,
+      9.2568
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.12074,
+      0.06764
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2795.476,
+     5008.757
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -95,
+      -329.5
+     ],
+     "world": [
+      -16.4373,
+      -57.0114
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.12011,
+      -0.41658
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -95,
+      143.5
+     ],
+     "world": [
+      -16.4373,
+      24.8289
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.12011,
+      0.18142
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2795.563,
+     5024.329
+    ]
+   },
+   "origin": "AI-generated in the established painterly style (Royal set / Garden art), blue-screen keyed with the Royal key.py",
+   "sheet": "/workspace/ant-colony/furniture/farm/_sources/props1.jpg",
+   "target": "visible height 180 px",
+   "mirrored": false,
+   "shadow": {
+    "file": "tool-rack-shadow.png",
+    "topleft": [
+     360,
+     712
+    ],
+    "size": [
+     171,
+     65
+    ],
+    "how": "soft elliptical contact shadow, 0.9 x visible base width",
+    "md5": "60e2ef4358fd20b4cb0f694b1732ddb1"
+   }
+  },
+  {
+   "name": "water-barrel",
+   "draw_order": 1,
+   "file": "water-barrel.png",
+   "md5": "14853689ad0081b3cf95a4a144fd69db",
+   "png_size": [
+    115,
+    140
+   ],
+   "topleft_in_1080x1680": [
+    570,
+    608
+   ],
+   "png_box_xyxy": [
+    570,
+    608,
+    685,
+    748
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    570,
+    608,
+    685,
+    746
+   ],
+   "visible_size": [
+    115,
+    138
+   ],
+   "visible_size_world": [
+    19.8977,
+    23.8773
+   ],
+   "bbox_centre": [
+    627.5,
+    677.0
+   ],
+   "foot_bottom_centre": [
+    628,
+    746
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      87.5,
+      -398.5
+     ],
+     "world": [
+      15.1396,
+      -68.95
+     ],
+     "frac_of_hex_width_790.97": [
+      0.11062,
+      -0.50381
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      87.5,
+      74.5
+     ],
+     "world": [
+      15.1396,
+      12.8903
+     ],
+     "frac_of_hex_width_790.97": [
+      0.11062,
+      0.09419
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2827.14,
+     5012.39
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      88,
+      -329.5
+     ],
+     "world": [
+      15.2261,
+      -57.0114
+     ],
+     "frac_of_hex_width_790.97": [
+      0.11126,
+      -0.41658
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      88,
+      143.5
+     ],
+     "world": [
+      15.2261,
+      24.8289
+     ],
+     "frac_of_hex_width_790.97": [
+      0.11126,
+      0.18142
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2827.226,
+     5024.329
+    ]
+   },
+   "origin": "AI-generated in the established painterly style (Royal set / Garden art), blue-screen keyed with the Royal key.py",
+   "sheet": "/workspace/ant-colony/furniture/farm/_sources/props3.jpg",
+   "target": "visible height 140 px",
+   "mirrored": false,
+   "shadow": {
+    "file": "water-barrel-shadow.png",
+    "topleft": [
+     565,
+     718
+    ],
+    "size": [
+     126,
+     52
+    ],
+    "how": "soft elliptical contact shadow, 0.9 x visible base width",
+    "md5": "4e98e1337e9bbe0eb634eed86be6e315"
+   }
+  },
+  {
+   "name": "watering-can",
+   "draw_order": 2,
+   "file": "watering-can.png",
+   "md5": "40334df40d820be4cde4768fcd52fc10",
+   "png_size": [
+    85,
+    76
+   ],
+   "topleft_in_1080x1680": [
+    642,
+    680
+   ],
+   "png_box_xyxy": [
+    642,
+    680,
+    727,
+    756
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    642,
+    680,
+    727,
+    756
+   ],
+   "visible_size": [
+    85,
+    76
+   ],
+   "visible_size_world": [
+    14.707,
+    13.1498
+   ],
+   "bbox_centre": [
+    684.5,
+    718.0
+   ],
+   "foot_bottom_centre": [
+    684,
+    756
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      144.5,
+      -357.5
+     ],
+     "world": [
+      25.002,
+      -61.856
+     ],
+     "frac_of_hex_width_790.97": [
+      0.18269,
+      -0.45198
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      144.5,
+      115.5
+     ],
+     "world": [
+      25.002,
+      19.9843
+     ],
+     "frac_of_hex_width_790.97": [
+      0.18269,
+      0.14602
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2837.002,
+     5019.484
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      144,
+      -319.5
+     ],
+     "world": [
+      24.9154,
+      -55.2811
+     ],
+     "frac_of_hex_width_790.97": [
+      0.18205,
+      -0.40393
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      144,
+      153.5
+     ],
+     "world": [
+      24.9154,
+      26.5592
+     ],
+     "frac_of_hex_width_790.97": [
+      0.18205,
+      0.19407
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2836.915,
+     5026.059
+    ]
+   },
+   "origin": "AI-generated in the established painterly style (Royal set / Garden art), blue-screen keyed with the Royal key.py",
+   "sheet": "/workspace/ant-colony/furniture/farm/_sources/props3.jpg",
+   "target": "visible height 76 px",
+   "mirrored": false,
+   "shadow": {
+    "file": "watering-can-shadow.png",
+    "topleft": [
+     634,
+     732
+    ],
+    "size": [
+     99,
+     45
+    ],
+    "how": "soft elliptical contact shadow, 0.9 x visible base width",
+    "md5": "f65d7bfb2f0d5f65d9de0ec83f44c4ed"
+   }
+  },
+  {
+   "name": "lantern-post-left",
+   "draw_order": 3,
+   "file": "lantern-post-left.png",
+   "md5": "0b902979e5f89574f24e81d3c9090be5",
+   "png_size": [
+    89,
+    300
+   ],
+   "topleft_in_1080x1680": [
+    262,
+    505
+   ],
+   "png_box_xyxy": [
+    262,
+    505,
+    351,
+    805
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    263,
+    505,
+    351,
+    804
+   ],
+   "visible_size": [
+    88,
+    299
+   ],
+   "visible_size_world": [
+    15.2261,
+    51.7341
+   ],
+   "bbox_centre": [
+    307.0,
+    654.5
+   ],
+   "foot_bottom_centre": [
+    307.04,
+    804.0
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -233.0,
+      -421.0
+     ],
+     "world": [
+      -40.3146,
+      -72.8431
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.29458,
+      -0.53226
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -233.0,
+      52.0
+     ],
+     "world": [
+      -40.3146,
+      8.9972
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.29458,
+      0.06574
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2771.685,
+     5008.497
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -232.96,
+      -271.5
+     ],
+     "world": [
+      -40.3076,
+      -46.976
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.29452,
+      -0.34325
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -232.96,
+      201.5
+     ],
+     "world": [
+      -40.3076,
+      34.8643
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.29452,
+      0.25475
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2771.692,
+     5034.364
+    ]
+   },
+   "origin": "AI-generated in the established painterly style (Royal set / Garden art), blue-screen keyed with the Royal key.py ; MIRRORED copy of the left piece",
+   "sheet": "/workspace/ant-colony/furniture/farm/_sources/lantern2.jpg",
+   "target": "visible height 300 px",
+   "mirrored": true,
+   "shadow": {
+    "file": "lantern-post-left-shadow.png",
+    "topleft": [
+     256,
+     779
+    ],
+    "size": [
+     102,
+     45
+    ],
+    "how": "soft elliptical contact shadow, 0.9 x visible base width",
+    "md5": "8ed58fc26029de520be7b25feb7d48c4"
+   }
+  },
+  {
+   "name": "lantern-post-right",
+   "draw_order": 4,
+   "file": "lantern-post-right.png",
+   "md5": "7a1b6ae031ae7c15b05f6f93b1fca6e0",
+   "png_size": [
+    89,
+    300
+   ],
+   "topleft_in_1080x1680": [
+    729,
+    505
+   ],
+   "png_box_xyxy": [
+    729,
+    505,
+    818,
+    805
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    729,
+    505,
+    817,
+    804
+   ],
+   "visible_size": [
+    88,
+    299
+   ],
+   "visible_size_world": [
+    15.2261,
+    51.7341
+   ],
+   "bbox_centre": [
+    773.0,
+    654.5
+   ],
+   "foot_bottom_centre": [
+    772.96,
+    804.0
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      233.0,
+      -421.0
+     ],
+     "world": [
+      40.3146,
+      -72.8431
+     ],
+     "frac_of_hex_width_790.97": [
+      0.29458,
+      -0.53226
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      233.0,
+      52.0
+     ],
+     "world": [
+      40.3146,
+      8.9972
+     ],
+     "frac_of_hex_width_790.97": [
+      0.29458,
+      0.06574
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2852.315,
+     5008.497
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      232.96,
+      -271.5
+     ],
+     "world": [
+      40.3076,
+      -46.976
+     ],
+     "frac_of_hex_width_790.97": [
+      0.29452,
+      -0.34325
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      232.96,
+      201.5
+     ],
+     "world": [
+      40.3076,
+      34.8643
+     ],
+     "frac_of_hex_width_790.97": [
+      0.29452,
+      0.25475
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2852.308,
+     5034.364
+    ]
+   },
+   "origin": "AI-generated in the established painterly style (Royal set / Garden art), blue-screen keyed with the Royal key.py",
+   "sheet": "/workspace/ant-colony/furniture/farm/_sources/lantern2.jpg",
+   "target": "visible height 300 px",
+   "mirrored": false,
+   "shadow": {
+    "file": "lantern-post-right-shadow.png",
+    "topleft": [
+     722,
+     779
+    ],
+    "size": [
+     102,
+     45
+    ],
+    "how": "soft elliptical contact shadow, 0.9 x visible base width",
+    "md5": "8ed58fc26029de520be7b25feb7d48c4"
+   }
+  },
+  {
+   "name": "mushroom-stump-left",
+   "draw_order": 5,
+   "file": "mushroom-stump-left.png",
+   "md5": "048db47660c2564f969cbbd2fae64955",
+   "png_size": [
+    132,
+    140
+   ],
+   "topleft_in_1080x1680": [
+    170,
+    788
+   ],
+   "png_box_xyxy": [
+    170,
+    788,
+    302,
+    928
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    171,
+    788,
+    301,
+    927
+   ],
+   "visible_size": [
+    130,
+    139
+   ],
+   "visible_size_world": [
+    22.4931,
+    24.0503
+   ],
+   "bbox_centre": [
+    236.0,
+    857.5
+   ],
+   "foot_bottom_centre": [
+    235.85,
+    927.3
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -304.0,
+      -218.0
+     ],
+     "world": [
+      -52.5993,
+      -37.7192
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.38434,
+      -0.27561
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -304.0,
+      255.0
+     ],
+     "world": [
+      -52.5993,
+      44.1211
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.38434,
+      0.32239
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2759.401,
+     5043.621
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -304.15,
+      -148.2
+     ],
+     "world": [
+      -52.6252,
+      -25.6421
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.38453,
+      -0.18736
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -304.15,
+      324.8
+     ],
+     "world": [
+      -52.6252,
+      56.1982
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.38453,
+      0.41064
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2759.375,
+     5055.698
+    ]
+   },
+   "origin": "AI-generated in the established painterly style (Royal set / Garden art), blue-screen keyed with the Royal key.py",
+   "sheet": "/workspace/ant-colony/furniture/farm/_sources/props3.jpg",
+   "target": "visible height 140 px",
+   "mirrored": false,
+   "shadow": {
+    "file": "mushroom-stump-left-shadow.png",
+    "topleft": [
+     166,
+     897
+    ],
+    "size": [
+     140,
+     56
+    ],
+    "how": "soft elliptical contact shadow, 0.9 x visible base width",
+    "md5": "5309794998b13f86591722a94481b837"
+   }
+  },
+  {
+   "name": "seed-sacks",
+   "draw_order": 6,
+   "file": "seed-sacks.png",
+   "md5": "05269c9f85187a432d06a0a49f624d8d",
+   "png_size": [
+    114,
+    110
+   ],
+   "topleft_in_1080x1680": [
+    787,
+    817
+   ],
+   "png_box_xyxy": [
+    787,
+    817,
+    901,
+    927
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    787,
+    817,
+    901,
+    927
+   ],
+   "visible_size": [
+    114,
+    110
+   ],
+   "visible_size_world": [
+    19.7247,
+    19.0326
+   ],
+   "bbox_centre": [
+    844.0,
+    872.0
+   ],
+   "foot_bottom_centre": [
+    844.15,
+    927.3
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      304.0,
+      -203.5
+     ],
+     "world": [
+      52.5993,
+      -35.2104
+     ],
+     "frac_of_hex_width_790.97": [
+      0.38434,
+      -0.25728
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      304.0,
+      269.5
+     ],
+     "world": [
+      52.5993,
+      46.6299
+     ],
+     "frac_of_hex_width_790.97": [
+      0.38434,
+      0.34072
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2864.599,
+     5046.13
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      304.15,
+      -148.2
+     ],
+     "world": [
+      52.6252,
+      -25.6421
+     ],
+     "frac_of_hex_width_790.97": [
+      0.38453,
+      -0.18736
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      304.15,
+      324.8
+     ],
+     "world": [
+      52.6252,
+      56.1982
+     ],
+     "frac_of_hex_width_790.97": [
+      0.38453,
+      0.41064
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2864.625,
+     5055.698
+    ]
+   },
+   "origin": "AI-generated in the established painterly style (Royal set / Garden art), blue-screen keyed with the Royal key.py",
+   "sheet": "/workspace/ant-colony/furniture/farm/_sources/props1.jpg",
+   "target": "visible height 110 px",
+   "mirrored": false,
+   "shadow": {
+    "file": "seed-sacks-shadow.png",
+    "topleft": [
+     782,
+     899
+    ],
+    "size": [
+     125,
+     52
+    ],
+    "how": "soft elliptical contact shadow, 0.9 x visible base width",
+    "md5": "4a8e1f023c97495b55c29f152b90c8bd"
+   }
+  },
+  {
+   "name": "glow-toadstools",
+   "draw_order": 7,
+   "file": "glow-toadstools.png",
+   "md5": "1d9d0aefae33830972a5a99c055ad7e5",
+   "png_size": [
+    91,
+    120
+   ],
+   "topleft_in_1080x1680": [
+    131,
+    910
+   ],
+   "png_box_xyxy": [
+    131,
+    910,
+    222,
+    1030
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    132,
+    910,
+    221,
+    1030
+   ],
+   "visible_size": [
+    89,
+    120
+   ],
+   "visible_size_world": [
+    15.3991,
+    20.7629
+   ],
+   "bbox_centre": [
+    176.5,
+    970.0
+   ],
+   "foot_bottom_centre": [
+    176.53,
+    1030.05
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -363.5,
+      -105.5
+     ],
+     "world": [
+      -62.8942,
+      -18.254
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.45956,
+      -0.13338
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -363.5,
+      367.5
+     ],
+     "world": [
+      -62.8942,
+      63.5863
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.45956,
+      0.46462
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2749.106,
+     5063.086
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -363.47,
+      -45.45
+     ],
+     "world": [
+      -62.889,
+      -7.8639
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.45952,
+      -0.05746
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -363.47,
+      427.55
+     ],
+     "world": [
+      -62.889,
+      73.9764
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.45952,
+      0.54054
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2749.111,
+     5073.476
+    ]
+   },
+   "origin": "AI-generated in the established painterly style (Royal set / Garden art), blue-screen keyed with the Royal key.py",
+   "sheet": "/workspace/ant-colony/furniture/farm/_sources/props3.jpg",
+   "target": "visible height 120 px",
+   "mirrored": false,
+   "shadow": {
+    "file": "glow-toadstools-shadow.png",
+    "topleft": [
+     125,
+     1005
+    ],
+    "size": [
+     103,
+     46
+    ],
+    "how": "soft elliptical contact shadow, 0.9 x visible base width",
+    "md5": "55a790e145521d9e9f5a34d11a3f9177"
+   }
+  },
+  {
+   "name": "mushroom-stump-right",
+   "draw_order": 8,
+   "file": "mushroom-stump-right.png",
+   "md5": "969fe519add40f7e6b3f5ab928c71cdb",
+   "png_size": [
+    132,
+    140
+   ],
+   "topleft_in_1080x1680": [
+    837,
+    891
+   ],
+   "png_box_xyxy": [
+    837,
+    891,
+    969,
+    1031
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    838,
+    891,
+    968,
+    1030
+   ],
+   "visible_size": [
+    130,
+    139
+   ],
+   "visible_size_world": [
+    22.4931,
+    24.0503
+   ],
+   "bbox_centre": [
+    903.0,
+    960.5
+   ],
+   "foot_bottom_centre": [
+    903.47,
+    1030.05
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      363.0,
+      -115.0
+     ],
+     "world": [
+      62.8077,
+      -19.8977
+     ],
+     "frac_of_hex_width_790.97": [
+      0.45893,
+      -0.14539
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      363.0,
+      358.0
+     ],
+     "world": [
+      62.8077,
+      61.9425
+     ],
+     "frac_of_hex_width_790.97": [
+      0.45893,
+      0.45261
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2874.808,
+     5061.443
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      363.47,
+      -45.45
+     ],
+     "world": [
+      62.889,
+      -7.8639
+     ],
+     "frac_of_hex_width_790.97": [
+      0.45952,
+      -0.05746
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      363.47,
+      427.55
+     ],
+     "world": [
+      62.889,
+      73.9764
+     ],
+     "frac_of_hex_width_790.97": [
+      0.45952,
+      0.54054
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2874.889,
+     5073.476
+    ]
+   },
+   "origin": "AI-generated in the established painterly style (Royal set / Garden art), blue-screen keyed with the Royal key.py ; MIRRORED copy of the left piece",
+   "sheet": "/workspace/ant-colony/furniture/farm/_sources/props3.jpg",
+   "target": "visible height 140 px",
+   "mirrored": true,
+   "shadow": {
+    "file": "mushroom-stump-right-shadow.png",
+    "topleft": [
+     833,
+     1000
+    ],
+    "size": [
+     140,
+     56
+    ],
+    "how": "soft elliptical contact shadow, 0.9 x visible base width",
+    "md5": "5309794998b13f86591722a94481b837"
+   }
+  },
+  {
+   "name": "courtyard-path",
+   "draw_order": 9,
+   "file": "courtyard-path.png",
+   "md5": "7398688b9409748ea431b5e7e58e0f49",
+   "png_size": [
+    370,
+    612
+   ],
+   "topleft_in_1080x1680": [
+    355,
+    771
+   ],
+   "png_box_xyxy": [
+    355,
+    771,
+    725,
+    1383
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    356,
+    773,
+    724,
+    1381
+   ],
+   "visible_size": [
+    368,
+    608
+   ],
+   "visible_size_world": [
+    63.6728,
+    105.1985
+   ],
+   "bbox_centre": [
+    540.0,
+    1077.0
+   ],
+   "foot_bottom_centre": [
+    540.0,
+    1381
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      0.0,
+      1.5
+     ],
+     "world": [
+      0.0,
+      0.2595
+     ],
+     "frac_of_hex_width_790.97": [
+      0.0,
+      0.0019
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      0.0,
+      474.5
+     ],
+     "world": [
+      0.0,
+      82.0998
+     ],
+     "frac_of_hex_width_790.97": [
+      0.0,
+      0.5999
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2812.0,
+     5081.6
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      0.0,
+      305.5
+     ],
+     "world": [
+      0.0,
+      52.8588
+     ],
+     "frac_of_hex_width_790.97": [
+      0.0,
+      0.38623
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      0.0,
+      778.5
+     ],
+     "world": [
+      0.0,
+      134.6991
+     ],
+     "frac_of_hex_width_790.97": [
+      0.0,
+      0.98423
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2812.0,
+     5134.199
+    ]
+   },
+   "origin": "cut from the approved concept B bed block (genB3), everything that is not a bed or stone wall; extends 4 px under the bed/stone edges so there is no seam",
+   "note": "flat on the floor",
+   "shadow": {
+    "file": "courtyard-path-shadow.png",
+    "topleft": [
+     350,
+     770
+    ],
+    "size": [
+     380,
+     620
+    ],
+    "how": "faint soft contact shadow (alpha shifted 3 px down, blur 4, x0.22)",
+    "md5": "c13a981babd123119342d1434dbd684a"
+   }
+  },
+  {
+   "name": "stone-retaining-wall",
+   "draw_order": 10,
+   "file": "stone-retaining-wall.png",
+   "md5": "2ca0df6dda88b15bef4f0139aa755e22",
+   "png_size": [
+    687,
+    204
+   ],
+   "topleft_in_1080x1680": [
+    197,
+    894
+   ],
+   "png_box_xyxy": [
+    197,
+    894,
+    884,
+    1098
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    197,
+    895,
+    882,
+    1097
+   ],
+   "visible_size": [
+    685,
+    202
+   ],
+   "visible_size_world": [
+    118.5214,
+    34.9508
+   ],
+   "bbox_centre": [
+    539.5,
+    996.0
+   ],
+   "foot_bottom_centre": [
+    539.5,
+    1097
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -0.5,
+      -79.5
+     ],
+     "world": [
+      -0.0865,
+      -13.7554
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.00063,
+      -0.10051
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -0.5,
+      393.5
+     ],
+     "world": [
+      -0.0865,
+      68.0849
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.00063,
+      0.49749
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2811.913,
+     5067.585
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -0.5,
+      21.5
+     ],
+     "world": [
+      -0.0865,
+      3.72
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.00063,
+      0.02718
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -0.5,
+      494.5
+     ],
+     "world": [
+      -0.0865,
+      85.5603
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.00063,
+      0.62518
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2811.913,
+     5085.06
+    ]
+   },
+   "origin": "cut from concept B (genB3): the fieldstone faces under the two raised back beds (both walls in one piece)",
+   "shadow": {
+    "file": "stone-retaining-wall-shadow.png",
+    "topleft": [
+     191,
+     893
+    ],
+    "size": [
+     698,
+     215
+    ],
+    "how": "soft contact shadow (alpha shifted 4 px down, blur 4, x0.40)",
+    "md5": "2fd70595c5b7936025ab5bf133f298b2"
+   }
+  },
+  {
+   "name": "bed-1-back-left-dirt",
+   "draw_order": 11,
+   "file": "bed-1-back-left-dirt.png",
+   "md5": "9b7d15788cf883ed413eb97c1154ba60",
+   "png_size": [
+    333,
+    311
+   ],
+   "topleft_in_1080x1680": [
+    197,
+    764
+   ],
+   "png_box_xyxy": [
+    197,
+    764,
+    530,
+    1075
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    198,
+    765,
+    527,
+    1072
+   ],
+   "visible_size": [
+    329,
+    307
+   ],
+   "visible_size_world": [
+    56.9249,
+    53.1183
+   ],
+   "bbox_centre": [
+    362.5,
+    918.5
+   ],
+   "foot_bottom_centre": [
+    362.5,
+    1072
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -177.5,
+      -157.0
+     ],
+     "world": [
+      -30.7117,
+      -27.1647
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      -0.19849
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -177.5,
+      316.0
+     ],
+     "world": [
+      -30.7117,
+      54.6755
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.39951
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2781.288,
+     5054.176
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -177.5,
+      -3.5
+     ],
+     "world": [
+      -30.7117,
+      -0.6056
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      -0.00442
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -177.5,
+      469.5
+     ],
+     "world": [
+      -30.7117,
+      81.2347
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.59358
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2781.288,
+     5080.735
+    ]
+   },
+   "origin": "concept B bed (genB3) cut on the fixed bed footprint; state art = Garden v2 plot designs repainted, sized x2 (Albert 130 / OT12 idle 65 room px) ; dirt = row ridges flattened in code",
+   "swap_group": "bed-1-back-left",
+   "state": "dirt",
+   "game_state": "dirt",
+   "plants_or_seeds_placed": 0,
+   "shadow": {
+    "file": "bed-1-back-left-dirt-shadow.png",
+    "topleft": [
+     190,
+     762
+    ],
+    "size": [
+     341,
+     322
+    ],
+    "how": "soft contact shadow (bed alpha shifted 6 px down, blur 5, x0.45); identical for all 7 states of this bed",
+    "md5": "71ad17c99c7b548db6cc9994c6b58805"
+   }
+  },
+  {
+   "name": "bed-1-back-left-plowed",
+   "draw_order": 11,
+   "file": "bed-1-back-left-plowed.png",
+   "md5": "ba0b0457f6c73f8ffd2833bc330c1614",
+   "png_size": [
+    333,
+    311
+   ],
+   "topleft_in_1080x1680": [
+    197,
+    764
+   ],
+   "png_box_xyxy": [
+    197,
+    764,
+    530,
+    1075
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    198,
+    765,
+    527,
+    1072
+   ],
+   "visible_size": [
+    329,
+    307
+   ],
+   "visible_size_world": [
+    56.9249,
+    53.1183
+   ],
+   "bbox_centre": [
+    362.5,
+    918.5
+   ],
+   "foot_bottom_centre": [
+    362.5,
+    1072
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -177.5,
+      -157.0
+     ],
+     "world": [
+      -30.7117,
+      -27.1647
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      -0.19849
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -177.5,
+      316.0
+     ],
+     "world": [
+      -30.7117,
+      54.6755
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.39951
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2781.288,
+     5054.176
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -177.5,
+      -3.5
+     ],
+     "world": [
+      -30.7117,
+      -0.6056
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      -0.00442
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -177.5,
+      469.5
+     ],
+     "world": [
+      -30.7117,
+      81.2347
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.59358
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2781.288,
+     5080.735
+    ]
+   },
+   "origin": "concept B bed (genB3) cut on the fixed bed footprint; state art = Garden v2 plot designs repainted, sized x2 (Albert 130 / OT12 idle 65 room px) ; plowed = the painted rows unchanged",
+   "swap_group": "bed-1-back-left",
+   "state": "plowed",
+   "game_state": "plowed",
+   "plants_or_seeds_placed": 0,
+   "shadow": {
+    "file": "bed-1-back-left-plowed-shadow.png",
+    "topleft": [
+     190,
+     762
+    ],
+    "size": [
+     341,
+     322
+    ],
+    "how": "soft contact shadow (bed alpha shifted 6 px down, blur 5, x0.45); identical for all 7 states of this bed",
+    "md5": "71ad17c99c7b548db6cc9994c6b58805"
+   }
+  },
+  {
+   "name": "bed-1-back-left-seeded",
+   "draw_order": 11,
+   "file": "bed-1-back-left-seeded.png",
+   "md5": "b061a82cf5c6bd1af2162afcb9e134f6",
+   "png_size": [
+    333,
+    311
+   ],
+   "topleft_in_1080x1680": [
+    197,
+    764
+   ],
+   "png_box_xyxy": [
+    197,
+    764,
+    530,
+    1075
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    198,
+    765,
+    527,
+    1072
+   ],
+   "visible_size": [
+    329,
+    307
+   ],
+   "visible_size_world": [
+    56.9249,
+    53.1183
+   ],
+   "bbox_centre": [
+    362.5,
+    918.5
+   ],
+   "foot_bottom_centre": [
+    362.5,
+    1072
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -177.5,
+      -157.0
+     ],
+     "world": [
+      -30.7117,
+      -27.1647
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      -0.19849
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -177.5,
+      316.0
+     ],
+     "world": [
+      -30.7117,
+      54.6755
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.39951
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2781.288,
+     5054.176
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -177.5,
+      -3.5
+     ],
+     "world": [
+      -30.7117,
+      -0.6056
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      -0.00442
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -177.5,
+      469.5
+     ],
+     "world": [
+      -30.7117,
+      81.2347
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.59358
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2781.288,
+     5080.735
+    ]
+   },
+   "origin": "concept B bed (genB3) cut on the fixed bed footprint; state art = Garden v2 plot designs repainted, sized x2 (Albert 130 / OT12 idle 65 room px)",
+   "swap_group": "bed-1-back-left",
+   "state": "seeded",
+   "game_state": "seeded",
+   "plants_or_seeds_placed": 66,
+   "shadow": {
+    "file": "bed-1-back-left-seeded-shadow.png",
+    "topleft": [
+     190,
+     762
+    ],
+    "size": [
+     341,
+     322
+    ],
+    "how": "soft contact shadow (bed alpha shifted 6 px down, blur 5, x0.45); identical for all 7 states of this bed",
+    "md5": "71ad17c99c7b548db6cc9994c6b58805"
+   }
+  },
+  {
+   "name": "bed-1-back-left-sprout",
+   "draw_order": 11,
+   "file": "bed-1-back-left-sprout.png",
+   "md5": "0dc2b5f32ee4c5ce8b620359aa7e1a03",
+   "png_size": [
+    333,
+    311
+   ],
+   "topleft_in_1080x1680": [
+    197,
+    764
+   ],
+   "png_box_xyxy": [
+    197,
+    764,
+    530,
+    1075
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    198,
+    765,
+    527,
+    1072
+   ],
+   "visible_size": [
+    329,
+    307
+   ],
+   "visible_size_world": [
+    56.9249,
+    53.1183
+   ],
+   "bbox_centre": [
+    362.5,
+    918.5
+   ],
+   "foot_bottom_centre": [
+    362.5,
+    1072
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -177.5,
+      -157.0
+     ],
+     "world": [
+      -30.7117,
+      -27.1647
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      -0.19849
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -177.5,
+      316.0
+     ],
+     "world": [
+      -30.7117,
+      54.6755
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.39951
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2781.288,
+     5054.176
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -177.5,
+      -3.5
+     ],
+     "world": [
+      -30.7117,
+      -0.6056
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      -0.00442
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -177.5,
+      469.5
+     ],
+     "world": [
+      -30.7117,
+      81.2347
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.59358
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2781.288,
+     5080.735
+    ]
+   },
+   "origin": "concept B bed (genB3) cut on the fixed bed footprint; state art = Garden v2 plot designs repainted, sized x2 (Albert 130 / OT12 idle 65 room px)",
+   "swap_group": "bed-1-back-left",
+   "state": "sprout",
+   "game_state": "sprout",
+   "plants_or_seeds_placed": 22,
+   "shadow": {
+    "file": "bed-1-back-left-sprout-shadow.png",
+    "topleft": [
+     190,
+     762
+    ],
+    "size": [
+     341,
+     322
+    ],
+    "how": "soft contact shadow (bed alpha shifted 6 px down, blur 5, x0.45); identical for all 7 states of this bed",
+    "md5": "71ad17c99c7b548db6cc9994c6b58805"
+   }
+  },
+  {
+   "name": "bed-1-back-left-weeds",
+   "draw_order": 11,
+   "file": "bed-1-back-left-weeds.png",
+   "md5": "b6b980662450e4034f7b2158c36d1023",
+   "png_size": [
+    333,
+    311
+   ],
+   "topleft_in_1080x1680": [
+    197,
+    764
+   ],
+   "png_box_xyxy": [
+    197,
+    764,
+    530,
+    1075
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    198,
+    765,
+    527,
+    1072
+   ],
+   "visible_size": [
+    329,
+    307
+   ],
+   "visible_size_world": [
+    56.9249,
+    53.1183
+   ],
+   "bbox_centre": [
+    362.5,
+    918.5
+   ],
+   "foot_bottom_centre": [
+    362.5,
+    1072
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -177.5,
+      -157.0
+     ],
+     "world": [
+      -30.7117,
+      -27.1647
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      -0.19849
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -177.5,
+      316.0
+     ],
+     "world": [
+      -30.7117,
+      54.6755
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.39951
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2781.288,
+     5054.176
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -177.5,
+      -3.5
+     ],
+     "world": [
+      -30.7117,
+      -0.6056
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      -0.00442
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -177.5,
+      469.5
+     ],
+     "world": [
+      -30.7117,
+      81.2347
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.59358
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2781.288,
+     5080.735
+    ]
+   },
+   "origin": "concept B bed (genB3) cut on the fixed bed footprint; state art = Garden v2 plot designs repainted, sized x2 (Albert 130 / OT12 idle 65 room px)",
+   "swap_group": "bed-1-back-left",
+   "state": "weeds",
+   "game_state": "sprout look + Garden v2 weed sprites",
+   "plants_or_seeds_placed": 22,
+   "shadow": {
+    "file": "bed-1-back-left-weeds-shadow.png",
+    "topleft": [
+     190,
+     762
+    ],
+    "size": [
+     341,
+     322
+    ],
+    "how": "soft contact shadow (bed alpha shifted 6 px down, blur 5, x0.45); identical for all 7 states of this bed",
+    "md5": "71ad17c99c7b548db6cc9994c6b58805"
+   }
+  },
+  {
+   "name": "bed-1-back-left-grown",
+   "draw_order": 11,
+   "file": "bed-1-back-left-grown.png",
+   "md5": "8c93b26f7267929b2923b33a09102b82",
+   "png_size": [
+    333,
+    311
+   ],
+   "topleft_in_1080x1680": [
+    197,
+    764
+   ],
+   "png_box_xyxy": [
+    197,
+    764,
+    530,
+    1075
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    198,
+    765,
+    527,
+    1072
+   ],
+   "visible_size": [
+    329,
+    307
+   ],
+   "visible_size_world": [
+    56.9249,
+    53.1183
+   ],
+   "bbox_centre": [
+    362.5,
+    918.5
+   ],
+   "foot_bottom_centre": [
+    362.5,
+    1072
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -177.5,
+      -157.0
+     ],
+     "world": [
+      -30.7117,
+      -27.1647
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      -0.19849
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -177.5,
+      316.0
+     ],
+     "world": [
+      -30.7117,
+      54.6755
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.39951
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2781.288,
+     5054.176
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -177.5,
+      -3.5
+     ],
+     "world": [
+      -30.7117,
+      -0.6056
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      -0.00442
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -177.5,
+      469.5
+     ],
+     "world": [
+      -30.7117,
+      81.2347
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.59358
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2781.288,
+     5080.735
+    ]
+   },
+   "origin": "concept B bed (genB3) cut on the fixed bed footprint; state art = Garden v2 plot designs repainted, sized x2 (Albert 130 / OT12 idle 65 room px)",
+   "swap_group": "bed-1-back-left",
+   "state": "grown",
+   "game_state": "leafy",
+   "plants_or_seeds_placed": 21,
+   "shadow": {
+    "file": "bed-1-back-left-grown-shadow.png",
+    "topleft": [
+     190,
+     762
+    ],
+    "size": [
+     341,
+     322
+    ],
+    "how": "soft contact shadow (bed alpha shifted 6 px down, blur 5, x0.45); identical for all 7 states of this bed",
+    "md5": "71ad17c99c7b548db6cc9994c6b58805"
+   }
+  },
+  {
+   "name": "bed-1-back-left-harvest",
+   "draw_order": 11,
+   "file": "bed-1-back-left-harvest.png",
+   "md5": "8fcc4ece9f807827c8a7ac587087c5bc",
+   "png_size": [
+    333,
+    311
+   ],
+   "topleft_in_1080x1680": [
+    197,
+    764
+   ],
+   "png_box_xyxy": [
+    197,
+    764,
+    530,
+    1075
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    198,
+    765,
+    527,
+    1072
+   ],
+   "visible_size": [
+    329,
+    307
+   ],
+   "visible_size_world": [
+    56.9249,
+    53.1183
+   ],
+   "bbox_centre": [
+    362.5,
+    918.5
+   ],
+   "foot_bottom_centre": [
+    362.5,
+    1072
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -177.5,
+      -157.0
+     ],
+     "world": [
+      -30.7117,
+      -27.1647
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      -0.19849
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -177.5,
+      316.0
+     ],
+     "world": [
+      -30.7117,
+      54.6755
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.39951
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2781.288,
+     5054.176
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -177.5,
+      -3.5
+     ],
+     "world": [
+      -30.7117,
+      -0.6056
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      -0.00442
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -177.5,
+      469.5
+     ],
+     "world": [
+      -30.7117,
+      81.2347
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.59358
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2781.288,
+     5080.735
+    ]
+   },
+   "origin": "concept B bed (genB3) cut on the fixed bed footprint; state art = Garden v2 plot designs repainted, sized x2 (Albert 130 / OT12 idle 65 room px)",
+   "swap_group": "bed-1-back-left",
+   "state": "harvest",
+   "game_state": "ripe",
+   "plants_or_seeds_placed": 20,
+   "shadow": {
+    "file": "bed-1-back-left-harvest-shadow.png",
+    "topleft": [
+     190,
+     762
+    ],
+    "size": [
+     341,
+     322
+    ],
+    "how": "soft contact shadow (bed alpha shifted 6 px down, blur 5, x0.45); identical for all 7 states of this bed",
+    "md5": "71ad17c99c7b548db6cc9994c6b58805"
+   }
+  },
+  {
+   "name": "bed-2-back-right-dirt",
+   "draw_order": 12,
+   "file": "bed-2-back-right-dirt.png",
+   "md5": "ffe6dea96383475972a1cc65dd5dce74",
+   "png_size": [
+    335,
+    309
+   ],
+   "topleft_in_1080x1680": [
+    550,
+    764
+   ],
+   "png_box_xyxy": [
+    550,
+    764,
+    885,
+    1073
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    554,
+    765,
+    884,
+    1072
+   ],
+   "visible_size": [
+    330,
+    307
+   ],
+   "visible_size_world": [
+    57.0979,
+    53.1183
+   ],
+   "bbox_centre": [
+    719.0,
+    918.5
+   ],
+   "foot_bottom_centre": [
+    719.0,
+    1072
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      179.0,
+      -157.0
+     ],
+     "world": [
+      30.9713,
+      -27.1647
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      -0.19849
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      179.0,
+      316.0
+     ],
+     "world": [
+      30.9713,
+      54.6755
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.39951
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2842.971,
+     5054.176
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      179.0,
+      -3.5
+     ],
+     "world": [
+      30.9713,
+      -0.6056
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      -0.00442
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      179.0,
+      469.5
+     ],
+     "world": [
+      30.9713,
+      81.2347
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.59358
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2842.971,
+     5080.735
+    ]
+   },
+   "origin": "concept B bed (genB3) cut on the fixed bed footprint; state art = Garden v2 plot designs repainted, sized x2 (Albert 130 / OT12 idle 65 room px) ; dirt = row ridges flattened in code",
+   "swap_group": "bed-2-back-right",
+   "state": "dirt",
+   "game_state": "dirt",
+   "plants_or_seeds_placed": 0,
+   "shadow": {
+    "file": "bed-2-back-right-dirt-shadow.png",
+    "topleft": [
+     550,
+     763
+    ],
+    "size": [
+     341,
+     322
+    ],
+    "how": "soft contact shadow (bed alpha shifted 6 px down, blur 5, x0.45); identical for all 7 states of this bed",
+    "md5": "e8c380ba8a2566cdfcb5aa0f0b9ffc14"
+   }
+  },
+  {
+   "name": "bed-2-back-right-plowed",
+   "draw_order": 12,
+   "file": "bed-2-back-right-plowed.png",
+   "md5": "00db6f0ab9d8e9494a59973c888a826e",
+   "png_size": [
+    335,
+    309
+   ],
+   "topleft_in_1080x1680": [
+    550,
+    764
+   ],
+   "png_box_xyxy": [
+    550,
+    764,
+    885,
+    1073
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    554,
+    765,
+    884,
+    1072
+   ],
+   "visible_size": [
+    330,
+    307
+   ],
+   "visible_size_world": [
+    57.0979,
+    53.1183
+   ],
+   "bbox_centre": [
+    719.0,
+    918.5
+   ],
+   "foot_bottom_centre": [
+    719.0,
+    1072
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      179.0,
+      -157.0
+     ],
+     "world": [
+      30.9713,
+      -27.1647
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      -0.19849
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      179.0,
+      316.0
+     ],
+     "world": [
+      30.9713,
+      54.6755
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.39951
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2842.971,
+     5054.176
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      179.0,
+      -3.5
+     ],
+     "world": [
+      30.9713,
+      -0.6056
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      -0.00442
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      179.0,
+      469.5
+     ],
+     "world": [
+      30.9713,
+      81.2347
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.59358
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2842.971,
+     5080.735
+    ]
+   },
+   "origin": "concept B bed (genB3) cut on the fixed bed footprint; state art = Garden v2 plot designs repainted, sized x2 (Albert 130 / OT12 idle 65 room px) ; plowed = the painted rows unchanged",
+   "swap_group": "bed-2-back-right",
+   "state": "plowed",
+   "game_state": "plowed",
+   "plants_or_seeds_placed": 0,
+   "shadow": {
+    "file": "bed-2-back-right-plowed-shadow.png",
+    "topleft": [
+     550,
+     763
+    ],
+    "size": [
+     341,
+     322
+    ],
+    "how": "soft contact shadow (bed alpha shifted 6 px down, blur 5, x0.45); identical for all 7 states of this bed",
+    "md5": "e8c380ba8a2566cdfcb5aa0f0b9ffc14"
+   }
+  },
+  {
+   "name": "bed-2-back-right-seeded",
+   "draw_order": 12,
+   "file": "bed-2-back-right-seeded.png",
+   "md5": "90e8a9e705f3cc252699deb5c44357a3",
+   "png_size": [
+    335,
+    309
+   ],
+   "topleft_in_1080x1680": [
+    550,
+    764
+   ],
+   "png_box_xyxy": [
+    550,
+    764,
+    885,
+    1073
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    554,
+    765,
+    884,
+    1072
+   ],
+   "visible_size": [
+    330,
+    307
+   ],
+   "visible_size_world": [
+    57.0979,
+    53.1183
+   ],
+   "bbox_centre": [
+    719.0,
+    918.5
+   ],
+   "foot_bottom_centre": [
+    719.0,
+    1072
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      179.0,
+      -157.0
+     ],
+     "world": [
+      30.9713,
+      -27.1647
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      -0.19849
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      179.0,
+      316.0
+     ],
+     "world": [
+      30.9713,
+      54.6755
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.39951
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2842.971,
+     5054.176
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      179.0,
+      -3.5
+     ],
+     "world": [
+      30.9713,
+      -0.6056
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      -0.00442
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      179.0,
+      469.5
+     ],
+     "world": [
+      30.9713,
+      81.2347
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.59358
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2842.971,
+     5080.735
+    ]
+   },
+   "origin": "concept B bed (genB3) cut on the fixed bed footprint; state art = Garden v2 plot designs repainted, sized x2 (Albert 130 / OT12 idle 65 room px)",
+   "swap_group": "bed-2-back-right",
+   "state": "seeded",
+   "game_state": "seeded",
+   "plants_or_seeds_placed": 78,
+   "shadow": {
+    "file": "bed-2-back-right-seeded-shadow.png",
+    "topleft": [
+     550,
+     763
+    ],
+    "size": [
+     341,
+     322
+    ],
+    "how": "soft contact shadow (bed alpha shifted 6 px down, blur 5, x0.45); identical for all 7 states of this bed",
+    "md5": "e8c380ba8a2566cdfcb5aa0f0b9ffc14"
+   }
+  },
+  {
+   "name": "bed-2-back-right-sprout",
+   "draw_order": 12,
+   "file": "bed-2-back-right-sprout.png",
+   "md5": "79b2a548c64d215580f2b3454ad885a9",
+   "png_size": [
+    335,
+    309
+   ],
+   "topleft_in_1080x1680": [
+    550,
+    764
+   ],
+   "png_box_xyxy": [
+    550,
+    764,
+    885,
+    1073
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    554,
+    765,
+    884,
+    1072
+   ],
+   "visible_size": [
+    330,
+    307
+   ],
+   "visible_size_world": [
+    57.0979,
+    53.1183
+   ],
+   "bbox_centre": [
+    719.0,
+    918.5
+   ],
+   "foot_bottom_centre": [
+    719.0,
+    1072
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      179.0,
+      -157.0
+     ],
+     "world": [
+      30.9713,
+      -27.1647
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      -0.19849
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      179.0,
+      316.0
+     ],
+     "world": [
+      30.9713,
+      54.6755
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.39951
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2842.971,
+     5054.176
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      179.0,
+      -3.5
+     ],
+     "world": [
+      30.9713,
+      -0.6056
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      -0.00442
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      179.0,
+      469.5
+     ],
+     "world": [
+      30.9713,
+      81.2347
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.59358
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2842.971,
+     5080.735
+    ]
+   },
+   "origin": "concept B bed (genB3) cut on the fixed bed footprint; state art = Garden v2 plot designs repainted, sized x2 (Albert 130 / OT12 idle 65 room px)",
+   "swap_group": "bed-2-back-right",
+   "state": "sprout",
+   "game_state": "sprout",
+   "plants_or_seeds_placed": 26,
+   "shadow": {
+    "file": "bed-2-back-right-sprout-shadow.png",
+    "topleft": [
+     550,
+     763
+    ],
+    "size": [
+     341,
+     322
+    ],
+    "how": "soft contact shadow (bed alpha shifted 6 px down, blur 5, x0.45); identical for all 7 states of this bed",
+    "md5": "e8c380ba8a2566cdfcb5aa0f0b9ffc14"
+   }
+  },
+  {
+   "name": "bed-2-back-right-weeds",
+   "draw_order": 12,
+   "file": "bed-2-back-right-weeds.png",
+   "md5": "e26dac988d425e826082705d0873e605",
+   "png_size": [
+    335,
+    309
+   ],
+   "topleft_in_1080x1680": [
+    550,
+    764
+   ],
+   "png_box_xyxy": [
+    550,
+    764,
+    885,
+    1073
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    554,
+    765,
+    884,
+    1072
+   ],
+   "visible_size": [
+    330,
+    307
+   ],
+   "visible_size_world": [
+    57.0979,
+    53.1183
+   ],
+   "bbox_centre": [
+    719.0,
+    918.5
+   ],
+   "foot_bottom_centre": [
+    719.0,
+    1072
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      179.0,
+      -157.0
+     ],
+     "world": [
+      30.9713,
+      -27.1647
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      -0.19849
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      179.0,
+      316.0
+     ],
+     "world": [
+      30.9713,
+      54.6755
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.39951
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2842.971,
+     5054.176
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      179.0,
+      -3.5
+     ],
+     "world": [
+      30.9713,
+      -0.6056
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      -0.00442
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      179.0,
+      469.5
+     ],
+     "world": [
+      30.9713,
+      81.2347
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.59358
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2842.971,
+     5080.735
+    ]
+   },
+   "origin": "concept B bed (genB3) cut on the fixed bed footprint; state art = Garden v2 plot designs repainted, sized x2 (Albert 130 / OT12 idle 65 room px)",
+   "swap_group": "bed-2-back-right",
+   "state": "weeds",
+   "game_state": "sprout look + Garden v2 weed sprites",
+   "plants_or_seeds_placed": 26,
+   "shadow": {
+    "file": "bed-2-back-right-weeds-shadow.png",
+    "topleft": [
+     550,
+     763
+    ],
+    "size": [
+     341,
+     322
+    ],
+    "how": "soft contact shadow (bed alpha shifted 6 px down, blur 5, x0.45); identical for all 7 states of this bed",
+    "md5": "e8c380ba8a2566cdfcb5aa0f0b9ffc14"
+   }
+  },
+  {
+   "name": "bed-2-back-right-grown",
+   "draw_order": 12,
+   "file": "bed-2-back-right-grown.png",
+   "md5": "62acb70d90e193b572143ecbcca27dd3",
+   "png_size": [
+    335,
+    309
+   ],
+   "topleft_in_1080x1680": [
+    550,
+    764
+   ],
+   "png_box_xyxy": [
+    550,
+    764,
+    885,
+    1073
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    554,
+    765,
+    884,
+    1072
+   ],
+   "visible_size": [
+    330,
+    307
+   ],
+   "visible_size_world": [
+    57.0979,
+    53.1183
+   ],
+   "bbox_centre": [
+    719.0,
+    918.5
+   ],
+   "foot_bottom_centre": [
+    719.0,
+    1072
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      179.0,
+      -157.0
+     ],
+     "world": [
+      30.9713,
+      -27.1647
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      -0.19849
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      179.0,
+      316.0
+     ],
+     "world": [
+      30.9713,
+      54.6755
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.39951
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2842.971,
+     5054.176
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      179.0,
+      -3.5
+     ],
+     "world": [
+      30.9713,
+      -0.6056
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      -0.00442
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      179.0,
+      469.5
+     ],
+     "world": [
+      30.9713,
+      81.2347
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.59358
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2842.971,
+     5080.735
+    ]
+   },
+   "origin": "concept B bed (genB3) cut on the fixed bed footprint; state art = Garden v2 plot designs repainted, sized x2 (Albert 130 / OT12 idle 65 room px)",
+   "swap_group": "bed-2-back-right",
+   "state": "grown",
+   "game_state": "leafy",
+   "plants_or_seeds_placed": 26,
+   "shadow": {
+    "file": "bed-2-back-right-grown-shadow.png",
+    "topleft": [
+     550,
+     763
+    ],
+    "size": [
+     341,
+     322
+    ],
+    "how": "soft contact shadow (bed alpha shifted 6 px down, blur 5, x0.45); identical for all 7 states of this bed",
+    "md5": "e8c380ba8a2566cdfcb5aa0f0b9ffc14"
+   }
+  },
+  {
+   "name": "bed-2-back-right-harvest",
+   "draw_order": 12,
+   "file": "bed-2-back-right-harvest.png",
+   "md5": "f7013b280b1c56c9f85b4eae7d4cd38b",
+   "png_size": [
+    335,
+    309
+   ],
+   "topleft_in_1080x1680": [
+    550,
+    764
+   ],
+   "png_box_xyxy": [
+    550,
+    764,
+    885,
+    1073
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    554,
+    765,
+    884,
+    1072
+   ],
+   "visible_size": [
+    330,
+    307
+   ],
+   "visible_size_world": [
+    57.0979,
+    53.1183
+   ],
+   "bbox_centre": [
+    719.0,
+    918.5
+   ],
+   "foot_bottom_centre": [
+    719.0,
+    1072
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      179.0,
+      -157.0
+     ],
+     "world": [
+      30.9713,
+      -27.1647
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      -0.19849
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      179.0,
+      316.0
+     ],
+     "world": [
+      30.9713,
+      54.6755
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.39951
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2842.971,
+     5054.176
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      179.0,
+      -3.5
+     ],
+     "world": [
+      30.9713,
+      -0.6056
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      -0.00442
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      179.0,
+      469.5
+     ],
+     "world": [
+      30.9713,
+      81.2347
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.59358
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2842.971,
+     5080.735
+    ]
+   },
+   "origin": "concept B bed (genB3) cut on the fixed bed footprint; state art = Garden v2 plot designs repainted, sized x2 (Albert 130 / OT12 idle 65 room px)",
+   "swap_group": "bed-2-back-right",
+   "state": "harvest",
+   "game_state": "ripe",
+   "plants_or_seeds_placed": 24,
+   "shadow": {
+    "file": "bed-2-back-right-harvest-shadow.png",
+    "topleft": [
+     550,
+     763
+    ],
+    "size": [
+     341,
+     322
+    ],
+    "how": "soft contact shadow (bed alpha shifted 6 px down, blur 5, x0.45); identical for all 7 states of this bed",
+    "md5": "e8c380ba8a2566cdfcb5aa0f0b9ffc14"
+   }
+  },
+  {
+   "name": "bed-3-front-left-dirt",
+   "draw_order": 13,
+   "file": "bed-3-front-left-dirt.png",
+   "md5": "8ed77da01ed8a8e4065c601147aead55",
+   "png_size": [
+    331,
+    316
+   ],
+   "topleft_in_1080x1680": [
+    197,
+    1076
+   ],
+   "png_box_xyxy": [
+    197,
+    1076,
+    528,
+    1392
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    198,
+    1079,
+    527,
+    1391
+   ],
+   "visible_size": [
+    329,
+    312
+   ],
+   "visible_size_world": [
+    56.9249,
+    53.9834
+   ],
+   "bbox_centre": [
+    362.5,
+    1235.0
+   ],
+   "foot_bottom_centre": [
+    362.5,
+    1391
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -177.5,
+      159.5
+     ],
+     "world": [
+      -30.7117,
+      27.5973
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.20165
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -177.5,
+      632.5
+     ],
+     "world": [
+      -30.7117,
+      109.4376
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.79965
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2781.288,
+     5108.938
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -177.5,
+      315.5
+     ],
+     "world": [
+      -30.7117,
+      54.589
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.39888
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -177.5,
+      788.5
+     ],
+     "world": [
+      -30.7117,
+      136.4293
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.99688
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2781.288,
+     5135.929
+    ]
+   },
+   "origin": "concept B bed (genB3) cut on the fixed bed footprint; state art = Garden v2 plot designs repainted, sized x2 (Albert 130 / OT12 idle 65 room px) ; dirt = row ridges flattened in code",
+   "swap_group": "bed-3-front-left",
+   "state": "dirt",
+   "game_state": "dirt",
+   "plants_or_seeds_placed": 0,
+   "shadow": {
+    "file": "bed-3-front-left-dirt-shadow.png",
+    "topleft": [
+     190,
+     1077
+    ],
+    "size": [
+     344,
+     329
+    ],
+    "how": "soft contact shadow (bed alpha shifted 6 px down, blur 5, x0.45); identical for all 7 states of this bed",
+    "md5": "f4f71bb07c94f64a52727be6f531d0bf"
+   }
+  },
+  {
+   "name": "bed-3-front-left-plowed",
+   "draw_order": 13,
+   "file": "bed-3-front-left-plowed.png",
+   "md5": "4873a60aec35336d5d84ab4b0049131f",
+   "png_size": [
+    331,
+    316
+   ],
+   "topleft_in_1080x1680": [
+    197,
+    1076
+   ],
+   "png_box_xyxy": [
+    197,
+    1076,
+    528,
+    1392
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    198,
+    1079,
+    527,
+    1391
+   ],
+   "visible_size": [
+    329,
+    312
+   ],
+   "visible_size_world": [
+    56.9249,
+    53.9834
+   ],
+   "bbox_centre": [
+    362.5,
+    1235.0
+   ],
+   "foot_bottom_centre": [
+    362.5,
+    1391
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -177.5,
+      159.5
+     ],
+     "world": [
+      -30.7117,
+      27.5973
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.20165
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -177.5,
+      632.5
+     ],
+     "world": [
+      -30.7117,
+      109.4376
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.79965
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2781.288,
+     5108.938
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -177.5,
+      315.5
+     ],
+     "world": [
+      -30.7117,
+      54.589
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.39888
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -177.5,
+      788.5
+     ],
+     "world": [
+      -30.7117,
+      136.4293
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.99688
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2781.288,
+     5135.929
+    ]
+   },
+   "origin": "concept B bed (genB3) cut on the fixed bed footprint; state art = Garden v2 plot designs repainted, sized x2 (Albert 130 / OT12 idle 65 room px) ; plowed = the painted rows unchanged",
+   "swap_group": "bed-3-front-left",
+   "state": "plowed",
+   "game_state": "plowed",
+   "plants_or_seeds_placed": 0,
+   "shadow": {
+    "file": "bed-3-front-left-plowed-shadow.png",
+    "topleft": [
+     190,
+     1077
+    ],
+    "size": [
+     344,
+     329
+    ],
+    "how": "soft contact shadow (bed alpha shifted 6 px down, blur 5, x0.45); identical for all 7 states of this bed",
+    "md5": "f4f71bb07c94f64a52727be6f531d0bf"
+   }
+  },
+  {
+   "name": "bed-3-front-left-seeded",
+   "draw_order": 13,
+   "file": "bed-3-front-left-seeded.png",
+   "md5": "8761264950fefec75866107439ee9d70",
+   "png_size": [
+    331,
+    316
+   ],
+   "topleft_in_1080x1680": [
+    197,
+    1076
+   ],
+   "png_box_xyxy": [
+    197,
+    1076,
+    528,
+    1392
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    198,
+    1079,
+    527,
+    1391
+   ],
+   "visible_size": [
+    329,
+    312
+   ],
+   "visible_size_world": [
+    56.9249,
+    53.9834
+   ],
+   "bbox_centre": [
+    362.5,
+    1235.0
+   ],
+   "foot_bottom_centre": [
+    362.5,
+    1391
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -177.5,
+      159.5
+     ],
+     "world": [
+      -30.7117,
+      27.5973
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.20165
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -177.5,
+      632.5
+     ],
+     "world": [
+      -30.7117,
+      109.4376
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.79965
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2781.288,
+     5108.938
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -177.5,
+      315.5
+     ],
+     "world": [
+      -30.7117,
+      54.589
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.39888
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -177.5,
+      788.5
+     ],
+     "world": [
+      -30.7117,
+      136.4293
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.99688
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2781.288,
+     5135.929
+    ]
+   },
+   "origin": "concept B bed (genB3) cut on the fixed bed footprint; state art = Garden v2 plot designs repainted, sized x2 (Albert 130 / OT12 idle 65 room px)",
+   "swap_group": "bed-3-front-left",
+   "state": "seeded",
+   "game_state": "seeded",
+   "plants_or_seeds_placed": 63,
+   "shadow": {
+    "file": "bed-3-front-left-seeded-shadow.png",
+    "topleft": [
+     190,
+     1077
+    ],
+    "size": [
+     344,
+     329
+    ],
+    "how": "soft contact shadow (bed alpha shifted 6 px down, blur 5, x0.45); identical for all 7 states of this bed",
+    "md5": "f4f71bb07c94f64a52727be6f531d0bf"
+   }
+  },
+  {
+   "name": "bed-3-front-left-sprout",
+   "draw_order": 13,
+   "file": "bed-3-front-left-sprout.png",
+   "md5": "2774c9f0676f271d532751a25f071b12",
+   "png_size": [
+    331,
+    316
+   ],
+   "topleft_in_1080x1680": [
+    197,
+    1076
+   ],
+   "png_box_xyxy": [
+    197,
+    1076,
+    528,
+    1392
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    198,
+    1079,
+    527,
+    1391
+   ],
+   "visible_size": [
+    329,
+    312
+   ],
+   "visible_size_world": [
+    56.9249,
+    53.9834
+   ],
+   "bbox_centre": [
+    362.5,
+    1235.0
+   ],
+   "foot_bottom_centre": [
+    362.5,
+    1391
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -177.5,
+      159.5
+     ],
+     "world": [
+      -30.7117,
+      27.5973
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.20165
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -177.5,
+      632.5
+     ],
+     "world": [
+      -30.7117,
+      109.4376
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.79965
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2781.288,
+     5108.938
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -177.5,
+      315.5
+     ],
+     "world": [
+      -30.7117,
+      54.589
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.39888
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -177.5,
+      788.5
+     ],
+     "world": [
+      -30.7117,
+      136.4293
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.99688
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2781.288,
+     5135.929
+    ]
+   },
+   "origin": "concept B bed (genB3) cut on the fixed bed footprint; state art = Garden v2 plot designs repainted, sized x2 (Albert 130 / OT12 idle 65 room px)",
+   "swap_group": "bed-3-front-left",
+   "state": "sprout",
+   "game_state": "sprout",
+   "plants_or_seeds_placed": 21,
+   "shadow": {
+    "file": "bed-3-front-left-sprout-shadow.png",
+    "topleft": [
+     190,
+     1077
+    ],
+    "size": [
+     344,
+     329
+    ],
+    "how": "soft contact shadow (bed alpha shifted 6 px down, blur 5, x0.45); identical for all 7 states of this bed",
+    "md5": "f4f71bb07c94f64a52727be6f531d0bf"
+   }
+  },
+  {
+   "name": "bed-3-front-left-weeds",
+   "draw_order": 13,
+   "file": "bed-3-front-left-weeds.png",
+   "md5": "76a53aafeb48dea42da0f5104be724bd",
+   "png_size": [
+    331,
+    316
+   ],
+   "topleft_in_1080x1680": [
+    197,
+    1076
+   ],
+   "png_box_xyxy": [
+    197,
+    1076,
+    528,
+    1392
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    198,
+    1079,
+    527,
+    1391
+   ],
+   "visible_size": [
+    329,
+    312
+   ],
+   "visible_size_world": [
+    56.9249,
+    53.9834
+   ],
+   "bbox_centre": [
+    362.5,
+    1235.0
+   ],
+   "foot_bottom_centre": [
+    362.5,
+    1391
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -177.5,
+      159.5
+     ],
+     "world": [
+      -30.7117,
+      27.5973
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.20165
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -177.5,
+      632.5
+     ],
+     "world": [
+      -30.7117,
+      109.4376
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.79965
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2781.288,
+     5108.938
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -177.5,
+      315.5
+     ],
+     "world": [
+      -30.7117,
+      54.589
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.39888
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -177.5,
+      788.5
+     ],
+     "world": [
+      -30.7117,
+      136.4293
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.99688
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2781.288,
+     5135.929
+    ]
+   },
+   "origin": "concept B bed (genB3) cut on the fixed bed footprint; state art = Garden v2 plot designs repainted, sized x2 (Albert 130 / OT12 idle 65 room px)",
+   "swap_group": "bed-3-front-left",
+   "state": "weeds",
+   "game_state": "sprout look + Garden v2 weed sprites",
+   "plants_or_seeds_placed": 21,
+   "shadow": {
+    "file": "bed-3-front-left-weeds-shadow.png",
+    "topleft": [
+     190,
+     1077
+    ],
+    "size": [
+     344,
+     329
+    ],
+    "how": "soft contact shadow (bed alpha shifted 6 px down, blur 5, x0.45); identical for all 7 states of this bed",
+    "md5": "f4f71bb07c94f64a52727be6f531d0bf"
+   }
+  },
+  {
+   "name": "bed-3-front-left-grown",
+   "draw_order": 13,
+   "file": "bed-3-front-left-grown.png",
+   "md5": "e14f15148196ea05d0b211b62a3eff27",
+   "png_size": [
+    331,
+    316
+   ],
+   "topleft_in_1080x1680": [
+    197,
+    1076
+   ],
+   "png_box_xyxy": [
+    197,
+    1076,
+    528,
+    1392
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    198,
+    1079,
+    527,
+    1391
+   ],
+   "visible_size": [
+    329,
+    312
+   ],
+   "visible_size_world": [
+    56.9249,
+    53.9834
+   ],
+   "bbox_centre": [
+    362.5,
+    1235.0
+   ],
+   "foot_bottom_centre": [
+    362.5,
+    1391
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -177.5,
+      159.5
+     ],
+     "world": [
+      -30.7117,
+      27.5973
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.20165
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -177.5,
+      632.5
+     ],
+     "world": [
+      -30.7117,
+      109.4376
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.79965
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2781.288,
+     5108.938
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -177.5,
+      315.5
+     ],
+     "world": [
+      -30.7117,
+      54.589
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.39888
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -177.5,
+      788.5
+     ],
+     "world": [
+      -30.7117,
+      136.4293
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.99688
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2781.288,
+     5135.929
+    ]
+   },
+   "origin": "concept B bed (genB3) cut on the fixed bed footprint; state art = Garden v2 plot designs repainted, sized x2 (Albert 130 / OT12 idle 65 room px)",
+   "swap_group": "bed-3-front-left",
+   "state": "grown",
+   "game_state": "leafy",
+   "plants_or_seeds_placed": 19,
+   "shadow": {
+    "file": "bed-3-front-left-grown-shadow.png",
+    "topleft": [
+     190,
+     1077
+    ],
+    "size": [
+     344,
+     329
+    ],
+    "how": "soft contact shadow (bed alpha shifted 6 px down, blur 5, x0.45); identical for all 7 states of this bed",
+    "md5": "f4f71bb07c94f64a52727be6f531d0bf"
+   }
+  },
+  {
+   "name": "bed-3-front-left-harvest",
+   "draw_order": 13,
+   "file": "bed-3-front-left-harvest.png",
+   "md5": "c58af1cdd0f5aa055a6cea9ea13f6bd3",
+   "png_size": [
+    331,
+    316
+   ],
+   "topleft_in_1080x1680": [
+    197,
+    1076
+   ],
+   "png_box_xyxy": [
+    197,
+    1076,
+    528,
+    1392
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    198,
+    1079,
+    527,
+    1391
+   ],
+   "visible_size": [
+    329,
+    312
+   ],
+   "visible_size_world": [
+    56.9249,
+    53.9834
+   ],
+   "bbox_centre": [
+    362.5,
+    1235.0
+   ],
+   "foot_bottom_centre": [
+    362.5,
+    1391
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -177.5,
+      159.5
+     ],
+     "world": [
+      -30.7117,
+      27.5973
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.20165
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -177.5,
+      632.5
+     ],
+     "world": [
+      -30.7117,
+      109.4376
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.79965
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2781.288,
+     5108.938
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -177.5,
+      315.5
+     ],
+     "world": [
+      -30.7117,
+      54.589
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.39888
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -177.5,
+      788.5
+     ],
+     "world": [
+      -30.7117,
+      136.4293
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.22441,
+      0.99688
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2781.288,
+     5135.929
+    ]
+   },
+   "origin": "concept B bed (genB3) cut on the fixed bed footprint; state art = Garden v2 plot designs repainted, sized x2 (Albert 130 / OT12 idle 65 room px)",
+   "swap_group": "bed-3-front-left",
+   "state": "harvest",
+   "game_state": "ripe",
+   "plants_or_seeds_placed": 18,
+   "shadow": {
+    "file": "bed-3-front-left-harvest-shadow.png",
+    "topleft": [
+     190,
+     1077
+    ],
+    "size": [
+     344,
+     329
+    ],
+    "how": "soft contact shadow (bed alpha shifted 6 px down, blur 5, x0.45); identical for all 7 states of this bed",
+    "md5": "f4f71bb07c94f64a52727be6f531d0bf"
+   }
+  },
+  {
+   "name": "bed-4-front-right-dirt",
+   "draw_order": 14,
+   "file": "bed-4-front-right-dirt.png",
+   "md5": "af659d2d52471267f3e20f0719e7bedc",
+   "png_size": [
+    332,
+    326
+   ],
+   "topleft_in_1080x1680": [
+    553,
+    1066
+   ],
+   "png_box_xyxy": [
+    553,
+    1066,
+    885,
+    1392
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    554,
+    1067,
+    884,
+    1391
+   ],
+   "visible_size": [
+    330,
+    324
+   ],
+   "visible_size_world": [
+    57.0979,
+    56.0597
+   ],
+   "bbox_centre": [
+    719.0,
+    1229.0
+   ],
+   "foot_bottom_centre": [
+    719.0,
+    1391
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      179.0,
+      153.5
+     ],
+     "world": [
+      30.9713,
+      26.5592
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.19407
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      179.0,
+      626.5
+     ],
+     "world": [
+      30.9713,
+      108.3995
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.79207
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2842.971,
+     5107.899
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      179.0,
+      315.5
+     ],
+     "world": [
+      30.9713,
+      54.589
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.39888
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      179.0,
+      788.5
+     ],
+     "world": [
+      30.9713,
+      136.4293
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.99688
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2842.971,
+     5135.929
+    ]
+   },
+   "origin": "concept B bed (genB3) cut on the fixed bed footprint; state art = Garden v2 plot designs repainted, sized x2 (Albert 130 / OT12 idle 65 room px) ; dirt = row ridges flattened in code",
+   "swap_group": "bed-4-front-right",
+   "state": "dirt",
+   "game_state": "dirt",
+   "plants_or_seeds_placed": 0,
+   "shadow": {
+    "file": "bed-4-front-right-dirt-shadow.png",
+    "topleft": [
+     547,
+     1068
+    ],
+    "size": [
+     346,
+     338
+    ],
+    "how": "soft contact shadow (bed alpha shifted 6 px down, blur 5, x0.45); identical for all 7 states of this bed",
+    "md5": "a76b20b11e86a4dd0a98abb8111cd114"
+   }
+  },
+  {
+   "name": "bed-4-front-right-plowed",
+   "draw_order": 14,
+   "file": "bed-4-front-right-plowed.png",
+   "md5": "114665f82db9625801a8675d046e91df",
+   "png_size": [
+    332,
+    326
+   ],
+   "topleft_in_1080x1680": [
+    553,
+    1066
+   ],
+   "png_box_xyxy": [
+    553,
+    1066,
+    885,
+    1392
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    554,
+    1067,
+    884,
+    1391
+   ],
+   "visible_size": [
+    330,
+    324
+   ],
+   "visible_size_world": [
+    57.0979,
+    56.0597
+   ],
+   "bbox_centre": [
+    719.0,
+    1229.0
+   ],
+   "foot_bottom_centre": [
+    719.0,
+    1391
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      179.0,
+      153.5
+     ],
+     "world": [
+      30.9713,
+      26.5592
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.19407
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      179.0,
+      626.5
+     ],
+     "world": [
+      30.9713,
+      108.3995
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.79207
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2842.971,
+     5107.899
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      179.0,
+      315.5
+     ],
+     "world": [
+      30.9713,
+      54.589
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.39888
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      179.0,
+      788.5
+     ],
+     "world": [
+      30.9713,
+      136.4293
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.99688
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2842.971,
+     5135.929
+    ]
+   },
+   "origin": "concept B bed (genB3) cut on the fixed bed footprint; state art = Garden v2 plot designs repainted, sized x2 (Albert 130 / OT12 idle 65 room px) ; plowed = the painted rows unchanged",
+   "swap_group": "bed-4-front-right",
+   "state": "plowed",
+   "game_state": "plowed",
+   "plants_or_seeds_placed": 0,
+   "shadow": {
+    "file": "bed-4-front-right-plowed-shadow.png",
+    "topleft": [
+     547,
+     1068
+    ],
+    "size": [
+     346,
+     338
+    ],
+    "how": "soft contact shadow (bed alpha shifted 6 px down, blur 5, x0.45); identical for all 7 states of this bed",
+    "md5": "a76b20b11e86a4dd0a98abb8111cd114"
+   }
+  },
+  {
+   "name": "bed-4-front-right-seeded",
+   "draw_order": 14,
+   "file": "bed-4-front-right-seeded.png",
+   "md5": "0483879dc7c5feb21f3536e5baa24d8c",
+   "png_size": [
+    332,
+    326
+   ],
+   "topleft_in_1080x1680": [
+    553,
+    1066
+   ],
+   "png_box_xyxy": [
+    553,
+    1066,
+    885,
+    1392
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    554,
+    1067,
+    884,
+    1391
+   ],
+   "visible_size": [
+    330,
+    324
+   ],
+   "visible_size_world": [
+    57.0979,
+    56.0597
+   ],
+   "bbox_centre": [
+    719.0,
+    1229.0
+   ],
+   "foot_bottom_centre": [
+    719.0,
+    1391
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      179.0,
+      153.5
+     ],
+     "world": [
+      30.9713,
+      26.5592
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.19407
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      179.0,
+      626.5
+     ],
+     "world": [
+      30.9713,
+      108.3995
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.79207
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2842.971,
+     5107.899
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      179.0,
+      315.5
+     ],
+     "world": [
+      30.9713,
+      54.589
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.39888
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      179.0,
+      788.5
+     ],
+     "world": [
+      30.9713,
+      136.4293
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.99688
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2842.971,
+     5135.929
+    ]
+   },
+   "origin": "concept B bed (genB3) cut on the fixed bed footprint; state art = Garden v2 plot designs repainted, sized x2 (Albert 130 / OT12 idle 65 room px)",
+   "swap_group": "bed-4-front-right",
+   "state": "seeded",
+   "game_state": "seeded",
+   "plants_or_seeds_placed": 63,
+   "shadow": {
+    "file": "bed-4-front-right-seeded-shadow.png",
+    "topleft": [
+     547,
+     1068
+    ],
+    "size": [
+     346,
+     338
+    ],
+    "how": "soft contact shadow (bed alpha shifted 6 px down, blur 5, x0.45); identical for all 7 states of this bed",
+    "md5": "a76b20b11e86a4dd0a98abb8111cd114"
+   }
+  },
+  {
+   "name": "bed-4-front-right-sprout",
+   "draw_order": 14,
+   "file": "bed-4-front-right-sprout.png",
+   "md5": "ba065c8e171e5999a234703a5ec681b5",
+   "png_size": [
+    332,
+    326
+   ],
+   "topleft_in_1080x1680": [
+    553,
+    1066
+   ],
+   "png_box_xyxy": [
+    553,
+    1066,
+    885,
+    1392
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    554,
+    1067,
+    884,
+    1391
+   ],
+   "visible_size": [
+    330,
+    324
+   ],
+   "visible_size_world": [
+    57.0979,
+    56.0597
+   ],
+   "bbox_centre": [
+    719.0,
+    1229.0
+   ],
+   "foot_bottom_centre": [
+    719.0,
+    1391
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      179.0,
+      153.5
+     ],
+     "world": [
+      30.9713,
+      26.5592
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.19407
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      179.0,
+      626.5
+     ],
+     "world": [
+      30.9713,
+      108.3995
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.79207
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2842.971,
+     5107.899
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      179.0,
+      315.5
+     ],
+     "world": [
+      30.9713,
+      54.589
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.39888
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      179.0,
+      788.5
+     ],
+     "world": [
+      30.9713,
+      136.4293
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.99688
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2842.971,
+     5135.929
+    ]
+   },
+   "origin": "concept B bed (genB3) cut on the fixed bed footprint; state art = Garden v2 plot designs repainted, sized x2 (Albert 130 / OT12 idle 65 room px)",
+   "swap_group": "bed-4-front-right",
+   "state": "sprout",
+   "game_state": "sprout",
+   "plants_or_seeds_placed": 21,
+   "shadow": {
+    "file": "bed-4-front-right-sprout-shadow.png",
+    "topleft": [
+     547,
+     1068
+    ],
+    "size": [
+     346,
+     338
+    ],
+    "how": "soft contact shadow (bed alpha shifted 6 px down, blur 5, x0.45); identical for all 7 states of this bed",
+    "md5": "a76b20b11e86a4dd0a98abb8111cd114"
+   }
+  },
+  {
+   "name": "bed-4-front-right-weeds",
+   "draw_order": 14,
+   "file": "bed-4-front-right-weeds.png",
+   "md5": "2a3a26923393833df6c215909a77d0a4",
+   "png_size": [
+    332,
+    326
+   ],
+   "topleft_in_1080x1680": [
+    553,
+    1066
+   ],
+   "png_box_xyxy": [
+    553,
+    1066,
+    885,
+    1392
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    554,
+    1067,
+    884,
+    1391
+   ],
+   "visible_size": [
+    330,
+    324
+   ],
+   "visible_size_world": [
+    57.0979,
+    56.0597
+   ],
+   "bbox_centre": [
+    719.0,
+    1229.0
+   ],
+   "foot_bottom_centre": [
+    719.0,
+    1391
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      179.0,
+      153.5
+     ],
+     "world": [
+      30.9713,
+      26.5592
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.19407
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      179.0,
+      626.5
+     ],
+     "world": [
+      30.9713,
+      108.3995
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.79207
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2842.971,
+     5107.899
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      179.0,
+      315.5
+     ],
+     "world": [
+      30.9713,
+      54.589
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.39888
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      179.0,
+      788.5
+     ],
+     "world": [
+      30.9713,
+      136.4293
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.99688
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2842.971,
+     5135.929
+    ]
+   },
+   "origin": "concept B bed (genB3) cut on the fixed bed footprint; state art = Garden v2 plot designs repainted, sized x2 (Albert 130 / OT12 idle 65 room px)",
+   "swap_group": "bed-4-front-right",
+   "state": "weeds",
+   "game_state": "sprout look + Garden v2 weed sprites",
+   "plants_or_seeds_placed": 21,
+   "shadow": {
+    "file": "bed-4-front-right-weeds-shadow.png",
+    "topleft": [
+     547,
+     1068
+    ],
+    "size": [
+     346,
+     338
+    ],
+    "how": "soft contact shadow (bed alpha shifted 6 px down, blur 5, x0.45); identical for all 7 states of this bed",
+    "md5": "a76b20b11e86a4dd0a98abb8111cd114"
+   }
+  },
+  {
+   "name": "bed-4-front-right-grown",
+   "draw_order": 14,
+   "file": "bed-4-front-right-grown.png",
+   "md5": "2e8706d70641cb757026383cd50dbf88",
+   "png_size": [
+    332,
+    326
+   ],
+   "topleft_in_1080x1680": [
+    553,
+    1066
+   ],
+   "png_box_xyxy": [
+    553,
+    1066,
+    885,
+    1392
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    554,
+    1067,
+    884,
+    1391
+   ],
+   "visible_size": [
+    330,
+    324
+   ],
+   "visible_size_world": [
+    57.0979,
+    56.0597
+   ],
+   "bbox_centre": [
+    719.0,
+    1229.0
+   ],
+   "foot_bottom_centre": [
+    719.0,
+    1391
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      179.0,
+      153.5
+     ],
+     "world": [
+      30.9713,
+      26.5592
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.19407
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      179.0,
+      626.5
+     ],
+     "world": [
+      30.9713,
+      108.3995
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.79207
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2842.971,
+     5107.899
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      179.0,
+      315.5
+     ],
+     "world": [
+      30.9713,
+      54.589
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.39888
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      179.0,
+      788.5
+     ],
+     "world": [
+      30.9713,
+      136.4293
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.99688
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2842.971,
+     5135.929
+    ]
+   },
+   "origin": "concept B bed (genB3) cut on the fixed bed footprint; state art = Garden v2 plot designs repainted, sized x2 (Albert 130 / OT12 idle 65 room px)",
+   "swap_group": "bed-4-front-right",
+   "state": "grown",
+   "game_state": "leafy",
+   "plants_or_seeds_placed": 19,
+   "shadow": {
+    "file": "bed-4-front-right-grown-shadow.png",
+    "topleft": [
+     547,
+     1068
+    ],
+    "size": [
+     346,
+     338
+    ],
+    "how": "soft contact shadow (bed alpha shifted 6 px down, blur 5, x0.45); identical for all 7 states of this bed",
+    "md5": "a76b20b11e86a4dd0a98abb8111cd114"
+   }
+  },
+  {
+   "name": "bed-4-front-right-harvest",
+   "draw_order": 14,
+   "file": "bed-4-front-right-harvest.png",
+   "md5": "795944227cd6e100a8d6a4bf680f9f5d",
+   "png_size": [
+    332,
+    326
+   ],
+   "topleft_in_1080x1680": [
+    553,
+    1066
+   ],
+   "png_box_xyxy": [
+    553,
+    1066,
+    885,
+    1392
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    554,
+    1067,
+    884,
+    1391
+   ],
+   "visible_size": [
+    330,
+    324
+   ],
+   "visible_size_world": [
+    57.0979,
+    56.0597
+   ],
+   "bbox_centre": [
+    719.0,
+    1229.0
+   ],
+   "foot_bottom_centre": [
+    719.0,
+    1391
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      179.0,
+      153.5
+     ],
+     "world": [
+      30.9713,
+      26.5592
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.19407
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      179.0,
+      626.5
+     ],
+     "world": [
+      30.9713,
+      108.3995
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.79207
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2842.971,
+     5107.899
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      179.0,
+      315.5
+     ],
+     "world": [
+      30.9713,
+      54.589
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.39888
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      179.0,
+      788.5
+     ],
+     "world": [
+      30.9713,
+      136.4293
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2263,
+      0.99688
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2842.971,
+     5135.929
+    ]
+   },
+   "origin": "concept B bed (genB3) cut on the fixed bed footprint; state art = Garden v2 plot designs repainted, sized x2 (Albert 130 / OT12 idle 65 room px)",
+   "swap_group": "bed-4-front-right",
+   "state": "harvest",
+   "game_state": "ripe",
+   "plants_or_seeds_placed": 18,
+   "shadow": {
+    "file": "bed-4-front-right-harvest-shadow.png",
+    "topleft": [
+     547,
+     1068
+    ],
+    "size": [
+     346,
+     338
+    ],
+    "how": "soft contact shadow (bed alpha shifted 6 px down, blur 5, x0.45); identical for all 7 states of this bed",
+    "md5": "a76b20b11e86a4dd0a98abb8111cd114"
+   }
+  }
+ ],
+ "previews": {
+  "dir": "/workspace/ant-colony/furniture/previews/",
+  "v13": "/workspace/ant-colony/big-chamber/v13-noants-2026-11-13/big-chamber-v13-noants-clean.jpg",
+  "v13_md5": "cd5119a00eff77bbe32096706955b667",
+  "cell": "v13 cell 8 (c=0,r=1), centre (3599.0,2827.82) - same as Royal",
+  "scale_template_to_791": 1.0000380940050961,
+  "paste_topleft_of_1080x1680_canvas": [
+   3059,
+   1752
+  ],
+  "zoom_crop_xyxy": [
+   2610,
+   1799,
+   4587,
+   3322
+  ],
+  "strip": "bed-3-front-left, 7 tiles built by compositing the actual cut piece files (other beds in dirt), crop in v13 px [3226, 2778, 3617, 3174]",
+  "mock_label": "48 px \"MOCK - not from the game\" bar added BELOW each preview (outside the art); v13 pixel coords unchanged",
+  "files": {
+   "farm-furniture-on-v13-preview-v1.jpg": "e953d4aac9eb993d662cc868fca76ac3",
+   "farm-furniture-on-v13-preview-v1-zoom-crop.jpg": "6e5202d3fbfddc62732133da3104c6d8",
+   "farm-bed-states-strip-on-v13-preview-v1.jpg": "c67f2c0f3628e431274c07781c2c4ffe",
+   "MD5SUMS-farm-previews-v1": "1a716322ee838352b12b875a457f03fc"
+  }
+ },
+ "flags": [
+  "Albert 130 px (v13.py) vs game-derived ~124 (same as Royal); drawn bbox measures 127 px at alpha>127 like the Royal check",
+  "Prop heights are design choices (no farm-prop spec): lantern posts 300 (= Royal lantern stands), tool rack 180, barrel 140, watering can 76 (barrel:can ratio from the approved concept art), mushroom stumps 140, toadstools 120, seed sacks 110",
+  "Lantern posts L/R are one piece; LEFT is the mirrored copy. Mushroom stump RIGHT is the mirrored copy of LEFT",
+  "Barrel, watering can, stumps, toadstools and lantern post were re-generated as separate objects (blue screen) to match the concept B look without overlap and without soil mounds under them; tool rack and seed sacks are the same keyed art as concept B",
+  "Edges: blue-screen spill removed in code (edge colour pulled from the opaque interior); blue-dominant edge pixels after cleanup: 1 px total across all pieces",
+  "Bed numbering here (bed-1 back-left, bed-2 back-right, bed-3 front-left, bed-4 front-right) is not yet tied to game plot index p.i - map in code",
+  "Plants follow the painted row ridges (bed-1 22, bed-2 26, bed-3 21, bed-4 21 spots), not the game 4x4 grid; plants that would poke outside the fixed bed footprint were dropped so every state fits the same alpha",
+  "Rim pixels: states only change the soil interior plus where plants overlap the inner rail; dirt flattening blends a few px into the rail edge (counts in footprint_check.rim_pixels_changed_vs_plowed). Alpha is byte-identical in all 7 states",
+  "Courtyard/path piece runs 4 px under the bed and stone-wall edges so there is no seam; it must be drawn before them",
+  "Chris pick at 10:10 AM ET is per Game Manager; GM still confirming his exact words"
+ ]
+}

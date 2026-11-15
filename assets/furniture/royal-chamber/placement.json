@@ -1,0 +1,1732 @@
+{
+ "room": "Royal chamber (Queen's chamber) furniture - furniture only, no walls/background",
+ "created": "2026-11-13 (ET)",
+ "canvas": [
+  1080,
+  1680
+ ],
+ "template": {
+  "name": "LOCKED 3-D hex template",
+  "lock": "/workspace/kit/approved/NOTE-entrance-room-hex-LOCKED-2026-11-07.json",
+  "compose": "/workspace/ant-colony/underground/rooms/_tools/compose_room_hex.py",
+  "outline_overlay": "/workspace/builder-opening/shots/hex-3d-outline-color.jpg",
+  "outline_overlay_md5": "6e299814ac5b4c5bc595ac6a2117ecb0",
+  "dst_floor_green": [
+   [
+    342.2575,
+    733
+   ],
+   [
+    737.7425,
+    733
+   ],
+   [
+    935.4849,
+    1075.5
+   ],
+   [
+    737.7425,
+    1418
+   ],
+   [
+    342.2575,
+    1418
+   ],
+   [
+    144.5151,
+    1075.5
+   ]
+  ],
+  "dst_ceil_red_y": [
+   260,
+   602.5,
+   945
+  ],
+  "floor_wall_back_line_y": 733,
+  "floor_hex_width_px": 790.9698687897874,
+  "floor_hex_height_px": 685
+ },
+ "scale": {
+  "in_game_hex_width_px": 791,
+  "source_of_791": "v13.py HW=791 (/workspace/ant-colony/big-chamber/LOCKED-v13-2026-11-13/v13.py md5 10aaea375545c0f5a6bc25b148cfaaf0)",
+  "template_to_791": 1.0000380940050961,
+  "template_to_791_note": "template floor hex = 935.4849-144.5151 = 790.96987 px; 791/790.96987 = 1.000038, i.e. 1 template px = 1 in-game px at hex 791 (used 1:1)",
+  "HEX.w_world": 136.8566720971564,
+  "ROOM_SCALE_world_per_px": 0.17302387549421078,
+  "px_per_world": 5.779549193102308,
+  "source": "/workspace/notes-pass-5-fix3/index.html (md5 dfc7b054e1958c6a5b9e6ed1bfb13f8e): HEX={cx:2812,cy:4999.5,w:136.8566720971564}; ROOM_SCALE=HEX.w/790.9698687897874; ROOM_COMPOSE={x:HEX.cx-540*ROOM_SCALE,y:HEX.cy-602.5*ROOM_SCALE,...}; FLOOR_HEX.cy=HEX.cy+(1075.5-602.5)*ROOM_SCALE",
+  "note_HEX_centre": "game HEX centre is the RED/ceiling centre (540,602.5); floor (green) centre is (540,1075.5). Offsets given from both."
+ },
+ "sizing": {
+  "albert_underground": {
+   "height_px": 130,
+   "source": "v13.py ANT_H=130, ANT_W=94 at HW=791",
+   "scale_check_ant": "locked idle frame 0 (LOCKED-WALKS-2026-11-09/idle-facing-camera/ant-idle-transparent.gif md5 cde49ea6..., Character Artist cutout ant-idle_00.png via _tools/ant_locked.py), visible 287 px -> x0.452962 = 130 px",
+   "scale_check_bbox": [
+    655,
+    1113,
+    746,
+    1240
+   ],
+   "FLAG": "game-derived worker underground size = classroom-loop 44x62 room px x UNDER_K 2 = ~88x124 px; v13.py says 130. Used 130 as instructed."
+  },
+  "queen_underground": {
+   "scale": "QUEEN_UNDER_K 1.25",
+   "room_px_per_queen_px": 0.7121334648300934,
+   "cell_px": [
+    284.853,
+    299.096
+   ],
+   "visible_px_approx": [
+    102.5,
+    143.1
+   ],
+   "anchor_feet": [
+    200,
+    395
+   ],
+   "scale_check_bbox": [
+    472,
+    941,
+    575,
+    1084
+   ],
+   "scale_check_feet": [
+    530,
+    1080
+   ],
+   "source": "derived from game constants in notes-pass-5-fix3/index.html: FAR.s 0.62, START_SPP 720/168, QUEEN_DOWN_W=190*FAR.s/START_SPP=27.4867 world, Q3 cell 400x420 anchor (200,395), Q3_BODY_MATCH=(104/200)/(145/400) -> QUEEN_Q3_CELL_W 39.4291 world; x1.25 /ROOM_SCALE -> 284.85 px cell; queen asset assets/queen/queen_idle_front_strip_v1.png md5 551e7661af78d596e8a53017459d6193 frame 0",
+   "FLAG": "no single written \"queen underground px\" spec exists; size is computed from game constants (x1 = 227.88x239.28 cell matches the accepted scale-v1 check). She fits inside the bed (bed 160x154) and under the canopy opening."
+  }
+ },
+ "outputs": {
+  "royal-chamber-furniture.png": {
+   "md5": "74eec363b3c0d21b04b186d7f70729ba",
+   "size": [
+    1080,
+    1680
+   ]
+  },
+  "royal-chamber-furniture-programming.png": {
+   "md5": "a9478bb59e2bdaf7ba04cbb67b7f14ce",
+   "size": [
+    1080,
+    1680
+   ]
+  },
+  "royal-chamber-furniture-programming-view.jpg": {
+   "md5": "ab41b6b0c5ee18d25247d429bf172a92",
+   "size": [
+    1080,
+    1680
+   ]
+  },
+  "royal-chamber-furniture-scale-check.jpg": {
+   "md5": "225a5dee2bb107223d963f659bc7cd6b",
+   "size": [
+    1080,
+    1680
+   ]
+  }
+ },
+ "pieces": [
+  {
+   "name": "petal-rug",
+   "draw_order": 0,
+   "file": "petal-rug.png",
+   "md5": "ca3f77e9de6f4b62345539de5ed2c4c0",
+   "png_size": [
+    291,
+    139
+   ],
+   "topleft_in_1080x1680": [
+    384,
+    1146
+   ],
+   "png_box_xyxy": [
+    384,
+    1146,
+    675,
+    1285
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    385,
+    1146,
+    675,
+    1284
+   ],
+   "visible_size": [
+    290,
+    138
+   ],
+   "visible_size_world": [
+    50.1769,
+    23.8773
+   ],
+   "bbox_centre": [
+    530.0,
+    1215.0
+   ],
+   "foot_bottom_centre": [
+    530.0,
+    1284
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -10.0,
+      139.5
+     ],
+     "world": [
+      -1.7302,
+      24.1368
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.01264,
+      0.17637
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -10.0,
+      612.5
+     ],
+     "world": [
+      -1.7302,
+      105.9771
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.01264,
+      0.77437
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2810.27,
+     5105.477
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -10.0,
+      208.5
+     ],
+     "world": [
+      -1.7302,
+      36.0755
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.01264,
+      0.2636
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -10.0,
+      681.5
+     ],
+     "world": [
+      -1.7302,
+      117.9158
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.01264,
+      0.8616
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2810.27,
+     5117.416
+    ]
+   },
+   "origin": "AI-generated in the style of Chris's Queen's chamber art (no cut-able source existed), blue-screen keyed",
+   "sheet": "/workspace/rc-scratch/sheet-b.jpg",
+   "sheet_md5": "2790f5367426625c9f18e40082e37170",
+   "target": "visible width 290 px",
+   "shadow": {
+    "file": "petal-rug-shadow.png",
+    "topleft": [
+     377,
+     1233
+    ],
+    "size": [
+     307,
+     69
+    ],
+    "how": "soft contact shadow (faint, flat rug)",
+    "md5": "955d1bb42bc1d1e6926586659292c207"
+   }
+  },
+  {
+   "name": "guard-banner-left",
+   "draw_order": 1,
+   "file": "guard-banner-left.png",
+   "md5": "c4790ad02a7933b6d7393ff1af27e239",
+   "png_size": [
+    120,
+    290
+   ],
+   "topleft_in_1080x1680": [
+    338,
+    456
+   ],
+   "png_box_xyxy": [
+    338,
+    456,
+    458,
+    746
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    339,
+    456,
+    458,
+    746
+   ],
+   "visible_size": [
+    119,
+    290
+   ],
+   "visible_size_world": [
+    20.5898,
+    50.1769
+   ],
+   "bbox_centre": [
+    398.5,
+    601.0
+   ],
+   "foot_bottom_centre": [
+    398.5,
+    746
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -141.5,
+      -474.5
+     ],
+     "world": [
+      -24.4829,
+      -82.0998
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.17889,
+      -0.5999
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -141.5,
+      -1.5
+     ],
+     "world": [
+      -24.4829,
+      -0.2595
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.17889,
+      -0.0019
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2787.517,
+     4999.24
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -141.5,
+      -329.5
+     ],
+     "world": [
+      -24.4829,
+      -57.0114
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.17889,
+      -0.41658
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -141.5,
+      143.5
+     ],
+     "world": [
+      -24.4829,
+      24.8289
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.17889,
+      0.18142
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2787.517,
+     5024.329
+    ]
+   },
+   "origin": "AI-generated in the style of Chris's Queen's chamber art (no cut-able source existed), blue-screen keyed",
+   "sheet": "/workspace/rc-scratch/sheet-b.jpg",
+   "sheet_md5": "2790f5367426625c9f18e40082e37170",
+   "target": "visible height 290 px",
+   "mirrored": false,
+   "shadow": {
+    "file": "guard-banner-left-shadow.png",
+    "topleft": [
+     333,
+     716
+    ],
+    "size": [
+     131,
+     52
+    ],
+    "how": "soft contact shadow under the base",
+    "md5": "b28f10339562acd0bf88260e9d93d9b1"
+   }
+  },
+  {
+   "name": "guard-banner-right",
+   "draw_order": 2,
+   "file": "guard-banner-right.png",
+   "md5": "bd56cdaade302efa021ca6c54343b3f4",
+   "png_size": [
+    120,
+    290
+   ],
+   "topleft_in_1080x1680": [
+    622,
+    456
+   ],
+   "png_box_xyxy": [
+    622,
+    456,
+    742,
+    746
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    622,
+    456,
+    741,
+    746
+   ],
+   "visible_size": [
+    119,
+    290
+   ],
+   "visible_size_world": [
+    20.5898,
+    50.1769
+   ],
+   "bbox_centre": [
+    681.5,
+    601.0
+   ],
+   "foot_bottom_centre": [
+    681.5,
+    746
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      141.5,
+      -474.5
+     ],
+     "world": [
+      24.4829,
+      -82.0998
+     ],
+     "frac_of_hex_width_790.97": [
+      0.17889,
+      -0.5999
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      141.5,
+      -1.5
+     ],
+     "world": [
+      24.4829,
+      -0.2595
+     ],
+     "frac_of_hex_width_790.97": [
+      0.17889,
+      -0.0019
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2836.483,
+     4999.24
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      141.5,
+      -329.5
+     ],
+     "world": [
+      24.4829,
+      -57.0114
+     ],
+     "frac_of_hex_width_790.97": [
+      0.17889,
+      -0.41658
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      141.5,
+      143.5
+     ],
+     "world": [
+      24.4829,
+      24.8289
+     ],
+     "frac_of_hex_width_790.97": [
+      0.17889,
+      0.18142
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2836.483,
+     5024.329
+    ]
+   },
+   "origin": "AI-generated in the style of Chris's Queen's chamber art (no cut-able source existed), blue-screen keyed",
+   "sheet": "/workspace/rc-scratch/sheet-b.jpg",
+   "sheet_md5": "2790f5367426625c9f18e40082e37170",
+   "target": "visible height 290 px",
+   "mirrored": true,
+   "shadow": {
+    "file": "guard-banner-right-shadow.png",
+    "topleft": [
+     616,
+     716
+    ],
+    "size": [
+     131,
+     52
+    ],
+    "how": "soft contact shadow under the base",
+    "md5": "b28f10339562acd0bf88260e9d93d9b1"
+   }
+  },
+  {
+   "name": "lantern-stand-left",
+   "draw_order": 3,
+   "file": "lantern-stand-left.png",
+   "md5": "d69c0900b4f018f979adf5570f011c5a",
+   "png_size": [
+    81,
+    301
+   ],
+   "topleft_in_1080x1680": [
+    241,
+    566
+   ],
+   "png_box_xyxy": [
+    241,
+    566,
+    322,
+    867
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    242,
+    566,
+    322,
+    866
+   ],
+   "visible_size": [
+    80,
+    300
+   ],
+   "visible_size_world": [
+    13.8419,
+    51.9072
+   ],
+   "bbox_centre": [
+    282.0,
+    716.0
+   ],
+   "foot_bottom_centre": [
+    282.0,
+    866
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -258.0,
+      -359.5
+     ],
+     "world": [
+      -44.6402,
+      -62.2021
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.32618,
+      -0.45451
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -258.0,
+      113.5
+     ],
+     "world": [
+      -44.6402,
+      19.6382
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.32618,
+      0.14349
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2767.36,
+     5019.138
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -258.0,
+      -209.5
+     ],
+     "world": [
+      -44.6402,
+      -36.2485
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.32618,
+      -0.26486
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -258.0,
+      263.5
+     ],
+     "world": [
+      -44.6402,
+      45.5918
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.32618,
+      0.33314
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2767.36,
+     5045.092
+    ]
+   },
+   "origin": "AI-generated in the style of Chris's Queen's chamber art (no cut-able source existed), blue-screen keyed",
+   "sheet": "/workspace/rc-scratch/sheet-b.jpg",
+   "sheet_md5": "2790f5367426625c9f18e40082e37170",
+   "target": "visible height 300 px",
+   "mirrored": true,
+   "shadow": {
+    "file": "lantern-stand-left-shadow.png",
+    "topleft": [
+     238,
+     846
+    ],
+    "size": [
+     88,
+     34
+    ],
+    "how": "soft contact shadow under the base",
+    "md5": "46fafa6c0e0ee4e9cd0791f309fee14c"
+   }
+  },
+  {
+   "name": "lantern-left",
+   "draw_order": 4,
+   "file": "lantern-left.png",
+   "md5": "fa141fcd1a00d6936e5d3756e7216a7a",
+   "png_size": [
+    42,
+    86
+   ],
+   "topleft_in_1080x1680": [
+    275,
+    608
+   ],
+   "png_box_xyxy": [
+    275,
+    608,
+    317,
+    694
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    276,
+    610,
+    316,
+    693
+   ],
+   "visible_size": [
+    40,
+    83
+   ],
+   "visible_size_world": [
+    6.921,
+    14.361
+   ],
+   "bbox_centre": [
+    296.0,
+    651.5
+   ],
+   "foot_bottom_centre": [
+    296.0,
+    693
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -244.0,
+      -424.0
+     ],
+     "world": [
+      -42.2178,
+      -73.3621
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.30848,
+      -0.53605
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -244.0,
+      49.0
+     ],
+     "world": [
+      -42.2178,
+      8.4782
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.30848,
+      0.06195
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2769.782,
+     5007.978
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -244.0,
+      -382.5
+     ],
+     "world": [
+      -42.2178,
+      -66.1816
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.30848,
+      -0.48358
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -244.0,
+      90.5
+     ],
+     "world": [
+      -42.2178,
+      15.6587
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.30848,
+      0.11442
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2769.782,
+     5015.159
+    ]
+   },
+   "origin": "CUT from Chris's Queen's chamber package art (GrabCut), left wall lantern incl. top loop; right copy mirrored",
+   "source": "/workspace/ant-colony/room-ideas/_extract/part1/rooms/01-queens-chamber.webp",
+   "source_md5": "c7204d941286f54c4dc6652d167f0969",
+   "source_crop_xyxy": [
+    385,
+    150,
+    510,
+    385
+   ],
+   "scale": 0.47191011235955055,
+   "target": "visible height 84 px",
+   "hangs_from": "lantern-stand-left hook tip [296, 611]",
+   "mirrored": false
+  },
+  {
+   "name": "lantern-stand-right",
+   "draw_order": 5,
+   "file": "lantern-stand-right.png",
+   "md5": "d30a36c333cd856e55fb9f5fef316a1e",
+   "png_size": [
+    81,
+    301
+   ],
+   "topleft_in_1080x1680": [
+    758,
+    566
+   ],
+   "png_box_xyxy": [
+    758,
+    566,
+    839,
+    867
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    758,
+    566,
+    838,
+    866
+   ],
+   "visible_size": [
+    80,
+    300
+   ],
+   "visible_size_world": [
+    13.8419,
+    51.9072
+   ],
+   "bbox_centre": [
+    798.0,
+    716.0
+   ],
+   "foot_bottom_centre": [
+    798.0,
+    866
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      258.0,
+      -359.5
+     ],
+     "world": [
+      44.6402,
+      -62.2021
+     ],
+     "frac_of_hex_width_790.97": [
+      0.32618,
+      -0.45451
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      258.0,
+      113.5
+     ],
+     "world": [
+      44.6402,
+      19.6382
+     ],
+     "frac_of_hex_width_790.97": [
+      0.32618,
+      0.14349
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2856.64,
+     5019.138
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      258.0,
+      -209.5
+     ],
+     "world": [
+      44.6402,
+      -36.2485
+     ],
+     "frac_of_hex_width_790.97": [
+      0.32618,
+      -0.26486
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      258.0,
+      263.5
+     ],
+     "world": [
+      44.6402,
+      45.5918
+     ],
+     "frac_of_hex_width_790.97": [
+      0.32618,
+      0.33314
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2856.64,
+     5045.092
+    ]
+   },
+   "origin": "AI-generated in the style of Chris's Queen's chamber art (no cut-able source existed), blue-screen keyed",
+   "sheet": "/workspace/rc-scratch/sheet-b.jpg",
+   "sheet_md5": "2790f5367426625c9f18e40082e37170",
+   "target": "visible height 300 px",
+   "mirrored": false,
+   "shadow": {
+    "file": "lantern-stand-right-shadow.png",
+    "topleft": [
+     754,
+     846
+    ],
+    "size": [
+     88,
+     34
+    ],
+    "how": "soft contact shadow under the base",
+    "md5": "46fafa6c0e0ee4e9cd0791f309fee14c"
+   }
+  },
+  {
+   "name": "lantern-right",
+   "draw_order": 6,
+   "file": "lantern-right.png",
+   "md5": "6d78a2a6c889d7d91473d8da565bb250",
+   "png_size": [
+    42,
+    86
+   ],
+   "topleft_in_1080x1680": [
+    761,
+    608
+   ],
+   "png_box_xyxy": [
+    761,
+    608,
+    803,
+    694
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    762,
+    610,
+    802,
+    693
+   ],
+   "visible_size": [
+    40,
+    83
+   ],
+   "visible_size_world": [
+    6.921,
+    14.361
+   ],
+   "bbox_centre": [
+    782.0,
+    651.5
+   ],
+   "foot_bottom_centre": [
+    782.0,
+    693
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      242.0,
+      -424.0
+     ],
+     "world": [
+      41.8718,
+      -73.3621
+     ],
+     "frac_of_hex_width_790.97": [
+      0.30595,
+      -0.53605
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      242.0,
+      49.0
+     ],
+     "world": [
+      41.8718,
+      8.4782
+     ],
+     "frac_of_hex_width_790.97": [
+      0.30595,
+      0.06195
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2853.872,
+     5007.978
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      242.0,
+      -382.5
+     ],
+     "world": [
+      41.8718,
+      -66.1816
+     ],
+     "frac_of_hex_width_790.97": [
+      0.30595,
+      -0.48358
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      242.0,
+      90.5
+     ],
+     "world": [
+      41.8718,
+      15.6587
+     ],
+     "frac_of_hex_width_790.97": [
+      0.30595,
+      0.11442
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2853.872,
+     5015.159
+    ]
+   },
+   "origin": "CUT from Chris's Queen's chamber package art (GrabCut), left wall lantern incl. top loop; right copy mirrored",
+   "source": "/workspace/ant-colony/room-ideas/_extract/part1/rooms/01-queens-chamber.webp",
+   "source_md5": "c7204d941286f54c4dc6652d167f0969",
+   "source_crop_xyxy": [
+    385,
+    150,
+    510,
+    385
+   ],
+   "scale": 0.47191011235955055,
+   "target": "visible height 84 px",
+   "hangs_from": "lantern-stand-right hook tip [782, 611]",
+   "mirrored": true
+  },
+  {
+   "name": "egg-cradle-empty",
+   "draw_order": 7,
+   "file": "egg-cradle-empty.png",
+   "md5": "03278f0e754cc7b801fb00f8f3583b8e",
+   "png_size": [
+    72,
+    86
+   ],
+   "topleft_in_1080x1680": [
+    679,
+    879
+   ],
+   "png_box_xyxy": [
+    679,
+    879,
+    751,
+    965
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    685,
+    882,
+    741,
+    961
+   ],
+   "visible_size": [
+    56,
+    79
+   ],
+   "visible_size_world": [
+    9.6893,
+    13.6689
+   ],
+   "bbox_centre": [
+    713.0,
+    921.5
+   ],
+   "foot_bottom_centre": [
+    713.0,
+    961
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      173.0,
+      -154.0
+     ],
+     "world": [
+      29.9331,
+      -26.6457
+     ],
+     "frac_of_hex_width_790.97": [
+      0.21872,
+      -0.1947
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      173.0,
+      319.0
+     ],
+     "world": [
+      29.9331,
+      55.1946
+     ],
+     "frac_of_hex_width_790.97": [
+      0.21872,
+      0.4033
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2841.933,
+     5054.695
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      173.0,
+      -114.5
+     ],
+     "world": [
+      29.9331,
+      -19.8112
+     ],
+     "frac_of_hex_width_790.97": [
+      0.21872,
+      -0.14476
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      173.0,
+      358.5
+     ],
+     "world": [
+      29.9331,
+      62.0291
+     ],
+     "frac_of_hex_width_790.97": [
+      0.21872,
+      0.45324
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2841.933,
+     5061.529
+    ]
+   },
+   "moved_from_chamber_topleft": [
+    649,
+    779
+   ],
+   "move_offset_px": [
+    30,
+    100
+   ],
+   "move_reason": "kept clear of the canopy pole; pixels unchanged",
+   "origin": "EXACT copy of the empty twig/moss basket already in the scale-v1 Queen's chamber (locally regenerated empty version of Chris's basket, no eggs)",
+   "source": "/workspace/notes-pass-5-fix3/assets/rooms/queens-chamber-in-game-hex-no-outline-scale-v1.jpg",
+   "source_md5": "4a031184c0d1d4e271b361d4a7788745",
+   "rgba_size": [
+    72,
+    86
+   ],
+   "source_topleft": [
+    649,
+    779
+   ],
+   "placement_check_vs_fix3_jpeg": {
+    "px": 3222,
+    "max": 9,
+    "mean": 2.3289882060831784,
+    "p99": 6.0,
+    "best_shift": [
+     2.3289882060831784,
+     0,
+     0
+    ]
+   },
+   "shadow": {
+    "file": "egg-cradle-empty-shadow.png",
+    "topleft": [
+     678,
+     939
+    ],
+    "size": [
+     75,
+     37
+    ],
+    "how": "scale-v1 basket shadow (ellipse 655,846,715,868 fill 20,12,4,83 blur 3) moved by the same offset as the basket",
+    "md5": "cb14be53f004005399167fa80b21a95c"
+   }
+  },
+  {
+   "name": "mushroom-throne",
+   "draw_order": 8,
+   "file": "mushroom-throne.png",
+   "md5": "ded5ee38535b7737d84f39889a3d393b",
+   "png_size": [
+    103,
+    175
+   ],
+   "topleft_in_1080x1680": [
+    238,
+    915
+   ],
+   "png_box_xyxy": [
+    238,
+    915,
+    341,
+    1090
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    238,
+    915,
+    341,
+    1090
+   ],
+   "visible_size": [
+    103,
+    175
+   ],
+   "visible_size_world": [
+    17.8215,
+    30.2792
+   ],
+   "bbox_centre": [
+    289.5,
+    1002.5
+   ],
+   "foot_bottom_centre": [
+    289.5,
+    1090
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -250.5,
+      -73.0
+     ],
+     "world": [
+      -43.3425,
+      -12.6307
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.3167,
+      -0.09229
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -250.5,
+      400.0
+     ],
+     "world": [
+      -43.3425,
+      69.2096
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.3167,
+      0.50571
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2768.658,
+     5068.71
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -250.5,
+      14.5
+     ],
+     "world": [
+      -43.3425,
+      2.5088
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.3167,
+      0.01833
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -250.5,
+      487.5
+     ],
+     "world": [
+      -43.3425,
+      84.3491
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.3167,
+      0.61633
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2768.658,
+     5083.849
+    ]
+   },
+   "origin": "AI-generated in the style of Chris's Queen's chamber art (no cut-able source existed), blue-screen keyed",
+   "sheet": "/workspace/rc-scratch/sheet-a.jpg",
+   "sheet_md5": "bbbbb87e70ec6d1833ab9c23ca8783f4",
+   "target": "visible height 175 px (Albert 130, queen 143)",
+   "shadow": {
+    "file": "mushroom-throne-shadow.png",
+    "topleft": [
+     233,
+     1064
+    ],
+    "size": [
+     113,
+     45
+    ],
+    "how": "soft contact shadow under the base",
+    "md5": "83b26ad69f0544c18183ba4d521a9f39"
+   }
+  },
+  {
+   "name": "leaf-canopy",
+   "draw_order": 9,
+   "file": "leaf-canopy.png",
+   "md5": "115d006b47ce04690f2ce90753f6b004",
+   "png_size": [
+    293,
+    336
+   ],
+   "topleft_in_1080x1680": [
+    384,
+    759
+   ],
+   "png_box_xyxy": [
+    384,
+    759,
+    677,
+    1095
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    384,
+    759,
+    677,
+    1095
+   ],
+   "visible_size": [
+    293,
+    336
+   ],
+   "visible_size_world": [
+    50.696,
+    58.136
+   ],
+   "bbox_centre": [
+    530.5,
+    927.0
+   ],
+   "foot_bottom_centre": [
+    530.5,
+    1095
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -9.5,
+      -148.5
+     ],
+     "world": [
+      -1.6437,
+      -25.694
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.01201,
+      -0.18774
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -9.5,
+      324.5
+     ],
+     "world": [
+      -1.6437,
+      56.1462
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.01201,
+      0.41026
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2810.356,
+     5055.646
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -9.5,
+      19.5
+     ],
+     "world": [
+      -1.6437,
+      3.374
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.01201,
+      0.02465
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -9.5,
+      492.5
+     ],
+     "world": [
+      -1.6437,
+      85.2143
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.01201,
+      0.62265
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2810.356,
+     5084.714
+    ]
+   },
+   "origin": "AI-generated in the style of Chris's Queen's chamber art (no cut-able source existed), blue-screen keyed",
+   "sheet": "/workspace/rc-scratch/sheet-a.jpg",
+   "sheet_md5": "bbbbb87e70ec6d1833ab9c23ca8783f4",
+   "target": "visible width 292 px; opening clears bed (160 px) and queen (103x143 px)",
+   "draw_note": "drawn BEHIND the bed and queen",
+   "shadow": {
+    "file": "leaf-canopy-shadow.png",
+    "topleft": [
+     377,
+     1078
+    ],
+    "size": [
+     309,
+     33
+    ],
+    "how": "soft contact shadow under each pole foot",
+    "md5": "b4e71df5a6670e1ff7ba1bf8b6f9ca1f"
+   }
+  },
+  {
+   "name": "berry-seedcake-dish",
+   "draw_order": 10,
+   "file": "berry-seedcake-dish.png",
+   "md5": "32be27223f613aa16d3da1e72dd0380a",
+   "png_size": [
+    74,
+    91
+   ],
+   "topleft_in_1080x1680": [
+    735,
+    981
+   ],
+   "png_box_xyxy": [
+    735,
+    981,
+    809,
+    1072
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    735,
+    981,
+    809,
+    1072
+   ],
+   "visible_size": [
+    74,
+    91
+   ],
+   "visible_size_world": [
+    12.8038,
+    15.7452
+   ],
+   "bbox_centre": [
+    772.0,
+    1026.5
+   ],
+   "foot_bottom_centre": [
+    772.0,
+    1072
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      232.0,
+      -49.0
+     ],
+     "world": [
+      40.1415,
+      -8.4782
+     ],
+     "frac_of_hex_width_790.97": [
+      0.29331,
+      -0.06195
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      232.0,
+      424.0
+     ],
+     "world": [
+      40.1415,
+      73.3621
+     ],
+     "frac_of_hex_width_790.97": [
+      0.29331,
+      0.53605
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2852.142,
+     5072.862
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      232.0,
+      -3.5
+     ],
+     "world": [
+      40.1415,
+      -0.6056
+     ],
+     "frac_of_hex_width_790.97": [
+      0.29331,
+      -0.00442
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      232.0,
+      469.5
+     ],
+     "world": [
+      40.1415,
+      81.2347
+     ],
+     "frac_of_hex_width_790.97": [
+      0.29331,
+      0.59358
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2852.142,
+     5080.735
+    ]
+   },
+   "origin": "AI-generated in the style of Chris's Queen's chamber art (no cut-able source existed), blue-screen keyed",
+   "sheet": "/workspace/rc-scratch/sheet-a.jpg",
+   "sheet_md5": "bbbbb87e70ec6d1833ab9c23ca8783f4",
+   "target": "visible width 74 px",
+   "shadow": {
+    "file": "berry-seedcake-dish-shadow.png",
+    "topleft": [
+     731,
+     1053
+    ],
+    "size": [
+     82,
+     33
+    ],
+    "how": "soft contact shadow under the base",
+    "md5": "1ebf70fd486127c830f2fd13120c3033"
+   }
+  },
+  {
+   "name": "leaf-bed",
+   "draw_order": 11,
+   "file": "leaf-bed.png",
+   "md5": "861b2e44ff1e836aeedad3c6b4e563bd",
+   "png_size": [
+    160,
+    154
+   ],
+   "topleft_in_1080x1680": [
+    450,
+    974
+   ],
+   "png_box_xyxy": [
+    450,
+    974,
+    610,
+    1128
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    451,
+    975,
+    609,
+    1127
+   ],
+   "visible_size": [
+    158,
+    152
+   ],
+   "visible_size_world": [
+    27.3378,
+    26.2996
+   ],
+   "bbox_centre": [
+    530.0,
+    1051.0
+   ],
+   "foot_bottom_centre": [
+    530.0,
+    1127
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -10.0,
+      -24.5
+     ],
+     "world": [
+      -1.7302,
+      -4.2391
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.01264,
+      -0.03097
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -10.0,
+      448.5
+     ],
+     "world": [
+      -1.7302,
+      77.6012
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.01264,
+      0.56703
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2810.27,
+     5077.101
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -10.0,
+      51.5
+     ],
+     "world": [
+      -1.7302,
+      8.9107
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.01264,
+      0.06511
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -10.0,
+      524.5
+     ],
+     "world": [
+      -1.7302,
+      90.751
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.01264,
+      0.66311
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2810.27,
+     5090.251
+    ]
+   },
+   "origin": "EXACT cut of Chris's leaf bed from the scale-v1 Queen's chamber, no redraw/rescale/recolour",
+   "source": "/workspace/notes-pass-5-fix3/assets/rooms/queens-chamber-in-game-hex-no-outline-scale-v1.jpg",
+   "source_md5": "4a031184c0d1d4e271b361d4a7788745",
+   "shadow": {
+    "file": "leaf-bed-shadow.png",
+    "topleft": [
+     432,
+     1054
+    ],
+    "size": [
+     200,
+     94
+    ],
+    "how": "EXACT scale-v1 bed shadow (ellipse 448,1070,615,1131 fill 23,13,5,88 blur 7)",
+    "md5": "03a20e19cc6ff236f2e3d3a53b933e85"
+   },
+   "exact_cut_check": {
+    "method": "scale-v1-method.py bed pipeline re-run (queens-chamber-in-game-hex-no-outline.jpg md5 6c96f8427bb4798d9ccf21791081668c, crop 300,820,750,1260, 46-pt polygon, dilate 7, blur 5x5 0.8, bbox crop, x0.43 LANCZOS -> 160x154) compared with the fix3 JPEG at (450,974)",
+    "alpha>=250_px": 16539,
+    "max_abs_diff": 10,
+    "mean": 1.995,
+    "p99": 5,
+    "best_shift": [
+     0,
+     0
+    ],
+    "1px_shift_mean": "~22",
+    "result": "placement pixel-identical; RGB taken from fix3 JPEG where alpha>=250, reproduction RGB on the 1-2 px anti-aliased edge (avoids floor fringe); alpha = reproduction mask",
+    "floor_and_shadow_excluded": true
+   }
+  }
+ ],
+ "previews": {
+  "folder": "/workspace/ant-colony/furniture/previews/",
+  "v13_source": "/workspace/ant-colony/big-chamber/v13-noants-2026-11-13/big-chamber-v13-noants-clean.jpg",
+  "v13_md5": "cd5119a00eff77bbe32096706955b667",
+  "hex": "v13 cell index 8 (c=0,r=1), directly below the centre cell (0,0); centre (3599.0,2827.82); column is in cell 7 (0,-1)",
+  "scale_template_to_v13": 1.0000380940050961,
+  "paste_topleft_of_1080x1680_canvas": [
+   3059,
+   1752
+  ],
+  "zoom_crop_xyxy": [
+   2610,
+   1799,
+   4587,
+   3322
+  ],
+  "mapping": "template floor centre (540,1075.5) placed on v13 hex centre; v13 flat hex height 791*sqrt(3)/2 = 685.0 = template floor height",
+  "files": {
+   "MD5SUMS-royal-chamber-previews-v1": "d81d408f1fa1d2a08354c81d85c8b1ff",
+   "royal-chamber-furniture-on-v13-preview-v1-hex-outlined-zoom-crop.jpg": "021cee079a191f094192ac84c498df2c",
+   "royal-chamber-furniture-on-v13-preview-v1-hex-outlined.jpg": "fed7a48feb7c94f7b0ed7e6c868170d8",
+   "royal-chamber-furniture-on-v13-preview-v1-zoom-crop.jpg": "18253b202cbe948825686e927236bf69",
+   "royal-chamber-furniture-on-v13-preview-v1.jpg": "532bc583857253bd8b9d4080399a33ed",
+   "royal-chamber-leaf-bed-on-v13-preview-v1-zoom-crop.jpg": "0daa3c89dbafcfedb1003a71fa3dbb55",
+   "royal-chamber-leaf-bed-on-v13-preview-v1.jpg": "20b337372bf267a1caa011fb3e67c28d"
+  }
+ },
+ "flags": [
+  "Albert 130 (v13.py) vs game-derived ~124",
+  "Queen size derived from game constants (no direct spec)",
+  "Egg cradle = the existing EMPTY basket from scale-v1 (a locally regenerated empty version of Chris's basket; his original has eggs), pixels exact, moved +30,+100 px to clear the canopy pole",
+  "Generated pieces (throne, canopy, rug, banners, lantern stands, berry dish) are AI-generated in Chris's style - no cut-able source; banners have no lettering/symbols",
+  "Both lanterns are the same cut of Chris's left wall lantern (right copy mirrored); the right-hand source lantern did not cut cleanly",
+  "No walls/ceiling, so lanterns hang from floor-standing shepherd-hook stands on the side floor-wall lines; banners stand on the back floor-wall line (y 733)",
+  "In the flat v13 preview the wall-line pieces (banners, lantern stands) sit just outside the 2-D hex outline because v13 has no walls",
+  "Template to 791 = 1.000038 (treated as 1:1)"
+ ]
+}

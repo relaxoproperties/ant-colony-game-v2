@@ -1,0 +1,913 @@
+{
+ "loop": "merry-go-round",
+ "fps": 12,
+ "frames": 54,
+ "seconds": 4.5,
+ "loops_seamlessly": true,
+ "crop_template_xyxy": [
+  560,
+  948,
+  760,
+  1112
+ ],
+ "crop_on_v13_xyxy": [
+  4212,
+  2358,
+  4412,
+  2522
+ ],
+ "v13": "/workspace/ant-colony/big-chamber/v13-noants-2026-11-13/big-chamber-v13-noants-clean.jpg",
+ "v13_cell": [
+  1,
+  0
+ ],
+ "template_topleft_on_v13": [
+  3652,
+  1410
+ ],
+ "kid_sources_used": [
+  "side_00.png",
+  "side_01.png",
+  "side_02.png",
+  "side_03.png",
+  "side_04.png",
+  "side_05.png",
+  "side_06.png",
+  "side_07.png",
+  "side_08.png",
+  "side_09.png",
+  "side_10.png",
+  "side_11.png",
+  "side_12.png",
+  "side_13.png",
+  "side_14.png",
+  "side_15.png"
+ ],
+ "notes": "The top does NOT spin (see README: one painted view of a 3-D top with posts cannot be turned by moving it whole). The kid crawls round the deck around the hub: ellipse rx 29.7, ry 11.5 px centred 2 px below the hub base; one lap = 54 frames (4.5 s) = 160 crawl frames, so the loop is seamless and his feet do not slide. Facing right along the front, left (mirrored) along the back. Behind the hub, the top's own hub and front-rail pixels are drawn again over him (a cut of the top, nothing painted).",
+ "timeline": [
+  {
+   "frame": 0,
+   "kid": [
+    {
+     "src": "side_00.png",
+     "flip": false,
+     "feet": [
+      655.0,
+      1034.68
+     ],
+     "behind_hub": false,
+     "facing": "right"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 1,
+   "kid": [
+    {
+     "src": "side_02.png",
+     "flip": false,
+     "feet": [
+      658.44,
+      1034.61
+     ],
+     "behind_hub": false,
+     "facing": "right"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 2,
+   "kid": [
+    {
+     "src": "side_05.png",
+     "flip": false,
+     "feet": [
+      661.84,
+      1034.37
+     ],
+     "behind_hub": false,
+     "facing": "right"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 3,
+   "kid": [
+    {
+     "src": "side_08.png",
+     "flip": false,
+     "feet": [
+      665.15,
+      1033.99
+     ],
+     "behind_hub": false,
+     "facing": "right"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 4,
+   "kid": [
+    {
+     "src": "side_11.png",
+     "flip": false,
+     "feet": [
+      668.31,
+      1033.46
+     ],
+     "behind_hub": false,
+     "facing": "right"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 5,
+   "kid": [
+    {
+     "src": "side_14.png",
+     "flip": false,
+     "feet": [
+      671.3,
+      1032.79
+     ],
+     "behind_hub": false,
+     "facing": "right"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 6,
+   "kid": [
+    {
+     "src": "side_01.png",
+     "flip": false,
+     "feet": [
+      674.07,
+      1032.0
+     ],
+     "behind_hub": false,
+     "facing": "right"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 7,
+   "kid": [
+    {
+     "src": "side_04.png",
+     "flip": false,
+     "feet": [
+      676.58,
+      1031.08
+     ],
+     "behind_hub": false,
+     "facing": "right"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 8,
+   "kid": [
+    {
+     "src": "side_07.png",
+     "flip": false,
+     "feet": [
+      678.8,
+      1030.06
+     ],
+     "behind_hub": false,
+     "facing": "right"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 9,
+   "kid": [
+    {
+     "src": "side_10.png",
+     "flip": false,
+     "feet": [
+      680.69,
+      1028.94
+     ],
+     "behind_hub": false,
+     "facing": "right"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 10,
+   "kid": [
+    {
+     "src": "side_13.png",
+     "flip": false,
+     "feet": [
+      682.24,
+      1027.75
+     ],
+     "behind_hub": false,
+     "facing": "right"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 11,
+   "kid": [
+    {
+     "src": "side_00.png",
+     "flip": false,
+     "feet": [
+      683.42,
+      1026.49
+     ],
+     "behind_hub": false,
+     "facing": "right"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 12,
+   "kid": [
+    {
+     "src": "side_03.png",
+     "flip": false,
+     "feet": [
+      684.22,
+      1025.19
+     ],
+     "behind_hub": false,
+     "facing": "right"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 13,
+   "kid": [
+    {
+     "src": "side_06.png",
+     "flip": false,
+     "feet": [
+      684.62,
+      1023.87
+     ],
+     "behind_hub": false,
+     "facing": "right"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 14,
+   "kid": [
+    {
+     "src": "side_09.png",
+     "flip": true,
+     "feet": [
+      684.62,
+      1022.53
+     ],
+     "behind_hub": true,
+     "facing": "left"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 15,
+   "kid": [
+    {
+     "src": "side_12.png",
+     "flip": true,
+     "feet": [
+      684.22,
+      1021.21
+     ],
+     "behind_hub": true,
+     "facing": "left"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 16,
+   "kid": [
+    {
+     "src": "side_15.png",
+     "flip": true,
+     "feet": [
+      683.42,
+      1019.91
+     ],
+     "behind_hub": true,
+     "facing": "left"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 17,
+   "kid": [
+    {
+     "src": "side_02.png",
+     "flip": true,
+     "feet": [
+      682.24,
+      1018.65
+     ],
+     "behind_hub": true,
+     "facing": "left"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 18,
+   "kid": [
+    {
+     "src": "side_05.png",
+     "flip": true,
+     "feet": [
+      680.69,
+      1017.46
+     ],
+     "behind_hub": true,
+     "facing": "left"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 19,
+   "kid": [
+    {
+     "src": "side_08.png",
+     "flip": true,
+     "feet": [
+      678.8,
+      1016.34
+     ],
+     "behind_hub": true,
+     "facing": "left"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 20,
+   "kid": [
+    {
+     "src": "side_11.png",
+     "flip": true,
+     "feet": [
+      676.58,
+      1015.32
+     ],
+     "behind_hub": true,
+     "facing": "left"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 21,
+   "kid": [
+    {
+     "src": "side_14.png",
+     "flip": true,
+     "feet": [
+      674.07,
+      1014.4
+     ],
+     "behind_hub": true,
+     "facing": "left"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 22,
+   "kid": [
+    {
+     "src": "side_01.png",
+     "flip": true,
+     "feet": [
+      671.3,
+      1013.61
+     ],
+     "behind_hub": true,
+     "facing": "left"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 23,
+   "kid": [
+    {
+     "src": "side_04.png",
+     "flip": true,
+     "feet": [
+      668.31,
+      1012.94
+     ],
+     "behind_hub": true,
+     "facing": "left"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 24,
+   "kid": [
+    {
+     "src": "side_07.png",
+     "flip": true,
+     "feet": [
+      665.15,
+      1012.41
+     ],
+     "behind_hub": true,
+     "facing": "left"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 25,
+   "kid": [
+    {
+     "src": "side_10.png",
+     "flip": true,
+     "feet": [
+      661.84,
+      1012.03
+     ],
+     "behind_hub": true,
+     "facing": "left"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 26,
+   "kid": [
+    {
+     "src": "side_13.png",
+     "flip": true,
+     "feet": [
+      658.44,
+      1011.79
+     ],
+     "behind_hub": true,
+     "facing": "left"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 27,
+   "kid": [
+    {
+     "src": "side_00.png",
+     "flip": true,
+     "feet": [
+      655.0,
+      1011.72
+     ],
+     "behind_hub": true,
+     "facing": "left"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 28,
+   "kid": [
+    {
+     "src": "side_02.png",
+     "flip": true,
+     "feet": [
+      651.56,
+      1011.79
+     ],
+     "behind_hub": true,
+     "facing": "left"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 29,
+   "kid": [
+    {
+     "src": "side_05.png",
+     "flip": true,
+     "feet": [
+      648.16,
+      1012.03
+     ],
+     "behind_hub": true,
+     "facing": "left"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 30,
+   "kid": [
+    {
+     "src": "side_08.png",
+     "flip": true,
+     "feet": [
+      644.85,
+      1012.41
+     ],
+     "behind_hub": true,
+     "facing": "left"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 31,
+   "kid": [
+    {
+     "src": "side_11.png",
+     "flip": true,
+     "feet": [
+      641.69,
+      1012.94
+     ],
+     "behind_hub": true,
+     "facing": "left"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 32,
+   "kid": [
+    {
+     "src": "side_14.png",
+     "flip": true,
+     "feet": [
+      638.7,
+      1013.61
+     ],
+     "behind_hub": true,
+     "facing": "left"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 33,
+   "kid": [
+    {
+     "src": "side_01.png",
+     "flip": true,
+     "feet": [
+      635.93,
+      1014.4
+     ],
+     "behind_hub": true,
+     "facing": "left"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 34,
+   "kid": [
+    {
+     "src": "side_04.png",
+     "flip": true,
+     "feet": [
+      633.42,
+      1015.32
+     ],
+     "behind_hub": true,
+     "facing": "left"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 35,
+   "kid": [
+    {
+     "src": "side_07.png",
+     "flip": true,
+     "feet": [
+      631.2,
+      1016.34
+     ],
+     "behind_hub": true,
+     "facing": "left"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 36,
+   "kid": [
+    {
+     "src": "side_10.png",
+     "flip": true,
+     "feet": [
+      629.31,
+      1017.46
+     ],
+     "behind_hub": true,
+     "facing": "left"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 37,
+   "kid": [
+    {
+     "src": "side_13.png",
+     "flip": true,
+     "feet": [
+      627.76,
+      1018.65
+     ],
+     "behind_hub": true,
+     "facing": "left"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 38,
+   "kid": [
+    {
+     "src": "side_00.png",
+     "flip": true,
+     "feet": [
+      626.58,
+      1019.91
+     ],
+     "behind_hub": true,
+     "facing": "left"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 39,
+   "kid": [
+    {
+     "src": "side_03.png",
+     "flip": true,
+     "feet": [
+      625.78,
+      1021.21
+     ],
+     "behind_hub": true,
+     "facing": "left"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 40,
+   "kid": [
+    {
+     "src": "side_06.png",
+     "flip": true,
+     "feet": [
+      625.38,
+      1022.53
+     ],
+     "behind_hub": true,
+     "facing": "left"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 41,
+   "kid": [
+    {
+     "src": "side_09.png",
+     "flip": false,
+     "feet": [
+      625.38,
+      1023.87
+     ],
+     "behind_hub": false,
+     "facing": "right"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 42,
+   "kid": [
+    {
+     "src": "side_12.png",
+     "flip": false,
+     "feet": [
+      625.78,
+      1025.19
+     ],
+     "behind_hub": false,
+     "facing": "right"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 43,
+   "kid": [
+    {
+     "src": "side_15.png",
+     "flip": false,
+     "feet": [
+      626.58,
+      1026.49
+     ],
+     "behind_hub": false,
+     "facing": "right"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 44,
+   "kid": [
+    {
+     "src": "side_02.png",
+     "flip": false,
+     "feet": [
+      627.76,
+      1027.75
+     ],
+     "behind_hub": false,
+     "facing": "right"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 45,
+   "kid": [
+    {
+     "src": "side_05.png",
+     "flip": false,
+     "feet": [
+      629.31,
+      1028.94
+     ],
+     "behind_hub": false,
+     "facing": "right"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 46,
+   "kid": [
+    {
+     "src": "side_08.png",
+     "flip": false,
+     "feet": [
+      631.2,
+      1030.06
+     ],
+     "behind_hub": false,
+     "facing": "right"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 47,
+   "kid": [
+    {
+     "src": "side_11.png",
+     "flip": false,
+     "feet": [
+      633.42,
+      1031.08
+     ],
+     "behind_hub": false,
+     "facing": "right"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 48,
+   "kid": [
+    {
+     "src": "side_14.png",
+     "flip": false,
+     "feet": [
+      635.93,
+      1032.0
+     ],
+     "behind_hub": false,
+     "facing": "right"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 49,
+   "kid": [
+    {
+     "src": "side_01.png",
+     "flip": false,
+     "feet": [
+      638.7,
+      1032.79
+     ],
+     "behind_hub": false,
+     "facing": "right"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 50,
+   "kid": [
+    {
+     "src": "side_04.png",
+     "flip": false,
+     "feet": [
+      641.69,
+      1033.46
+     ],
+     "behind_hub": false,
+     "facing": "right"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 51,
+   "kid": [
+    {
+     "src": "side_07.png",
+     "flip": false,
+     "feet": [
+      644.85,
+      1033.99
+     ],
+     "behind_hub": false,
+     "facing": "right"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 52,
+   "kid": [
+    {
+     "src": "side_10.png",
+     "flip": false,
+     "feet": [
+      648.16,
+      1034.37
+     ],
+     "behind_hub": false,
+     "facing": "right"
+    }
+   ],
+   "top_angle_deg": 0
+  },
+  {
+   "frame": 53,
+   "kid": [
+    {
+     "src": "side_13.png",
+     "flip": false,
+     "feet": [
+      651.56,
+      1034.61
+     ],
+     "behind_hub": false,
+     "facing": "right"
+    }
+   ],
+   "top_angle_deg": 0
+  }
+ ]
+}

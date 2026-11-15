@@ -1,0 +1,999 @@
+{
+ "what": "WATER room furniture cut from the established NP5 water room (v2 in-game hex picture). PREVIEW ONLY: not for building-v1 or any build, no publish.",
+ "created": "2026-11-13 (ET)",
+ "source": {
+  "folder": "/workspace/ant-colony/underground/rooms/water-room-np5/",
+  "read_only": true,
+  "files_used": {
+   "water-room-in-game-hex-no-outline-np5-v2.jpg": "77549691c5618772d249ba9988074823",
+   "tank-sprite-src-b.png": "8c47e7cd918463ee5897058126020680",
+   "build_water_v2.py": "f3049ee36265e9db767c504e8a776d69",
+   "water_np5_stage1b.py": "a920cec3e52d4b5584ceeb7d80403d4b",
+   "build_np5.py": "8d0b9ad14f90d3aa5729bc17cea2f107",
+   "water-room-np5-water-full-layer-v2.png": "0935f9770ad639c17cbb253f4df123a0",
+   "water-room-np5-water-surface-strip-v2.png": "4efe1b697490d544cf3c6586c73eb5ae",
+   "water-room-np5-water-fill-mask-v2.png": "1be6b683737820d82ea97dda2f1c1bde",
+   "water-room-np5-preview-fill-050-v2.jpg": "005d1eb824de3c5c8545ec6fb66ccd31",
+   "water-room-np5-preview-fill-100-v2.jpg": "d1981f685d5299e84791225f433bbca4"
+  }
+ },
+ "canvas": [
+  1080,
+  1680
+ ],
+ "template": {
+  "name": "LOCKED 3-D hex template (green floor, yellow walls, red ceiling)",
+  "outline_overlay": "/workspace/builder-opening/shots/hex-3d-outline-color.jpg",
+  "outline_overlay_md5": "6e299814ac5b4c5bc595ac6a2117ecb0",
+  "floor_hex_width_px": 790.9698687897874,
+  "CX": 540,
+  "CY_GREEN": 1075.5,
+  "note": "build_water_v2.py used this same outline overlay for the NP5 v2 programming view, so the v2 picture is on this template"
+ },
+ "world_scale": {
+  "in_game_hex_width_px": 791,
+  "ROOM_SCALE_world_per_px": 0.17302387549421078,
+  "source": "same as Royal chamber set v1 / Kitchen / training-camp-A"
+ },
+ "scale_match": {
+  "rule": "Same as the Kitchen cut: furniture px = 1:1 with the room's established in-game hex picture on the locked template (Kitchen matched kitchen-clean-in-game-hex by SIFT -> 0.5071 source px).",
+  "how": "Pieces re-sampled from tank-sprite-src-b.png with the exact build_water_v2.py code (tank 0.90, barrels 0.50, LANCZOS, RGB*1.06+3, same topleft), then compared with water-room-in-game-hex-no-outline-np5-v2.jpg.",
+  "result": {
+   "v2_picture": "/workspace/ant-colony/underground/rooms/water-room-np5/water-room-in-game-hex-no-outline-np5-v2.jpg",
+   "opaque_px_compared": 48416,
+   "max_abs_diff": 214,
+   "mean_abs_diff": 1.601,
+   "px_diff_gt8": 72,
+   "px_diff_gt16": 56,
+   "note": "v2 is JPEG q98 4:4:4 over the plate; diffs are JPEG noise + drip stream (drawn over the tank in v2, not cut)",
+   "glass_box_vs_v2_fill_050": {
+    "max_abs_diff": 6,
+    "mean_abs_diff": 1.199,
+    "px_diff_gt16": 0
+   },
+   "glass_box_vs_v2_fill_100": {
+    "max_abs_diff": 5,
+    "mean_abs_diff": 1.013,
+    "px_diff_gt16": 0
+   }
+  }
+ },
+ "cleanup_alpha_only": {
+  "tank_bottom": "per column x 88..365: rows below (darkest row within +-5 of the rail shadow line)+1 removed (floor soil under the tank)",
+  "stream_above_rim": "x 226..236, rows < 2 removed (thin falling stream above the rim; rim top measured on cols 224/238)",
+  "barrel_left": "left-barrel part (src x 0..89) kept only inside polygon [(0, 0), (81, 0), (81, 190), (68, 200), (40, 202), (0, 202)]: removes the tank-post sliver / dark background strip x 82..89 and the soil wedge under the barrel",
+  "barrel_right": "right-barrel part (src x 362..) kept only inside polygon [(374, 92), (455, 92), (455, 214), (390, 214), (366, 212), (366, 112), (369, 106)]: removes the tank top-corner and side-panel sliver plus the dark background strip (src x 362..373 above the lid, x 362..365 below) and the soil wedge under the barrel",
+  "removed_src_px_alpha_gt0": {
+   "tank": 1697,
+   "barrel_left": 1367,
+   "barrel_right": 1338
+  }
+ },
+ "left_out": [
+  "the floor plate itself (soil floor, walls, ceiling of the NP5 room)",
+  "wall plumbing: the copper wall pipes and the wall-mounted funnel/spout above the tank (wall art; there are no walls in the furniture set)",
+  "the falling drip stream from the funnel tip (571,493) to y 600: it was drawn by build_water_v2.py, not cut art, and has nothing to fall from without the wall spout",
+  "all wall lanterns (two hanging at the back, the side-wall lanterns)",
+  "floor clutter: pebbles, soil crumbs, roots, moss/plant tufts and the tunnel mouth at the front left",
+  "the floor soil patches that the NP5 sprite cut carried under the tank and under both barrels (alpha removed, see cleanup)",
+  "the tank top-corner / side-panel sliver and dark background strips that the v2 barrel parts carried (alpha removed)"
+ ],
+ "flags": [
+  "GENERATED SOURCE: the NP5 tank and barrels are image-generator art (tank-sprite-src-b.png was cut by water_np5_stage1b.py from /workspace/np5-scratch/gen-water-reg.png, the registered np5-water-generated-raw-a.jpg). None of it is Chris's art; nothing was redrawn here.",
+  "PROCEDURAL WATER: the water-fill and surface-strip layers are not painted art. build_water_v2.py made them (blue gradient + blurred noise, alpha 0.76; 5-row bright strip). They are byte-identical copies of the NP5 v2 files.",
+  "NP5 FILL ALREADY IN SOURCE: water_np5_stage1b.py inpainted the falling stream inside the tank sprite (cv2 TELEA). That fill is in tank-sprite-src-b.png and so in this tank. A faint drip highlight on the inner back wall and a faint vertical line in the glass remain from the source; kept, not edited.",
+  "NO NEW FILLS: this cut made zero hidden-area fills. It only removed alpha (soil, background strips, stream above the rim).",
+  "Right barrel: the bottom hoop flares out to the right (source art); kept. Left barrel: small notch on its left side in the source alpha; kept.",
+  "Mixed scale in the source design: v2 drew the tank at 0.90 x sprite-b px but the barrels at 0.50. This cut keeps both exactly (1:1 with the v2 picture). At the Kitchen's 0.5071 source-px factor the tank would be about 141x117 px instead of 250x203 (v1 used 0.44).",
+  "Water is drawn OVER the tank piece inside the glass box (as NP5 v2 did), not between a back and a front layer. The tank sprite has no water pixels, so the level layer is fully independent.",
+  "Drink spots are the NP5 v2 use spots (build_water_v2.py SPOTS), not new values. Spots 1-2 are 74 px in front of the tank base, so a 130 px Albert / the queen stand in front of the lower glass and cover part of it (drawn after the tank). No drinking art exists; ants are standing idle.",
+  "Contact shadows: v2 drew all three ellipses into one shadow layer; here each piece has its own shadow PNG made with the same ellipse/blur/alpha. Composited together they match v2 (blur tails between pieces barely touch)."
+ ],
+ "ants": {
+  "queen": {
+   "how": "Royal check render: queen_idle_front_strip_v1 frame 0 (md5 551e7661af78d596e8a53017459d6193), QS 0.7121334648300934, anchor (200,395), visible about 103x143, STANDING",
+   "feet": {
+    "template": [
+     470,
+     850
+    ],
+    "v13_full_preview": [
+     4122,
+     2260
+    ],
+    "zoom_crop": [
+     920,
+     805
+    ],
+    "closeup": [
+     410,
+     535
+    ]
+   },
+   "bbox": [
+    412,
+    711,
+    515,
+    854
+   ]
+  },
+  "albert": {
+   "how": "locked idle frame 0, /workspace/ant-colony/art/classroom-anims-v1/_base-v2/ant-idle_00.png (md5 661a608e6e3652e70c884e5f874839a5, cutout of LOCKED-WALKS-2026-11-09 idle), 130 px (scale 130/287), anchor (135,334); same as training-camp-A. Never the round scout sheets.",
+   "feet": {
+    "template": [
+     672,
+     850
+    ],
+    "v13_full_preview": [
+     4324,
+     2260
+    ],
+    "zoom_crop": [
+     1122,
+     805
+    ],
+    "closeup": [
+     612,
+     535
+    ]
+   },
+   "bbox": [
+    627,
+    723,
+    718,
+    850
+   ]
+  }
+ },
+ "drink_spots": {
+  "spot1": {
+   "feet": {
+    "template": [
+     470,
+     850
+    ],
+    "v13_full_preview": [
+     4122,
+     2260
+    ],
+    "zoom_crop": [
+     920,
+     805
+    ],
+    "closeup": [
+     410,
+     535
+    ]
+   },
+   "albert_130_bbox": [
+    425,
+    723,
+    516,
+    850
+   ],
+   "queen_bbox": [
+    412,
+    711,
+    515,
+    854
+   ],
+   "albert_bbox_overlap_furniture_alpha_px": 2792,
+   "queen_bbox_overlap_furniture_alpha_px": 3793,
+   "feet_in_front_of_tank_base_px": 74,
+   "used_in_previews_by": "queen (standing Royal-check render)"
+  },
+  "spot2": {
+   "feet": {
+    "template": [
+     672,
+     850
+    ],
+    "v13_full_preview": [
+     4324,
+     2260
+    ],
+    "zoom_crop": [
+     1122,
+     805
+    ],
+    "closeup": [
+     612,
+     535
+    ]
+   },
+   "albert_130_bbox": [
+    627,
+    723,
+    718,
+    850
+   ],
+   "queen_bbox": [
+    614,
+    711,
+    717,
+    854
+   ],
+   "albert_bbox_overlap_furniture_alpha_px": 3085,
+   "queen_bbox_overlap_furniture_alpha_px": 4641,
+   "feet_in_front_of_tank_base_px": 74,
+   "used_in_previews_by": "Albert 130 px (locked idle frame 0)"
+  },
+  "spot3": {
+   "feet": {
+    "template": [
+     395,
+     975
+    ],
+    "v13_full_preview": [
+     4047,
+     2385
+    ],
+    "zoom_crop": [
+     845,
+     930
+    ],
+    "closeup": [
+     335,
+     660
+    ]
+   },
+   "albert_130_bbox": [
+    350,
+    848,
+    441,
+    975
+   ],
+   "queen_bbox": [
+    337,
+    836,
+    440,
+    979
+   ],
+   "albert_bbox_overlap_furniture_alpha_px": 0,
+   "queen_bbox_overlap_furniture_alpha_px": 0,
+   "feet_in_front_of_tank_base_px": 199,
+   "used_in_previews_by": "nobody (extra NP5 spot, second row)"
+  },
+  "spot4": {
+   "feet": {
+    "template": [
+     748,
+     975
+    ],
+    "v13_full_preview": [
+     4400,
+     2385
+    ],
+    "zoom_crop": [
+     1198,
+     930
+    ],
+    "closeup": [
+     688,
+     660
+    ]
+   },
+   "albert_130_bbox": [
+    703,
+    848,
+    794,
+    975
+   ],
+   "queen_bbox": [
+    690,
+    836,
+    793,
+    979
+   ],
+   "albert_bbox_overlap_furniture_alpha_px": 0,
+   "queen_bbox_overlap_furniture_alpha_px": 0,
+   "feet_in_front_of_tank_base_px": 199,
+   "used_in_previews_by": "nobody (extra NP5 spot, second row)"
+  }
+ },
+ "drink_spots_method": "feet = NP5 v2 SPOTS from build_water_v2.py (the room's established use spots). Boxes measured by placing the real sprites; overlap = furniture alpha>40 px inside the ant box (the ant is drawn in front).",
+ "draw_order_note": "Draw all three shadows, then water-barrel-left, water-barrel-right, water-tank-glass-front, then (if y_level < y_empty) the water-fill crop and the surface strip. All feet are at y 768-773 (same floor line); ants at drink spots (y 850) are drawn after the furniture.",
+ "outputs": {
+  "water-np5-cut-furniture.png": {
+   "md5": "e0ad6c43ab69e03147206888c8751c9e",
+   "size": [
+    1080,
+    1680
+   ]
+  },
+  "water-np5-cut-furniture-programming.png": {
+   "md5": "1ef3032fbfc60efe296166fca03bb777",
+   "size": [
+    1080,
+    1680
+   ]
+  },
+  "water-np5-cut-furniture-programming-view.jpg": {
+   "md5": "edd24073ca43dabfced0b9fcd4fa325a",
+   "size": [
+    1080,
+    1680
+   ]
+  },
+  "water-np5-cut-furniture-scale-check.jpg": {
+   "md5": "4e0acb779c6fccd78592cac8884c36aa",
+   "size": [
+    1080,
+    1680
+   ]
+  }
+ },
+ "outputs_note": "furniture.png = rest state with an EMPTY tank (as the v2 in-game picture). The scale check shows the water at 6/12 (y 681) with the queen at spot1 and Albert at spot2.",
+ "pieces": [
+  {
+   "name": "water-barrel-left",
+   "draw_order": 0,
+   "file": "water-np5-cut-water-barrel-left.png",
+   "md5": "ad30b8a856fd46a740890db2b187760d",
+   "png_size": [
+    44,
+    67
+   ],
+   "topleft_in_1080x1680": [
+    375,
+    704
+   ],
+   "png_box_xyxy": [
+    375,
+    704,
+    419,
+    771
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    375,
+    707,
+    416,
+    768
+   ],
+   "visible_size": [
+    41,
+    61
+   ],
+   "visible_size_world": [
+    7.094,
+    10.5545
+   ],
+   "height_ratio_to_albert_130": 0.469,
+   "height_ratio_to_queen_visible_143": 0.426,
+   "bbox_centre": [
+    395.5,
+    737.5
+   ],
+   "anchor_foot_bottom_centre": [
+    395.5,
+    768
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -144.5,
+      -338.0
+     ],
+     "world": [
+      -25.002,
+      -58.4821
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.18269,
+      -0.42732
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -144.5,
+      135.0
+     ],
+     "world": [
+      -25.002,
+      23.3582
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.18269,
+      0.17068
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2786.998,
+     5022.858
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -144.5,
+      -307.5
+     ],
+     "world": [
+      -25.002,
+      -53.2048
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.18269,
+      -0.38876
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -144.5,
+      165.5
+     ],
+     "world": [
+      -25.002,
+      28.6355
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.18269,
+      0.20924
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2786.998,
+     5028.135
+    ]
+   },
+   "pivot": null,
+   "shadow": {
+    "file": "water-np5-cut-water-barrel-left-shadow.png",
+    "md5": "134aff7216d0177576df2407b059bf76",
+    "topleft": [
+     365,
+     760
+    ],
+    "size": [
+     66,
+     31
+    ],
+    "how": "the NP5 v2 contact shadow for this piece, rebuilt with the exact build_water_v2.py ellipse/blur/alpha (one ellipse per piece, colour (18,10,4), blur 4, x0.6); draw all shadows before the pieces"
+   },
+   "source": {
+    "file": "/workspace/ant-colony/underground/rooms/water-room-np5/tank-sprite-src-b.png",
+    "md5": "8c47e7cd918463ee5897058126020680",
+    "part_columns_x0_x1": [
+     0,
+     90
+    ],
+    "v2_crop_box_in_sprite": [
+     0,
+     39,
+     90,
+     217
+    ],
+    "scale_sprite_px_to_template_px": 0.5,
+    "resample": "PIL LANCZOS, then RGB*1.06+3 (identical to build_water_v2.py sc())",
+    "v2_topleft_before_cleanup": [
+     375,
+     687
+    ],
+    "v2_size_before_cleanup": [
+     45,
+     89
+    ]
+   }
+  },
+  {
+   "name": "water-barrel-right",
+   "draw_order": 1,
+   "file": "water-np5-cut-water-barrel-right.png",
+   "md5": "61167b739abb8020d0eb7c82a8d66207",
+   "png_size": [
+    46,
+    67
+   ],
+   "topleft_in_1080x1680": [
+    722,
+    705
+   ],
+   "png_box_xyxy": [
+    722,
+    705,
+    768,
+    772
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    724,
+    708,
+    768,
+    769
+   ],
+   "visible_size": [
+    44,
+    61
+   ],
+   "visible_size_world": [
+    7.6131,
+    10.5545
+   ],
+   "height_ratio_to_albert_130": 0.469,
+   "height_ratio_to_queen_visible_143": 0.426,
+   "bbox_centre": [
+    746.0,
+    738.5
+   ],
+   "anchor_foot_bottom_centre": [
+    746.0,
+    769
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      206.0,
+      -337.0
+     ],
+     "world": [
+      35.6429,
+      -58.309
+     ],
+     "frac_of_hex_width_790.97": [
+      0.26044,
+      -0.42606
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      206.0,
+      136.0
+     ],
+     "world": [
+      35.6429,
+      23.5312
+     ],
+     "frac_of_hex_width_790.97": [
+      0.26044,
+      0.17194
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2847.643,
+     5023.031
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      206.0,
+      -306.5
+     ],
+     "world": [
+      35.6429,
+      -53.0318
+     ],
+     "frac_of_hex_width_790.97": [
+      0.26044,
+      -0.3875
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      206.0,
+      166.5
+     ],
+     "world": [
+      35.6429,
+      28.8085
+     ],
+     "frac_of_hex_width_790.97": [
+      0.26044,
+      0.2105
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2847.643,
+     5028.308
+    ]
+   },
+   "pivot": null,
+   "shadow": {
+    "file": "water-np5-cut-water-barrel-right-shadow.png",
+    "md5": "c6faa4f2a184e13c98ad247bef2db770",
+    "topleft": [
+     712,
+     760
+    ],
+    "size": [
+     67,
+     31
+    ],
+    "how": "the NP5 v2 contact shadow for this piece, rebuilt with the exact build_water_v2.py ellipse/blur/alpha (one ellipse per piece, colour (18,10,4), blur 4, x0.6); draw all shadows before the pieces"
+   },
+   "source": {
+    "file": "/workspace/ant-colony/underground/rooms/water-room-np5/tank-sprite-src-b.png",
+    "md5": "8c47e7cd918463ee5897058126020680",
+    "part_columns_x0_x1": [
+     362,
+     455
+    ],
+    "v2_crop_box_in_sprite": [
+     362,
+     5,
+     455,
+     228
+    ],
+    "scale_sprite_px_to_template_px": 0.5,
+    "resample": "PIL LANCZOS, then RGB*1.06+3 (identical to build_water_v2.py sc())",
+    "v2_topleft_before_cleanup": [
+     722,
+     664
+    ],
+    "v2_size_before_cleanup": [
+     46,
+     112
+    ]
+   }
+  },
+  {
+   "name": "water-tank-glass-front",
+   "draw_order": 2,
+   "file": "water-np5-cut-water-tank-glass-front.png",
+   "md5": "0a3969a26f65b1054473e4da98a59337",
+   "png_size": [
+    250,
+    207
+   ],
+   "topleft_in_1080x1680": [
+    446,
+    569
+   ],
+   "png_box_xyxy": [
+    446,
+    569,
+    696,
+    776
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    446,
+    570,
+    696,
+    773
+   ],
+   "visible_size": [
+    250,
+    203
+   ],
+   "visible_size_world": [
+    43.256,
+    35.1238
+   ],
+   "height_ratio_to_albert_130": 1.562,
+   "height_ratio_to_queen_visible_143": 1.419,
+   "bbox_centre": [
+    571.0,
+    671.5
+   ],
+   "anchor_foot_bottom_centre": [
+    571.0,
+    773
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      31.0,
+      -404.0
+     ],
+     "world": [
+      5.3637,
+      -69.9016
+     ],
+     "frac_of_hex_width_790.97": [
+      0.03919,
+      -0.51077
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      31.0,
+      69.0
+     ],
+     "world": [
+      5.3637,
+      11.9386
+     ],
+     "frac_of_hex_width_790.97": [
+      0.03919,
+      0.08723
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2817.364,
+     5011.439
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      31.0,
+      -302.5
+     ],
+     "world": [
+      5.3637,
+      -52.3397
+     ],
+     "frac_of_hex_width_790.97": [
+      0.03919,
+      -0.38244
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      31.0,
+      170.5
+     ],
+     "world": [
+      5.3637,
+      29.5006
+     ],
+     "frac_of_hex_width_790.97": [
+      0.03919,
+      0.21556
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2817.364,
+     5029.001
+    ]
+   },
+   "pivot": null,
+   "shadow": {
+    "file": "water-np5-cut-water-tank-glass-front-shadow.png",
+    "md5": "ed958369d57b3f014a24f7076cbfc54f",
+    "topleft": [
+     432,
+     753
+    ],
+    "size": [
+     279,
+     42
+    ],
+    "how": "the NP5 v2 contact shadow for this piece, rebuilt with the exact build_water_v2.py ellipse/blur/alpha (one ellipse per piece, colour (18,10,4), blur 4, x0.6); draw all shadows before the pieces"
+   },
+   "source": {
+    "file": "/workspace/ant-colony/underground/rooms/water-room-np5/tank-sprite-src-b.png",
+    "md5": "8c47e7cd918463ee5897058126020680",
+    "part_columns_x0_x1": [
+     88,
+     366
+    ],
+    "v2_crop_box_in_sprite": [
+     88,
+     0,
+     366,
+     230
+    ],
+    "scale_sprite_px_to_template_px": 0.9,
+    "resample": "PIL LANCZOS, then RGB*1.06+3 (identical to build_water_v2.py sc())",
+    "v2_topleft_before_cleanup": [
+     446,
+     569
+    ],
+    "v2_size_before_cleanup": [
+     250,
+     207
+    ]
+   },
+   "layers_in_draw_order": [
+    {
+     "layer": "tank",
+     "file": "water-np5-cut-water-tank-glass-front.png",
+     "md5": "0a3969a26f65b1054473e4da98a59337",
+     "what": "fixed: the wooden glass-front tank (frame, back wall, empty glass). Always drawn."
+    },
+    {
+     "layer": "water-fill",
+     "file": "water-np5-cut-tank-water-fill-full.png",
+     "md5": "0935f9770ad639c17cbb253f4df123a0",
+     "topleft_in_1080x1680": [
+      480,
+      632
+     ],
+     "png_size": [
+      167,
+      98
+     ],
+     "what": "MOVING (level): full-tank water, pixel-aligned to the glass box. For level y_level: crop rows (y_level-632 .. 98) of this PNG and draw at (480, y_level). Nothing drawn when y_level = y_empty."
+    },
+    {
+     "layer": "water-surface-strip",
+     "file": "water-np5-cut-tank-water-surface-strip.png",
+     "md5": "4efe1b697490d544cf3c6586c73eb5ae",
+     "png_size": [
+      167,
+      5
+     ],
+     "what": "MOVING (level): the bright fill-line strip; draw at (480, max(y_level-2, 632)) after the water-fill crop, only when y_level < y_empty."
+    }
+   ],
+   "water_level": {
+    "glass_box_xyxy": [
+     480,
+     632,
+     647,
+     730
+    ],
+    "y_empty": 730,
+    "y_full": 632,
+    "levels_of_12_y": {
+     "0": 730,
+     "1": 722,
+     "2": 714,
+     "3": 706,
+     "4": 697,
+     "5": 689,
+     "6": 681,
+     "7": 673,
+     "8": 665,
+     "9": 656,
+     "10": 648,
+     "11": 640,
+     "12": 632
+    },
+    "fill_mask": "water-np5-cut-tank-water-fill-mask.png",
+    "rule": "same as build_water_v2.py withwater(frac): y_level = round(y_empty - frac*(y_empty-y_full))",
+    "source_files": {
+     "fill": {
+      "file": "/workspace/ant-colony/underground/rooms/water-room-np5/water-room-np5-water-full-layer-v2.png",
+      "md5": "0935f9770ad639c17cbb253f4df123a0"
+     },
+     "surface": {
+      "file": "/workspace/ant-colony/underground/rooms/water-room-np5/water-room-np5-water-surface-strip-v2.png",
+      "md5": "4efe1b697490d544cf3c6586c73eb5ae"
+     },
+     "mask": {
+      "file": "/workspace/ant-colony/underground/rooms/water-room-np5/water-room-np5-water-fill-mask-v2.png",
+      "md5": "1be6b683737820d82ea97dda2f1c1bde"
+     }
+    }
+   },
+   "points": {
+    "tank_rim_top_y": 570,
+    "tank_front_base_y": 773
+   }
+  }
+ ],
+ "previews": {
+  "folder": "/workspace/ant-colony/furniture/previews/",
+  "jpeg": "q98 4:4:4",
+  "v13": "/workspace/ant-colony/big-chamber/v13-noants-2026-11-13/big-chamber-v13-noants-clean.jpg",
+  "v13_md5": "cd5119a00eff77bbe32096706955b667",
+  "cell": [
+   1,
+   0
+  ],
+  "sets": {
+   "water-np5-cut-on-v13-preview-v1": {
+    "water_fill_fraction": 0.5,
+    "water_level_y_template": 681,
+    "ants": false,
+    "paste_topleft_on_v13": [
+     3652,
+     1410
+    ],
+    "cell_centre_on_v13": [
+     4192.25,
+     2485.3030471967454
+    ],
+    "zoom_crop_xyxy": [
+     3202,
+     1455,
+     5182,
+     2985
+    ],
+    "closeup_crop_xyxy": [
+     3712,
+     1725,
+     4672,
+     2495
+    ],
+    "files": {
+     "full": "water-np5-cut-on-v13-preview-v1.jpg",
+     "zoom_crop": "water-np5-cut-on-v13-preview-v1-zoom-crop.jpg",
+     "closeup": "water-np5-cut-on-v13-preview-v1-closeup.jpg"
+    }
+   },
+   "water-np5-cut-on-v13-preview-v1-with-ants": {
+    "water_fill_fraction": 0.5,
+    "water_level_y_template": 681,
+    "ants": true,
+    "paste_topleft_on_v13": [
+     3652,
+     1410
+    ],
+    "cell_centre_on_v13": [
+     4192.25,
+     2485.3030471967454
+    ],
+    "zoom_crop_xyxy": [
+     3202,
+     1455,
+     5182,
+     2985
+    ],
+    "closeup_crop_xyxy": [
+     3712,
+     1725,
+     4672,
+     2495
+    ],
+    "files": {
+     "full": "water-np5-cut-on-v13-preview-v1-with-ants.jpg",
+     "zoom_crop": "water-np5-cut-on-v13-preview-v1-with-ants-zoom-crop.jpg",
+     "closeup": "water-np5-cut-on-v13-preview-v1-with-ants-closeup.jpg"
+    }
+   },
+   "water-np5-cut-on-v13-preview-v1-with-ants-fill-000": {
+    "water_fill_fraction": 0.0,
+    "water_level_y_template": 730,
+    "ants": true,
+    "paste_topleft_on_v13": [
+     3652,
+     1410
+    ],
+    "cell_centre_on_v13": [
+     4192.25,
+     2485.3030471967454
+    ],
+    "zoom_crop_xyxy": [
+     3202,
+     1455,
+     5182,
+     2985
+    ],
+    "closeup_crop_xyxy": [
+     3712,
+     1725,
+     4672,
+     2495
+    ],
+    "files": {
+     "zoom_crop": "water-np5-cut-on-v13-preview-v1-with-ants-fill-000-zoom-crop.jpg",
+     "closeup": "water-np5-cut-on-v13-preview-v1-with-ants-fill-000-closeup.jpg"
+    }
+   },
+   "water-np5-cut-on-v13-preview-v1-with-ants-fill-100": {
+    "water_fill_fraction": 1.0,
+    "water_level_y_template": 632,
+    "ants": true,
+    "paste_topleft_on_v13": [
+     3652,
+     1410
+    ],
+    "cell_centre_on_v13": [
+     4192.25,
+     2485.3030471967454
+    ],
+    "zoom_crop_xyxy": [
+     3202,
+     1455,
+     5182,
+     2985
+    ],
+    "closeup_crop_xyxy": [
+     3712,
+     1725,
+     4672,
+     2495
+    ],
+    "files": {
+     "zoom_crop": "water-np5-cut-on-v13-preview-v1-with-ants-fill-100-zoom-crop.jpg",
+     "closeup": "water-np5-cut-on-v13-preview-v1-with-ants-fill-100-closeup.jpg"
+    }
+   }
+  },
+  "md5sums_file": "water-np5-cut-previews-MD5SUMS",
+  "files": {
+   "water-np5-cut-on-v13-preview-v1-closeup.jpg": "ae0fef6364431526c833cb4e5351f18a",
+   "water-np5-cut-on-v13-preview-v1-with-ants-closeup.jpg": "ef239ab0bbae90302598b89cdd3b5c79",
+   "water-np5-cut-on-v13-preview-v1-with-ants-fill-000-closeup.jpg": "4a86bf8b8f2b432677293738be95a2a9",
+   "water-np5-cut-on-v13-preview-v1-with-ants-fill-000-zoom-crop.jpg": "1ead97a996539213d420ddab76509df3",
+   "water-np5-cut-on-v13-preview-v1-with-ants-fill-100-closeup.jpg": "297544bb8260d1b21ebf3d7e4e123e6d",
+   "water-np5-cut-on-v13-preview-v1-with-ants-fill-100-zoom-crop.jpg": "c33a9237ff3f4f5cb8fb58e854a51632",
+   "water-np5-cut-on-v13-preview-v1-with-ants-zoom-crop.jpg": "dab2bd2770507228f5e468eb2a357601",
+   "water-np5-cut-on-v13-preview-v1-with-ants.jpg": "17eb53073274fd0dec078acba9b60c59",
+   "water-np5-cut-on-v13-preview-v1-zoom-crop.jpg": "c02445d76db762d0be1918a139a2f72a",
+   "water-np5-cut-on-v13-preview-v1.jpg": "d24636427688cbaece4d8f4feb56be06"
+  }
+ }
+}

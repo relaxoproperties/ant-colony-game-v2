@@ -1,0 +1,4 @@
+/* GM option A: outside LOCKED opening; no effect on http/https. */
+(function(){if(location.protocol!=='file:')return;const orig=window.fetch;window.fetch=function(input,options){const raw=typeof input==='string'?input:input.url;const url=new URL(raw,location.href);const pos=url.pathname.lastIndexOf('/assets/');const key=pos>=0?decodeURIComponent(url.pathname.slice(pos+8)):url.pathname.split('/').pop();let txt=key==='landing-path.json'?window.__LANDING_PATH_JSON:(window.__LOCAL_JSON_TEXT||{})[key];if(txt!==undefined)return Promise.resolve(new Response(txt,{status:200,headers:{'Content-Type':'application/json'}}));return orig.call(window,input,options)}})();
+/* CP LINK (outside the LOCKED opening): load this folder's start preset, then the shared link code, before bv1 runs (parser-inserted, also on file://). */
+document.write('<script src="cplink-preset.js"><\/script><script src="cplink.js"><\/script>');

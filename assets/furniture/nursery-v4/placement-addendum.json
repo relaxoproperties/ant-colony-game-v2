@@ -1,0 +1,626 @@
+{
+ "what": "Nursery v4 = nursery v3 minus the rocking cradle and the leaf-twig nest (the two containers that still held eggs). v3 was: rocking-stand basket at all 4 basket spots (empty / two-eggs states), cradle, twig nest, changing table, lanterns+stands, soil-free mushroom clumps. No scattered blocks, no floor debris, no candles.",
+ "created": "2026-11-13 (ET)",
+ "v1_set": "/workspace/ant-colony/furniture/nursery/",
+ "v3_set": "/workspace/ant-colony/furniture/nursery-v3/",
+ "v3_placement_addendum_md5": "48be1d65558762715794b50053d73a5e",
+ "v1_placement_md5": "535683e3bf95208af68cf0f4853674f1",
+ "v2_baskets_set": "/workspace/ant-colony/furniture/nursery-v2-baskets/",
+ "canvas": [
+  1080,
+  1680
+ ],
+ "sizes": "hex 791 (template 790.97, 1:1); queen = Royal check render (front idle frame 0, QS 0.7121334648300934, anchor (200,395), visible ~103x143, STANDING); Albert 130 px; nothing re-sized",
+ "mechanic_note": "Baskets start EMPTY. The queen walks to a basket and sits on it; when she gets off, that basket switches to the TWO-EGGS state. (Note only, no code.)",
+ "basket_spots": [
+  {
+   "spot": "back",
+   "replaces_v1_piece": "back-small-basket-with-original-eggs",
+   "draw_order": 7,
+   "foot_bottom_centre": [
+    463.5,
+    757
+   ],
+   "topleft_in_1080x1680": [
+    407,
+    626
+   ],
+   "png_size": [
+    113,
+    133
+   ],
+   "offset_from_v1_front_basket": [
+    -240.0,
+    -386
+   ],
+   "shadow": {
+    "file": "../nursery/front-basket-and-low-stand-with-original-eggs-shadow.png",
+    "md5": "06da76f00cb92bf9ea384edbccadae5a",
+    "topleft": [
+     403,
+     729
+    ],
+    "note": "v1 front (rocking-stand) basket shadow, unchanged, moved with the basket"
+   },
+   "states": {
+    "empty": {
+     "file": "rocking-basket-back-spot-empty.png",
+     "md5": "7b5c2ddade34268e85cc5b93b9c63975",
+     "byte_identical_to": "/workspace/ant-colony/furniture/nursery-v2-baskets/front-basket-and-low-stand-empty.png"
+    },
+    "two-eggs": {
+     "file": "rocking-basket-back-spot-two-eggs.png",
+     "md5": "dd8ff49d676ee306cb486cf27f0405db",
+     "byte_identical_to": "/workspace/ant-colony/furniture/nursery-v2-baskets/front-basket-and-low-stand-two-eggs.png"
+    }
+   },
+   "start_state": "empty"
+  },
+  {
+   "spot": "left-upper",
+   "replaces_v1_piece": "left-upper-basket-with-original-eggs",
+   "draw_order": 16,
+   "foot_bottom_centre": [
+    351.5,
+    910
+   ],
+   "topleft_in_1080x1680": [
+    295,
+    779
+   ],
+   "png_size": [
+    113,
+    133
+   ],
+   "offset_from_v1_front_basket": [
+    -352.0,
+    -233
+   ],
+   "shadow": {
+    "file": "../nursery/front-basket-and-low-stand-with-original-eggs-shadow.png",
+    "md5": "06da76f00cb92bf9ea384edbccadae5a",
+    "topleft": [
+     291,
+     882
+    ],
+    "note": "v1 front (rocking-stand) basket shadow, unchanged, moved with the basket"
+   },
+   "states": {
+    "empty": {
+     "file": "rocking-basket-left-upper-spot-empty.png",
+     "md5": "7b5c2ddade34268e85cc5b93b9c63975",
+     "byte_identical_to": "/workspace/ant-colony/furniture/nursery-v2-baskets/front-basket-and-low-stand-empty.png"
+    },
+    "two-eggs": {
+     "file": "rocking-basket-left-upper-spot-two-eggs.png",
+     "md5": "dd8ff49d676ee306cb486cf27f0405db",
+     "byte_identical_to": "/workspace/ant-colony/furniture/nursery-v2-baskets/front-basket-and-low-stand-two-eggs.png"
+    }
+   },
+   "start_state": "empty"
+  },
+  {
+   "spot": "left-lower",
+   "replaces_v1_piece": "left-lower-basket-with-original-eggs",
+   "draw_order": 27,
+   "foot_bottom_centre": [
+    267.5,
+    1028
+   ],
+   "topleft_in_1080x1680": [
+    211,
+    897
+   ],
+   "png_size": [
+    113,
+    133
+   ],
+   "offset_from_v1_front_basket": [
+    -436.0,
+    -115
+   ],
+   "shadow": {
+    "file": "../nursery/front-basket-and-low-stand-with-original-eggs-shadow.png",
+    "md5": "06da76f00cb92bf9ea384edbccadae5a",
+    "topleft": [
+     207,
+     1000
+    ],
+    "note": "v1 front (rocking-stand) basket shadow, unchanged, moved with the basket"
+   },
+   "states": {
+    "empty": {
+     "file": "rocking-basket-left-lower-spot-empty.png",
+     "md5": "7b5c2ddade34268e85cc5b93b9c63975",
+     "byte_identical_to": "/workspace/ant-colony/furniture/nursery-v2-baskets/front-basket-and-low-stand-empty.png"
+    },
+    "two-eggs": {
+     "file": "rocking-basket-left-lower-spot-two-eggs.png",
+     "md5": "dd8ff49d676ee306cb486cf27f0405db",
+     "byte_identical_to": "/workspace/ant-colony/furniture/nursery-v2-baskets/front-basket-and-low-stand-two-eggs.png"
+    }
+   },
+   "start_state": "empty"
+  },
+  {
+   "spot": "front",
+   "replaces_v1_piece": "front-basket-and-low-stand-with-original-eggs",
+   "draw_order": 36,
+   "foot_bottom_centre": [
+    703.5,
+    1143
+   ],
+   "topleft_in_1080x1680": [
+    647,
+    1012
+   ],
+   "png_size": [
+    113,
+    133
+   ],
+   "offset_from_v1_front_basket": [
+    0.0,
+    0
+   ],
+   "shadow": {
+    "file": "../nursery/front-basket-and-low-stand-with-original-eggs-shadow.png",
+    "md5": "06da76f00cb92bf9ea384edbccadae5a",
+    "topleft": [
+     643,
+     1115
+    ],
+    "note": "v1 front (rocking-stand) basket shadow, unchanged, moved with the basket"
+   },
+   "states": {
+    "empty": {
+     "file": "rocking-basket-front-spot-empty.png",
+     "md5": "7b5c2ddade34268e85cc5b93b9c63975",
+     "byte_identical_to": "/workspace/ant-colony/furniture/nursery-v2-baskets/front-basket-and-low-stand-empty.png"
+    },
+    "two-eggs": {
+     "file": "rocking-basket-front-spot-two-eggs.png",
+     "md5": "dd8ff49d676ee306cb486cf27f0405db",
+     "byte_identical_to": "/workspace/ant-colony/furniture/nursery-v2-baskets/front-basket-and-low-stand-two-eggs.png"
+    }
+   },
+   "start_state": "empty"
+  }
+ ],
+ "kept_pieces": [
+  {
+   "name": "mushrooms-back-left",
+   "draw_order": 0,
+   "topleft_in_1080x1680": [
+    361,
+    641
+   ],
+   "png_size": [
+    48,
+    96
+   ],
+   "file": "mushrooms-back-left-nosoil.png",
+   "md5": "d42730db1c50d279af45ad6a7b3387f7",
+   "v1_file": "../nursery/mushrooms-back-left.png",
+   "v1_md5": "66b39e15301cd47dd2fcba49cd60abb3",
+   "note": "same file as nursery-v3 (byte-identical); v1 piece with its dark soil/moss masked out of its own alpha (pixels kept: value>48 and not green, components>=40 px); RGB untouched, no redraw",
+   "shadow": {
+    "file": "../nursery/mushrooms-back-left-shadow.png",
+    "md5": "130423d6f16b040ddb865247c1b71941",
+    "topleft": [
+     360,
+     724
+    ]
+   }
+  },
+  {
+   "name": "mushrooms-back-right",
+   "draw_order": 1,
+   "topleft_in_1080x1680": [
+    586,
+    674
+   ],
+   "png_size": [
+    32,
+    63
+   ],
+   "file": "mushrooms-back-right-nosoil.png",
+   "md5": "e996428eaed907e2998a84daac16a075",
+   "v1_file": "../nursery/mushrooms-back-right.png",
+   "v1_md5": "ad8160e39434acbb5908f233c63e8a83",
+   "note": "same file as nursery-v3 (byte-identical); v1 piece with its dark soil/moss masked out of its own alpha (pixels kept: value>48 and not green, components>=40 px); RGB untouched, no redraw",
+   "shadow": {
+    "file": "../nursery/mushrooms-back-right-shadow.png",
+    "md5": "c6e0b0e773750efd9176e63b14f5ba4e",
+    "topleft": [
+     584,
+     726
+    ]
+   }
+  },
+  {
+   "name": "mushrooms-back-centre",
+   "draw_order": 2,
+   "topleft_in_1080x1680": [
+    462,
+    677
+   ],
+   "png_size": [
+    43,
+    60
+   ],
+   "file": "mushrooms-back-centre-nosoil.png",
+   "md5": "d7b8125e90506afdb2ee7280c416a6f4",
+   "v1_file": "../nursery/mushrooms-back-centre.png",
+   "v1_md5": "3a37cf50e21041522adf7f27fa917954",
+   "note": "same file as nursery-v3 (byte-identical); v1 piece with its dark soil/moss masked out of its own alpha (pixels kept: value>48 and not green, components>=40 px); RGB untouched, no redraw",
+   "shadow": {
+    "file": "../nursery/mushrooms-back-centre-shadow.png",
+    "md5": "92214f5d666a8cb1cab528dd1335b148",
+    "topleft": [
+     461,
+     724
+    ]
+   }
+  },
+  {
+   "name": "lantern-stand-left-small-back",
+   "draw_order": 3,
+   "topleft_in_1080x1680": [
+    379,
+    442
+   ],
+   "png_size": [
+    81,
+    301
+   ],
+   "file": "../nursery/lantern-stand-left-small-back.png",
+   "md5": "d69c0900b4f018f979adf5570f011c5a",
+   "note": "v1 piece unchanged",
+   "shadow": {
+    "file": "../nursery/lantern-stand-left-small-back-shadow.png",
+    "md5": "46fafa6c0e0ee4e9cd0791f309fee14c",
+    "topleft": [
+     376,
+     722
+    ]
+   }
+  },
+  {
+   "name": "lantern-stand-right-small-back",
+   "draw_order": 4,
+   "topleft_in_1080x1680": [
+    615,
+    442
+   ],
+   "png_size": [
+    81,
+    301
+   ],
+   "file": "../nursery/lantern-stand-right-small-back.png",
+   "md5": "d30a36c333cd856e55fb9f5fef316a1e",
+   "note": "v1 piece unchanged",
+   "shadow": {
+    "file": "../nursery/lantern-stand-right-small-back-shadow.png",
+    "md5": "46fafa6c0e0ee4e9cd0791f309fee14c",
+    "topleft": [
+     611,
+     722
+    ]
+   }
+  },
+  {
+   "name": "lantern-left-small-back",
+   "draw_order": 5,
+   "topleft_in_1080x1680": [
+    420,
+    486
+   ],
+   "png_size": [
+    28,
+    104
+   ],
+   "file": "../nursery/lantern-left-small-back.png",
+   "md5": "b10c40cca53f62b42f9565952ffe014e",
+   "note": "v1 piece unchanged"
+  },
+  {
+   "name": "lantern-right-small-back",
+   "draw_order": 6,
+   "topleft_in_1080x1680": [
+    622,
+    486
+   ],
+   "png_size": [
+    33,
+    119
+   ],
+   "file": "../nursery/lantern-right-small-back.png",
+   "md5": "964369db7f7db9cbccaf25f7357c760a",
+   "note": "v1 piece unchanged"
+  },
+  {
+   "name": "lantern-stand-right-mid",
+   "draw_order": 8,
+   "topleft_in_1080x1680": [
+    732,
+    495
+   ],
+   "png_size": [
+    81,
+    301
+   ],
+   "file": "../nursery/lantern-stand-right-mid.png",
+   "md5": "d30a36c333cd856e55fb9f5fef316a1e",
+   "note": "v1 piece unchanged",
+   "shadow": {
+    "file": "../nursery/lantern-stand-right-mid-shadow.png",
+    "md5": "46fafa6c0e0ee4e9cd0791f309fee14c",
+    "topleft": [
+     728,
+     775
+    ]
+   }
+  },
+  {
+   "name": "lantern-right-mid",
+   "draw_order": 9,
+   "topleft_in_1080x1680": [
+    738,
+    539
+   ],
+   "png_size": [
+    35,
+    134
+   ],
+   "file": "../nursery/lantern-right-mid.png",
+   "md5": "8917b7302004d8fe5604a6e83b68243b",
+   "note": "v1 piece unchanged"
+  },
+  {
+   "name": "changing-table-with-all-original-top-supplies",
+   "draw_order": 10,
+   "topleft_in_1080x1680": [
+    600,
+    628
+   ],
+   "png_size": [
+    148,
+    232
+   ],
+   "file": "../nursery/changing-table-with-all-original-top-supplies.png",
+   "md5": "9d082282ae81422bd2ff1e74558e353c",
+   "note": "v1 piece unchanged",
+   "shadow": {
+    "file": "../nursery/changing-table-with-all-original-top-supplies-shadow.png",
+    "md5": "2b8e89e9b6cc6e3ce1624f602fbfe076",
+    "topleft": [
+     595,
+     822
+    ]
+   }
+  },
+  {
+   "name": "mushroom-right-with-stones",
+   "draw_order": 12,
+   "topleft_in_1080x1680": [
+    750,
+    775
+   ],
+   "png_size": [
+    74,
+    100
+   ],
+   "file": "mushroom-right-with-stones-nosoil.png",
+   "md5": "7d54490b9c57a591bfda906f2f5833a7",
+   "v1_file": "../nursery/mushroom-right-with-stones.png",
+   "v1_md5": "000d2beb22e72d09099d86bd25ca1cdf",
+   "note": "same file as nursery-v3 (byte-identical); v1 piece with its dark soil/moss masked out of its own alpha (pixels kept: value>48 and not green, components>=40 px); RGB untouched, no redraw",
+   "shadow": {
+    "file": "../nursery/mushroom-right-with-stones-shadow.png",
+    "md5": "551e818645d45b17337e3a85e77ca25f",
+    "topleft": [
+     749,
+     855
+    ]
+   }
+  },
+  {
+   "name": "lantern-stand-left-big",
+   "draw_order": 14,
+   "topleft_in_1080x1680": [
+    209,
+    600
+   ],
+   "png_size": [
+    81,
+    301
+   ],
+   "file": "../nursery/lantern-stand-left-big.png",
+   "md5": "d69c0900b4f018f979adf5570f011c5a",
+   "note": "v1 piece unchanged",
+   "shadow": {
+    "file": "../nursery/lantern-stand-left-big-shadow.png",
+    "md5": "46fafa6c0e0ee4e9cd0791f309fee14c",
+    "topleft": [
+     206,
+     880
+    ]
+   }
+  },
+  {
+   "name": "lantern-left-big",
+   "draw_order": 15,
+   "topleft_in_1080x1680": [
+    237,
+    644
+   ],
+   "png_size": [
+    54,
+    171
+   ],
+   "file": "../nursery/lantern-left-big.png",
+   "md5": "18f88ca224a3c451db37f5dca8139e46",
+   "note": "v1 piece unchanged"
+  },
+  {
+   "name": "lantern-stand-right-big",
+   "draw_order": 20,
+   "topleft_in_1080x1680": [
+    820,
+    652
+   ],
+   "png_size": [
+    81,
+    301
+   ],
+   "file": "../nursery/lantern-stand-right-big.png",
+   "md5": "d30a36c333cd856e55fb9f5fef316a1e",
+   "note": "v1 piece unchanged",
+   "shadow": {
+    "file": "../nursery/lantern-stand-right-big-shadow.png",
+    "md5": "46fafa6c0e0ee4e9cd0791f309fee14c",
+    "topleft": [
+     816,
+     932
+    ]
+   }
+  },
+  {
+   "name": "lantern-right-big",
+   "draw_order": 21,
+   "topleft_in_1080x1680": [
+    810,
+    696
+   ],
+   "png_size": [
+    68,
+    132
+   ],
+   "file": "../nursery/lantern-right-big.png",
+   "md5": "80f69a103481a7bc00312fdb8b0e11b4",
+   "note": "v1 piece unchanged"
+  },
+  {
+   "name": "mushrooms-left-wall",
+   "draw_order": 22,
+   "topleft_in_1080x1680": [
+    173,
+    748
+   ],
+   "png_size": [
+    98,
+    213
+   ],
+   "file": "mushrooms-left-wall-nosoil.png",
+   "md5": "5e4c5909610500bf5632496bd804a14b",
+   "v1_file": "../nursery/mushrooms-left-wall.png",
+   "v1_md5": "2c3c5ded82d12b140d5dfab48a3ce5a4",
+   "note": "same file as nursery-v3 (byte-identical); v1 piece with its dark soil/moss masked out of its own alpha (pixels kept: value>48 and not green, components>=40 px); RGB untouched, no redraw",
+   "shadow": {
+    "file": "../nursery/mushrooms-left-wall-shadow.png",
+    "md5": "3b632363a6a76d0bb8e5666a918df09b",
+    "topleft": [
+     170,
+     935
+    ]
+   }
+  }
+ ],
+ "REMOVED_from_nursery_set": {
+  "pieces": [
+   "red-nursery-bottle",
+   "left-block-tower-and-adjacent-rolling-toy",
+   "loose-cube-right-back",
+   "left-two-loose-blocks",
+   "loose-cube-back-center",
+   "right-block-stack",
+   "loose-cube-back-center-right",
+   "center-toy-cylinder",
+   "loose-block-right-middle",
+   "left-main-toy-block-pile",
+   "loose-block-center-small",
+   "loose-tall-block-center",
+   "loose-tall-block-right",
+   "loose-tall-block-center-right",
+   "front-left-toy-block",
+   "front-right-small-block",
+   "front-right-tall-block",
+   "front-center-toy-block",
+   "rocking-cradle-with-original-eggs",
+   "right-leaf-twig-nest-with-original-eggs"
+  ],
+  "removed_in_v3": [
+   "red-nursery-bottle",
+   "left-block-tower-and-adjacent-rolling-toy",
+   "loose-cube-right-back",
+   "left-two-loose-blocks",
+   "loose-cube-back-center",
+   "right-block-stack",
+   "loose-cube-back-center-right",
+   "center-toy-cylinder",
+   "loose-block-right-middle",
+   "left-main-toy-block-pile",
+   "loose-block-center-small",
+   "loose-tall-block-center",
+   "loose-tall-block-right",
+   "loose-tall-block-center-right",
+   "front-left-toy-block",
+   "front-right-small-block",
+   "front-right-tall-block",
+   "front-center-toy-block"
+  ],
+  "removed_in_v4_with_their_shadows": [
+   "rocking-cradle-with-original-eggs",
+   "right-leaf-twig-nest-with-original-eggs"
+  ],
+  "why_v4": "Chris 2026-11-13 11:12 AM ET: two containers still had eggs - eliminate those containers. Nothing moved or rescaled to fill the gap.",
+  "why": "Chris 2026-11-13: no blocks/debris on the floor (read as candles); keep the room clean. v1 files are NOT deleted, only left out of v3."
+ },
+ "combined_outputs": {
+  "nursery-v4-furniture-empty.png": "9cb168df95f09baf13878635b09cde6c",
+  "nursery-v4-furniture-empty-programming.png": "b3adaf5ada70eb56c733e47be130d03a",
+  "nursery-v4-furniture-empty-programming-view.jpg": "2c4a99533d3f0cfbbd4a8c7adbb7b736",
+  "nursery-v4-furniture-empty-scale-check.jpg": "65f8c558dcbf3265fc30ef24884c4c65",
+  "nursery-v4-furniture-two-eggs.png": "be2e618d45a5182976cd97fc88a6a03a",
+  "nursery-v4-furniture-two-eggs-programming.png": "97523be0f74efefc0b5be0d9f458c4a2",
+  "nursery-v4-furniture-two-eggs-programming-view.jpg": "bb76ddf85644a04146fdddb2604e6255",
+  "nursery-v4-furniture-two-eggs-scale-check.jpg": "1317268851b80232bd686de2ba2a0a2b"
+ },
+ "previews": {
+  "nursery-v4-all-empty-on-v13-preview-v1-zoom-crop.jpg": {
+   "md5": "31ba0a7e56bdbb69fab92d22bf3c99d7",
+   "cell": [
+    1,
+    0
+   ],
+   "zoom_crop_xyxy": [
+    3202,
+    1455,
+    5182,
+    2985
+   ],
+   "v13": "/workspace/ant-colony/big-chamber/v13-noants-2026-11-13/big-chamber-v13-noants-clean.jpg",
+   "v13_md5": "cd5119a00eff77bbe32096706955b667",
+   "ants": "standing queen (front idle frame 0, ~103x143) at template (560,1300); Albert 130 px at (425,1330)"
+  },
+  "nursery-v4-all-two-eggs-on-v13-preview-v1-zoom-crop.jpg": {
+   "md5": "0c530c60c2551b8e04cebe1b9271612a",
+   "cell": [
+    1,
+    0
+   ],
+   "zoom_crop_xyxy": [
+    3202,
+    1455,
+    5182,
+    2985
+   ],
+   "v13": "/workspace/ant-colony/big-chamber/v13-noants-2026-11-13/big-chamber-v13-noants-clean.jpg",
+   "v13_md5": "cd5119a00eff77bbe32096706955b667",
+   "ants": "standing queen (front idle frame 0, ~103x143) at template (560,1300); Albert 130 px at (425,1330)"
+  },
+  "folder": "/workspace/ant-colony/furniture/previews/",
+  "md5sums": "MD5SUMS-nursery-v4-previews-v1",
+  "md5sums_md5": "eea8cefd5e8707631b4e313e4b299211"
+ }
+}

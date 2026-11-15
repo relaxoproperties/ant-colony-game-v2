@@ -1,0 +1,80 @@
+{
+ "kind": "safflower",
+ "seed_id": "s01",
+ "patch_hires": "seed_patch_safflower_s01_hires.png",
+ "patch_game": "seed_patch_safflower_s01_game.png",
+ "patch_hires_px": [
+  3500,
+  3500
+ ],
+ "patch_game_px": [
+  1750,
+  1750
+ ],
+ "map_rect_px": {
+  "x": 1739,
+  "y": 348,
+  "w": 175,
+  "h": 175
+ },
+ "world_rect_px": {
+  "x": 23029.82368768135,
+  "y": 20817.85776839884,
+  "w": 280.51701398048004,
+  "h": 280.51701398048004
+ },
+ "world_px_per_map_px": 1.6029543656027432,
+ "hires_px_per_map_px": 20,
+ "game_px_per_map_px": 10,
+ "why_resolutions": "hi-res 20 px per map px covers the closest zoom (C.ZMAX 4 x K 1.603 x 3x screen = 19.2); game-res 10 px per map px covers the default zoom (1.95 x 1.603 x 3 = 9.4)",
+ "seed": {
+  "centre_map": [
+   1826.1,
+   435.1
+  ],
+  "length_map": 76.0,
+  "width_map": 34.8,
+  "angle_deg": -160.0,
+  "matches_blob_50pct_outline": {
+   "length": 69.0,
+   "width": 31.0,
+   "angle_deg": -160.0
+  }
+ },
+ "blend": {
+  "centre_map": [
+   1826.1,
+   435.1
+  ],
+  "r_grass_fill_map": 56.1,
+  "r_full_map": 62.1,
+  "r_zero_map": 86.1,
+  "falloff": "smoothstep",
+  "old_blur_ring_max_r_map": 44.1,
+  "grass_fill_source_offset_map": [
+   -87,
+   210
+  ]
+ },
+ "shadow": {
+  "colour": "black",
+  "blur_sigma_map": 3.74,
+  "offset_map": [
+   1.87,
+   3.12
+  ],
+  "opacity": 0.45,
+  "light": "from upper left",
+  "v2_contact_shadow": {
+   "colour": "black",
+   "blur_sigma_map": 1.1,
+   "offset_map": [
+    0.85,
+    1.4
+   ],
+   "opacity": 0.55,
+   "note": "added in v2 so the seed sits on the grass; the acorn recipe shadow is kept as well"
+  }
+ },
+ "draw": "Same as the mound patch (js/ot2.js:32-35): after the map tiles, BEFORE fog, ants, items and UI, inside ot2DrawMap's map-px transform: ctx.drawImage(patch, x, y, w, h) with map_rect_px; imageSmoothingEnabled=true, imageSmoothingQuality='high'. Candidate only - not placed in the game."
+}

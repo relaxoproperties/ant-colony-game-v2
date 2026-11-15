@@ -1,0 +1,1788 @@
+{
+ "loop": "slide",
+ "fps": 12,
+ "frames": 123,
+ "seconds": 10.25,
+ "loops_seamlessly": true,
+ "crop_template_xyxy": [
+  236,
+  836,
+  436,
+  1044
+ ],
+ "crop_on_v13_xyxy": [
+  3888,
+  2246,
+  4088,
+  2454
+ ],
+ "v13": "/workspace/ant-colony/big-chamber/v13-noants-2026-11-13/big-chamber-v13-noants-clean.jpg",
+ "v13_cell": [
+  1,
+  0
+ ],
+ "template_topleft_on_v13": [
+  3652,
+  1410
+ ],
+ "kid_sources_used": [
+  "idle_00.png",
+  "idle_01.png",
+  "idle_02.png",
+  "idle_03.png",
+  "idle_04.png",
+  "idle_05.png",
+  "idle_06.png",
+  "idle_07.png",
+  "side_00.png",
+  "side_01.png",
+  "side_02.png",
+  "side_03.png",
+  "side_04.png",
+  "side_05.png",
+  "side_06.png",
+  "side_07.png",
+  "side_08.png",
+  "side_09.png",
+  "side_10.png",
+  "side_11.png",
+  "side_12.png",
+  "side_13.png",
+  "side_14.png",
+  "side_15.png",
+  "wdo-plain frame 0",
+  "wdo-plain frame 0 (held)",
+  "wdo-plain frame 1",
+  "wdo-plain frame 2",
+  "wdo-plain frame 3",
+  "wu-plain frame 0",
+  "wu-plain frame 1",
+  "wu-plain frame 2",
+  "wu-plain frame 3"
+ ],
+ "notes": "Climb (away walk wu-plain, 8 fps), idle at the top, crawl onto the chute, slide down holding toward-walk frame 0 (no leg motion while sliding), land idle, walk toward camera (wdo-plain), crawl left (mirrored side crawl, frame advance by distance), walk away (wu) to the ladder foot. Path points = placement.json ride points.",
+ "timeline": [
+  {
+   "frame": 0,
+   "phase": "climb the ladder, back to camera (away walk)",
+   "kid": [
+    {
+     "src": "wu-plain frame 0",
+     "flip": false,
+     "feet": [
+      280.18,
+      995.25
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 1,
+   "phase": "climb the ladder, back to camera (away walk)",
+   "kid": [
+    {
+     "src": "wu-plain frame 0",
+     "flip": false,
+     "feet": [
+      280.46,
+      992.8
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 2,
+   "phase": "climb the ladder, back to camera (away walk)",
+   "kid": [
+    {
+     "src": "wu-plain frame 1",
+     "flip": false,
+     "feet": [
+      280.74,
+      990.35
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 3,
+   "phase": "climb the ladder, back to camera (away walk)",
+   "kid": [
+    {
+     "src": "wu-plain frame 2",
+     "flip": false,
+     "feet": [
+      281.02,
+      987.89
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 4,
+   "phase": "climb the ladder, back to camera (away walk)",
+   "kid": [
+    {
+     "src": "wu-plain frame 2",
+     "flip": false,
+     "feet": [
+      281.3,
+      985.44
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 5,
+   "phase": "climb the ladder, back to camera (away walk)",
+   "kid": [
+    {
+     "src": "wu-plain frame 3",
+     "flip": false,
+     "feet": [
+      281.58,
+      982.99
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 6,
+   "phase": "climb the ladder, back to camera (away walk)",
+   "kid": [
+    {
+     "src": "wu-plain frame 0",
+     "flip": false,
+     "feet": [
+      281.86,
+      980.54
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 7,
+   "phase": "climb the ladder, back to camera (away walk)",
+   "kid": [
+    {
+     "src": "wu-plain frame 0",
+     "flip": false,
+     "feet": [
+      282.15,
+      978.09
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 8,
+   "phase": "climb the ladder, back to camera (away walk)",
+   "kid": [
+    {
+     "src": "wu-plain frame 1",
+     "flip": false,
+     "feet": [
+      282.43,
+      975.64
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 9,
+   "phase": "climb the ladder, back to camera (away walk)",
+   "kid": [
+    {
+     "src": "wu-plain frame 2",
+     "flip": false,
+     "feet": [
+      282.71,
+      973.18
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 10,
+   "phase": "climb the ladder, back to camera (away walk)",
+   "kid": [
+    {
+     "src": "wu-plain frame 2",
+     "flip": false,
+     "feet": [
+      282.99,
+      970.73
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 11,
+   "phase": "climb the ladder, back to camera (away walk)",
+   "kid": [
+    {
+     "src": "wu-plain frame 3",
+     "flip": false,
+     "feet": [
+      283.27,
+      968.28
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 12,
+   "phase": "climb the ladder, back to camera (away walk)",
+   "kid": [
+    {
+     "src": "wu-plain frame 0",
+     "flip": false,
+     "feet": [
+      283.55,
+      965.83
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 13,
+   "phase": "climb the ladder, back to camera (away walk)",
+   "kid": [
+    {
+     "src": "wu-plain frame 0",
+     "flip": false,
+     "feet": [
+      283.83,
+      963.38
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 14,
+   "phase": "climb the ladder, back to camera (away walk)",
+   "kid": [
+    {
+     "src": "wu-plain frame 1",
+     "flip": false,
+     "feet": [
+      284.11,
+      960.93
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 15,
+   "phase": "climb the ladder, back to camera (away walk)",
+   "kid": [
+    {
+     "src": "wu-plain frame 2",
+     "flip": false,
+     "feet": [
+      284.39,
+      958.47
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 16,
+   "phase": "climb the ladder, back to camera (away walk)",
+   "kid": [
+    {
+     "src": "wu-plain frame 2",
+     "flip": false,
+     "feet": [
+      284.67,
+      956.02
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 17,
+   "phase": "climb the ladder, back to camera (away walk)",
+   "kid": [
+    {
+     "src": "wu-plain frame 3",
+     "flip": false,
+     "feet": [
+      284.95,
+      953.57
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 18,
+   "phase": "climb the ladder, back to camera (away walk)",
+   "kid": [
+    {
+     "src": "wu-plain frame 0",
+     "flip": false,
+     "feet": [
+      285.23,
+      951.12
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 19,
+   "phase": "climb the ladder, back to camera (away walk)",
+   "kid": [
+    {
+     "src": "wu-plain frame 0",
+     "flip": false,
+     "feet": [
+      285.51,
+      948.67
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 20,
+   "phase": "climb the ladder, back to camera (away walk)",
+   "kid": [
+    {
+     "src": "wu-plain frame 1",
+     "flip": false,
+     "feet": [
+      285.79,
+      946.22
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 21,
+   "phase": "climb the ladder, back to camera (away walk)",
+   "kid": [
+    {
+     "src": "wu-plain frame 2",
+     "flip": false,
+     "feet": [
+      286.07,
+      943.76
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 22,
+   "phase": "climb the ladder, back to camera (away walk)",
+   "kid": [
+    {
+     "src": "wu-plain frame 2",
+     "flip": false,
+     "feet": [
+      286.35,
+      941.31
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 23,
+   "phase": "climb the ladder, back to camera (away walk)",
+   "kid": [
+    {
+     "src": "wu-plain frame 3",
+     "flip": false,
+     "feet": [
+      286.64,
+      938.86
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 24,
+   "phase": "climb the ladder, back to camera (away walk)",
+   "kid": [
+    {
+     "src": "wu-plain frame 0",
+     "flip": false,
+     "feet": [
+      286.92,
+      936.41
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 25,
+   "phase": "climb the ladder, back to camera (away walk)",
+   "kid": [
+    {
+     "src": "wu-plain frame 0",
+     "flip": false,
+     "feet": [
+      287.2,
+      933.96
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 26,
+   "phase": "climb the ladder, back to camera (away walk)",
+   "kid": [
+    {
+     "src": "wu-plain frame 1",
+     "flip": false,
+     "feet": [
+      287.48,
+      931.51
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 27,
+   "phase": "climb the ladder, back to camera (away walk)",
+   "kid": [
+    {
+     "src": "wu-plain frame 2",
+     "flip": false,
+     "feet": [
+      287.76,
+      929.05
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 28,
+   "phase": "climb the ladder, back to camera (away walk)",
+   "kid": [
+    {
+     "src": "wu-plain frame 2",
+     "flip": false,
+     "feet": [
+      288.04,
+      926.6
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 29,
+   "phase": "climb the ladder, back to camera (away walk)",
+   "kid": [
+    {
+     "src": "wu-plain frame 3",
+     "flip": false,
+     "feet": [
+      288.32,
+      924.15
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 30,
+   "phase": "climb the ladder, back to camera (away walk)",
+   "kid": [
+    {
+     "src": "wu-plain frame 0",
+     "flip": false,
+     "feet": [
+      288.6,
+      921.7
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 31,
+   "phase": "at the top, faces the camera",
+   "kid": [
+    {
+     "src": "idle_00.png",
+     "flip": false,
+     "feet": [
+      288.6,
+      921.7
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 32,
+   "phase": "at the top, faces the camera",
+   "kid": [
+    {
+     "src": "idle_00.png",
+     "flip": false,
+     "feet": [
+      288.6,
+      921.7
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 33,
+   "phase": "at the top, faces the camera",
+   "kid": [
+    {
+     "src": "idle_01.png",
+     "flip": false,
+     "feet": [
+      288.6,
+      921.7
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 34,
+   "phase": "at the top, faces the camera",
+   "kid": [
+    {
+     "src": "idle_01.png",
+     "flip": false,
+     "feet": [
+      288.6,
+      921.7
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 35,
+   "phase": "at the top, faces the camera",
+   "kid": [
+    {
+     "src": "idle_02.png",
+     "flip": false,
+     "feet": [
+      288.6,
+      921.7
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 36,
+   "phase": "at the top, faces the camera",
+   "kid": [
+    {
+     "src": "idle_02.png",
+     "flip": false,
+     "feet": [
+      288.6,
+      921.7
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 37,
+   "phase": "at the top, faces the camera",
+   "kid": [
+    {
+     "src": "idle_03.png",
+     "flip": false,
+     "feet": [
+      288.6,
+      921.7
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 38,
+   "phase": "at the top, faces the camera",
+   "kid": [
+    {
+     "src": "idle_04.png",
+     "flip": false,
+     "feet": [
+      288.6,
+      921.7
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 39,
+   "phase": "steps right onto the chute (crawl, facing right)",
+   "kid": [
+    {
+     "src": "side_02.png",
+     "flip": false,
+     "feet": [
+      291.09,
+      921.26
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 40,
+   "phase": "steps right onto the chute (crawl, facing right)",
+   "kid": [
+    {
+     "src": "side_05.png",
+     "flip": false,
+     "feet": [
+      293.57,
+      920.81
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 41,
+   "phase": "steps right onto the chute (crawl, facing right)",
+   "kid": [
+    {
+     "src": "side_08.png",
+     "flip": false,
+     "feet": [
+      296.06,
+      920.37
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 42,
+   "phase": "steps right onto the chute (crawl, facing right)",
+   "kid": [
+    {
+     "src": "side_11.png",
+     "flip": false,
+     "feet": [
+      298.54,
+      919.93
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 43,
+   "phase": "steps right onto the chute (crawl, facing right)",
+   "kid": [
+    {
+     "src": "side_14.png",
+     "flip": false,
+     "feet": [
+      301.03,
+      919.49
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 44,
+   "phase": "steps right onto the chute (crawl, facing right)",
+   "kid": [
+    {
+     "src": "side_01.png",
+     "flip": false,
+     "feet": [
+      303.51,
+      919.04
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 45,
+   "phase": "steps right onto the chute (crawl, facing right)",
+   "kid": [
+    {
+     "src": "side_04.png",
+     "flip": false,
+     "feet": [
+      306.0,
+      918.6
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 46,
+   "phase": "slides down, facing the camera/down the chute (toward-walk frame 0 held still, no leg motion)",
+   "kid": [
+    {
+     "src": "wdo-plain frame 0 (held)",
+     "flip": false,
+     "feet": [
+      307.47,
+      920.11
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 47,
+   "phase": "slides down, facing the camera/down the chute (toward-walk frame 0 held still, no leg motion)",
+   "kid": [
+    {
+     "src": "wdo-plain frame 0 (held)",
+     "flip": false,
+     "feet": [
+      310.45,
+      923.18
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 48,
+   "phase": "slides down, facing the camera/down the chute (toward-walk frame 0 held still, no leg motion)",
+   "kid": [
+    {
+     "src": "wdo-plain frame 0 (held)",
+     "flip": false,
+     "feet": [
+      314.52,
+      927.37
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 49,
+   "phase": "slides down, facing the camera/down the chute (toward-walk frame 0 held still, no leg motion)",
+   "kid": [
+    {
+     "src": "wdo-plain frame 0 (held)",
+     "flip": false,
+     "feet": [
+      319.5,
+      932.5
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 50,
+   "phase": "slides down, facing the camera/down the chute (toward-walk frame 0 held still, no leg motion)",
+   "kid": [
+    {
+     "src": "wdo-plain frame 0 (held)",
+     "flip": false,
+     "feet": [
+      325.29,
+      938.46
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 51,
+   "phase": "slides down, facing the camera/down the chute (toward-walk frame 0 held still, no leg motion)",
+   "kid": [
+    {
+     "src": "wdo-plain frame 0 (held)",
+     "flip": false,
+     "feet": [
+      331.83,
+      945.19
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 52,
+   "phase": "slides down, facing the camera/down the chute (toward-walk frame 0 held still, no leg motion)",
+   "kid": [
+    {
+     "src": "wdo-plain frame 0 (held)",
+     "flip": false,
+     "feet": [
+      339.05,
+      952.63
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 53,
+   "phase": "slides down, facing the camera/down the chute (toward-walk frame 0 held still, no leg motion)",
+   "kid": [
+    {
+     "src": "wdo-plain frame 0 (held)",
+     "flip": false,
+     "feet": [
+      346.93,
+      960.73
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 54,
+   "phase": "slides down, facing the camera/down the chute (toward-walk frame 0 held still, no leg motion)",
+   "kid": [
+    {
+     "src": "wdo-plain frame 0 (held)",
+     "flip": false,
+     "feet": [
+      355.42,
+      969.47
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 55,
+   "phase": "slides down, facing the camera/down the chute (toward-walk frame 0 held still, no leg motion)",
+   "kid": [
+    {
+     "src": "wdo-plain frame 0 (held)",
+     "flip": false,
+     "feet": [
+      364.49,
+      978.81
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 56,
+   "phase": "slides down, facing the camera/down the chute (toward-walk frame 0 held still, no leg motion)",
+   "kid": [
+    {
+     "src": "wdo-plain frame 0 (held)",
+     "flip": false,
+     "feet": [
+      374.12,
+      988.73
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 57,
+   "phase": "slides down, facing the camera/down the chute (toward-walk frame 0 held still, no leg motion)",
+   "kid": [
+    {
+     "src": "wdo-plain frame 0 (held)",
+     "flip": false,
+     "feet": [
+      384.3,
+      999.2
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 58,
+   "phase": "lands, faces the camera",
+   "kid": [
+    {
+     "src": "idle_04.png",
+     "flip": false,
+     "feet": [
+      384.3,
+      999.2
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 59,
+   "phase": "lands, faces the camera",
+   "kid": [
+    {
+     "src": "idle_05.png",
+     "flip": false,
+     "feet": [
+      384.3,
+      999.2
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 60,
+   "phase": "lands, faces the camera",
+   "kid": [
+    {
+     "src": "idle_05.png",
+     "flip": false,
+     "feet": [
+      384.3,
+      999.2
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 61,
+   "phase": "lands, faces the camera",
+   "kid": [
+    {
+     "src": "idle_06.png",
+     "flip": false,
+     "feet": [
+      384.3,
+      999.2
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 62,
+   "phase": "lands, faces the camera",
+   "kid": [
+    {
+     "src": "idle_07.png",
+     "flip": false,
+     "feet": [
+      384.3,
+      999.2
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 63,
+   "phase": "lands, faces the camera",
+   "kid": [
+    {
+     "src": "idle_07.png",
+     "flip": false,
+     "feet": [
+      384.3,
+      999.2
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 64,
+   "phase": "walks toward the camera, off the chute foot",
+   "kid": [
+    {
+     "src": "wdo-plain frame 0",
+     "flip": false,
+     "feet": [
+      384.3,
+      1001.68
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 65,
+   "phase": "walks toward the camera, off the chute foot",
+   "kid": [
+    {
+     "src": "wdo-plain frame 0",
+     "flip": false,
+     "feet": [
+      384.3,
+      1004.15
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 66,
+   "phase": "walks toward the camera, off the chute foot",
+   "kid": [
+    {
+     "src": "wdo-plain frame 1",
+     "flip": false,
+     "feet": [
+      384.3,
+      1006.62
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 67,
+   "phase": "walks toward the camera, off the chute foot",
+   "kid": [
+    {
+     "src": "wdo-plain frame 2",
+     "flip": false,
+     "feet": [
+      384.3,
+      1009.1
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 68,
+   "phase": "walks toward the camera, off the chute foot",
+   "kid": [
+    {
+     "src": "wdo-plain frame 2",
+     "flip": false,
+     "feet": [
+      384.3,
+      1011.58
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 69,
+   "phase": "walks toward the camera, off the chute foot",
+   "kid": [
+    {
+     "src": "wdo-plain frame 3",
+     "flip": false,
+     "feet": [
+      384.3,
+      1014.05
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 70,
+   "phase": "walks toward the camera, off the chute foot",
+   "kid": [
+    {
+     "src": "wdo-plain frame 0",
+     "flip": false,
+     "feet": [
+      384.3,
+      1016.52
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 71,
+   "phase": "walks toward the camera, off the chute foot",
+   "kid": [
+    {
+     "src": "wdo-plain frame 0",
+     "flip": false,
+     "feet": [
+      384.3,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 72,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_07.png",
+     "flip": true,
+     "feet": [
+      381.81,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 73,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_10.png",
+     "flip": true,
+     "feet": [
+      379.33,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 74,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_13.png",
+     "flip": true,
+     "feet": [
+      376.84,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 75,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_00.png",
+     "flip": true,
+     "feet": [
+      374.36,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 76,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_03.png",
+     "flip": true,
+     "feet": [
+      371.87,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 77,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_06.png",
+     "flip": true,
+     "feet": [
+      369.39,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 78,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_09.png",
+     "flip": true,
+     "feet": [
+      366.9,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 79,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_12.png",
+     "flip": true,
+     "feet": [
+      364.41,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 80,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_15.png",
+     "flip": true,
+     "feet": [
+      361.93,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 81,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_02.png",
+     "flip": true,
+     "feet": [
+      359.44,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 82,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_05.png",
+     "flip": true,
+     "feet": [
+      356.96,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 83,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_08.png",
+     "flip": true,
+     "feet": [
+      354.47,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 84,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_10.png",
+     "flip": true,
+     "feet": [
+      351.99,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 85,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_13.png",
+     "flip": true,
+     "feet": [
+      349.5,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 86,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_00.png",
+     "flip": true,
+     "feet": [
+      347.01,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 87,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_03.png",
+     "flip": true,
+     "feet": [
+      344.53,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 88,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_06.png",
+     "flip": true,
+     "feet": [
+      342.04,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 89,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_09.png",
+     "flip": true,
+     "feet": [
+      339.56,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 90,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_12.png",
+     "flip": true,
+     "feet": [
+      337.07,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 91,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_15.png",
+     "flip": true,
+     "feet": [
+      334.59,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 92,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_02.png",
+     "flip": true,
+     "feet": [
+      332.1,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 93,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_05.png",
+     "flip": true,
+     "feet": [
+      329.61,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 94,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_08.png",
+     "flip": true,
+     "feet": [
+      327.13,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 95,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_11.png",
+     "flip": true,
+     "feet": [
+      324.64,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 96,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_14.png",
+     "flip": true,
+     "feet": [
+      322.16,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 97,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_01.png",
+     "flip": true,
+     "feet": [
+      319.67,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 98,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_03.png",
+     "flip": true,
+     "feet": [
+      317.19,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 99,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_06.png",
+     "flip": true,
+     "feet": [
+      314.7,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 100,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_09.png",
+     "flip": true,
+     "feet": [
+      312.21,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 101,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_12.png",
+     "flip": true,
+     "feet": [
+      309.73,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 102,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_15.png",
+     "flip": true,
+     "feet": [
+      307.24,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 103,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_02.png",
+     "flip": true,
+     "feet": [
+      304.76,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 104,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_05.png",
+     "flip": true,
+     "feet": [
+      302.27,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 105,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_08.png",
+     "flip": true,
+     "feet": [
+      299.79,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 106,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_11.png",
+     "flip": true,
+     "feet": [
+      297.3,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 107,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_14.png",
+     "flip": true,
+     "feet": [
+      294.81,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 108,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_01.png",
+     "flip": true,
+     "feet": [
+      292.33,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 109,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_04.png",
+     "flip": true,
+     "feet": [
+      289.84,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 110,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_07.png",
+     "flip": true,
+     "feet": [
+      287.36,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 111,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_10.png",
+     "flip": true,
+     "feet": [
+      284.87,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 112,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_13.png",
+     "flip": true,
+     "feet": [
+      282.39,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 113,
+   "phase": "crawls left (mirrored crawl) in front of the slide",
+   "kid": [
+    {
+     "src": "side_15.png",
+     "flip": true,
+     "feet": [
+      279.9,
+      1019.0
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 114,
+   "phase": "walks away from camera to the ladder foot",
+   "kid": [
+    {
+     "src": "wu-plain frame 0",
+     "flip": false,
+     "feet": [
+      279.9,
+      1016.63
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 115,
+   "phase": "walks away from camera to the ladder foot",
+   "kid": [
+    {
+     "src": "wu-plain frame 0",
+     "flip": false,
+     "feet": [
+      279.9,
+      1014.27
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 116,
+   "phase": "walks away from camera to the ladder foot",
+   "kid": [
+    {
+     "src": "wu-plain frame 1",
+     "flip": false,
+     "feet": [
+      279.9,
+      1011.9
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 117,
+   "phase": "walks away from camera to the ladder foot",
+   "kid": [
+    {
+     "src": "wu-plain frame 2",
+     "flip": false,
+     "feet": [
+      279.9,
+      1009.53
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 118,
+   "phase": "walks away from camera to the ladder foot",
+   "kid": [
+    {
+     "src": "wu-plain frame 2",
+     "flip": false,
+     "feet": [
+      279.9,
+      1007.17
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 119,
+   "phase": "walks away from camera to the ladder foot",
+   "kid": [
+    {
+     "src": "wu-plain frame 3",
+     "flip": false,
+     "feet": [
+      279.9,
+      1004.8
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 120,
+   "phase": "walks away from camera to the ladder foot",
+   "kid": [
+    {
+     "src": "wu-plain frame 0",
+     "flip": false,
+     "feet": [
+      279.9,
+      1002.43
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 121,
+   "phase": "walks away from camera to the ladder foot",
+   "kid": [
+    {
+     "src": "wu-plain frame 0",
+     "flip": false,
+     "feet": [
+      279.9,
+      1000.07
+     ]
+    }
+   ]
+  },
+  {
+   "frame": 122,
+   "phase": "walks away from camera to the ladder foot",
+   "kid": [
+    {
+     "src": "wu-plain frame 1",
+     "flip": false,
+     "feet": [
+      279.9,
+      997.7
+     ]
+    }
+   ]
+  }
+ ]
+}

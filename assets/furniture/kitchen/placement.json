@@ -1,0 +1,4180 @@
+{
+ "canvas": [
+  1080,
+  1680
+ ],
+ "template": {
+  "name": "LOCKED 3-D hex template (green floor, yellow walls, red ceiling)",
+  "lock": "/workspace/kit/approved/NOTE-entrance-room-hex-LOCKED-2026-11-07.json",
+  "outline_overlay": "/workspace/builder-opening/shots/hex-3d-outline-color.jpg",
+  "outline_overlay_md5": "6e299814ac5b4c5bc595ac6a2117ecb0",
+  "dst_floor_green": [
+   [
+    342.2575,
+    733
+   ],
+   [
+    737.7425,
+    733
+   ],
+   [
+    935.4849,
+    1075.5
+   ],
+   [
+    737.7425,
+    1418
+   ],
+   [
+    342.2575,
+    1418
+   ],
+   [
+    144.5151,
+    1075.5
+   ]
+  ],
+  "floor_wall_back_line_y": 733,
+  "floor_hex_width_px": 790.9698687897874
+ },
+ "world_scale": {
+  "in_game_hex_width_px": 791,
+  "template_to_791": 1.0000380940050961,
+  "ROOM_SCALE_world_per_px": 0.17302387549421078,
+  "source": "notes-pass-5-fix3/index.html HEX.w 136.8566720971564 / 790.9698687897874; same as Royal chamber set v1"
+ },
+ "scale_check": {
+  "albert": {
+   "height_px": 130,
+   "scale": 0.4529616724738676,
+   "sprite": "locked idle frame 0 (ant-idle_00.png cutout of LOCKED-WALKS idle GIF), visible 287 px",
+   "feet": [
+    655,
+    1150
+   ],
+   "bbox": [
+    610,
+    1023,
+    701,
+    1150
+   ]
+  },
+  "queen": {
+   "canonical_width_px": 198.6,
+   "canonical_note": "198.6 = QUEEN_DOWN_W 27.4867 world x1.25 / ROOM_SCALE. That is the game's draw width of the old 200-px queen frame (body 104 of 200 px). The game draws the Q3 strip cell at QUEEN_Q3_CELL_W x1.25 = 284.85 px (Q3_BODY_MATCH), so the visible body is ~103 px wide, ~143 px tall. Rendered exactly that way (same as Royal set v1).",
+   "room_px_per_queen_px": 0.7121334648300934,
+   "sprite": "/workspace/notes-pass-5-fix3/assets/queen/queen_idle_front_strip_v1.png",
+   "sprite_md5": "551e7661af78d596e8a53017459d6193",
+   "feet": [
+    540,
+    1110
+   ],
+   "bbox": [
+    482,
+    971,
+    585,
+    1114
+   ]
+  }
+ },
+ "outputs": {
+  "kitchen-furniture.png": {
+   "md5": "182e27c4e8bb151cbb52fddc7eaf2b40",
+   "size": [
+    1080,
+    1680
+   ]
+  },
+  "kitchen-furniture-programming.png": {
+   "md5": "8893578f59f40bd2126e75ef5d10bc2c",
+   "size": [
+    1080,
+    1680
+   ]
+  },
+  "kitchen-furniture-programming-view.jpg": {
+   "md5": "1a47bb19ea1d63d6d5a3ba366c6cea3e",
+   "size": [
+    1080,
+    1680
+   ]
+  },
+  "kitchen-furniture-scale-check.jpg": {
+   "md5": "b82127da4ab4308c23b350e045586e43",
+   "size": [
+    1080,
+    1680
+   ]
+  }
+ },
+ "pieces": [
+  {
+   "name": "garland-stand-left",
+   "draw_order": 0,
+   "file": "garland-stand-left.png",
+   "md5": "d69c0900b4f018f979adf5570f011c5a",
+   "png_size": [
+    81,
+    301
+   ],
+   "topleft_in_1080x1680": [
+    295,
+    442
+   ],
+   "png_box_xyxy": [
+    295,
+    442,
+    376,
+    743
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    296,
+    442,
+    376,
+    742
+   ],
+   "visible_size": [
+    80,
+    300
+   ],
+   "visible_size_world": [
+    13.8419,
+    51.9072
+   ],
+   "height_ratio_to_albert_130": 2.308,
+   "height_ratio_to_queen_visible_143": 2.096,
+   "bbox_centre": [
+    336.0,
+    592.0
+   ],
+   "foot_bottom_centre": [
+    336.0,
+    742
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -204.0,
+      -483.5
+     ],
+     "world": [
+      -35.2969,
+      -83.657
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.25791,
+      -0.61127
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -204.0,
+      -10.5
+     ],
+     "world": [
+      -35.2969,
+      -1.8168
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.25791,
+      -0.01327
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2776.703,
+     4997.683
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -204.0,
+      -333.5
+     ],
+     "world": [
+      -35.2969,
+      -57.7035
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.25791,
+      -0.42163
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -204.0,
+      139.5
+     ],
+     "world": [
+      -35.2969,
+      24.1368
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.25791,
+      0.17637
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2776.703,
+     5023.637
+    ]
+   },
+   "origin": "Royal chamber set v1 generated shepherd-hook stand (copied unchanged, not scaled)",
+   "source": "/workspace/ant-colony/furniture/royal-chamber/lantern-stand-left.png",
+   "source_md5": "d69c0900b4f018f979adf5570f011c5a",
+   "why": "holds the berry garland rope ends (no ceiling)",
+   "shadow": {
+    "file": "garland-stand-left-shadow.png",
+    "md5": "46fafa6c0e0ee4e9cd0791f309fee14c",
+    "topleft": [
+     292,
+     722
+    ],
+    "size": [
+     88,
+     34
+    ],
+    "how": "soft contact ellipse under the visible base"
+   }
+  },
+  {
+   "name": "garland-stand-right",
+   "draw_order": 1,
+   "file": "garland-stand-right.png",
+   "md5": "d30a36c333cd856e55fb9f5fef316a1e",
+   "png_size": [
+    81,
+    301
+   ],
+   "topleft_in_1080x1680": [
+    560,
+    442
+   ],
+   "png_box_xyxy": [
+    560,
+    442,
+    641,
+    743
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    560,
+    442,
+    640,
+    742
+   ],
+   "visible_size": [
+    80,
+    300
+   ],
+   "visible_size_world": [
+    13.8419,
+    51.9072
+   ],
+   "height_ratio_to_albert_130": 2.308,
+   "height_ratio_to_queen_visible_143": 2.096,
+   "bbox_centre": [
+    600.0,
+    592.0
+   ],
+   "foot_bottom_centre": [
+    600.0,
+    742
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      60.0,
+      -483.5
+     ],
+     "world": [
+      10.3814,
+      -83.657
+     ],
+     "frac_of_hex_width_790.97": [
+      0.07586,
+      -0.61127
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      60.0,
+      -10.5
+     ],
+     "world": [
+      10.3814,
+      -1.8168
+     ],
+     "frac_of_hex_width_790.97": [
+      0.07586,
+      -0.01327
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2822.381,
+     4997.683
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      60.0,
+      -333.5
+     ],
+     "world": [
+      10.3814,
+      -57.7035
+     ],
+     "frac_of_hex_width_790.97": [
+      0.07586,
+      -0.42163
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      60.0,
+      139.5
+     ],
+     "world": [
+      10.3814,
+      24.1368
+     ],
+     "frac_of_hex_width_790.97": [
+      0.07586,
+      0.17637
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2822.381,
+     5023.637
+    ]
+   },
+   "origin": "Royal chamber set v1 generated shepherd-hook stand (copied unchanged, not scaled)",
+   "source": "/workspace/ant-colony/furniture/royal-chamber/lantern-stand-right.png",
+   "source_md5": "d30a36c333cd856e55fb9f5fef316a1e",
+   "why": "holds the berry garland rope ends (no ceiling)",
+   "shadow": {
+    "file": "garland-stand-right-shadow.png",
+    "md5": "46fafa6c0e0ee4e9cd0791f309fee14c",
+    "topleft": [
+     556,
+     722
+    ],
+    "size": [
+     88,
+     34
+    ],
+    "how": "soft contact ellipse under the visible base"
+   }
+  },
+  {
+   "name": "hanging-berry-garland",
+   "draw_order": 2,
+   "file": "hanging-berry-garland.png",
+   "md5": "1b542f5e89ffcf09b7ccd8f18fb492dc",
+   "png_size": [
+    239,
+    93
+   ],
+   "topleft_in_1080x1680": [
+    348,
+    486
+   ],
+   "png_box_xyxy": [
+    348,
+    486,
+    587,
+    579
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    349,
+    487,
+    586,
+    578
+   ],
+   "visible_size": [
+    237,
+    91
+   ],
+   "visible_size_world": [
+    41.0067,
+    15.7452
+   ],
+   "height_ratio_to_albert_130": 0.7,
+   "height_ratio_to_queen_visible_143": 0.636,
+   "bbox_centre": [
+    467.5,
+    532.5
+   ],
+   "foot_bottom_centre": [
+    467.5,
+    578
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -72.5,
+      -543.0
+     ],
+     "world": [
+      -12.5442,
+      -93.952
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.09166,
+      -0.6865
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -72.5,
+      -70.0
+     ],
+     "world": [
+      -12.5442,
+      -12.1117
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.09166,
+      -0.0885
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2799.456,
+     4987.388
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -72.5,
+      -497.5
+     ],
+     "world": [
+      -12.5442,
+      -86.0794
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.09166,
+      -0.62897
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -72.5,
+      -24.5
+     ],
+     "world": [
+      -12.5442,
+      -4.2391
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.09166,
+      -0.03097
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2799.456,
+     4995.261
+    ]
+   },
+   "mask": "union of hand-traced selection polygons (one per item, plus the rope/rail) + light GrabCut on source pixels (RGB untouched); plus a 4 px band along the traced rope line (source pixels) so the bunches hang from it",
+   "polygons_in_source": [
+    [
+     [
+      680,
+      39
+     ],
+     [
+      757,
+      55
+     ]
+    ],
+    [
+     [
+      757,
+      55
+     ],
+     [
+      826,
+      82
+     ]
+    ],
+    [
+     [
+      826,
+      82
+     ],
+     [
+      911,
+      105
+     ]
+    ],
+    [
+     [
+      911,
+      105
+     ],
+     [
+      1011,
+      97
+     ]
+    ],
+    [
+     [
+      1011,
+      97
+     ],
+     [
+      1080,
+      82
+     ]
+    ],
+    [
+     [
+      1080,
+      82
+     ],
+     [
+      1142,
+      51
+     ]
+    ],
+    [
+     [
+      745,
+      66
+     ],
+     [
+      770,
+      66
+     ],
+     [
+      795,
+      150
+     ],
+     [
+      790,
+      200
+     ],
+     [
+      765,
+      215
+     ],
+     [
+      735,
+      205
+     ],
+     [
+      726,
+      150
+     ]
+    ],
+    [
+     [
+      815,
+      74
+     ],
+     [
+      830,
+      74
+     ],
+     [
+      846,
+      120
+     ],
+     [
+      842,
+      170
+     ],
+     [
+      825,
+      186
+     ],
+     [
+      805,
+      175
+     ],
+     [
+      800,
+      120
+     ]
+    ],
+    [
+     [
+      860,
+      105
+     ],
+     [
+      870,
+      105
+     ],
+     [
+      885,
+      140
+     ],
+     [
+      882,
+      190
+     ],
+     [
+      865,
+      206
+     ],
+     [
+      848,
+      192
+     ],
+     [
+      845,
+      140
+     ]
+    ],
+    [
+     [
+      905,
+      97
+     ],
+     [
+      915,
+      97
+     ],
+     [
+      935,
+      150
+     ],
+     [
+      930,
+      200
+     ],
+     [
+      912,
+      220
+     ],
+     [
+      893,
+      205
+     ],
+     [
+      886,
+      150
+     ]
+    ],
+    [
+     [
+      955,
+      105
+     ],
+     [
+      965,
+      105
+     ],
+     [
+      982,
+      145
+     ],
+     [
+      978,
+      182
+     ],
+     [
+      960,
+      194
+     ],
+     [
+      944,
+      182
+     ],
+     [
+      940,
+      145
+     ]
+    ],
+    [
+     [
+      1005,
+      93
+     ],
+     [
+      1015,
+      93
+     ],
+     [
+      1035,
+      130
+     ],
+     [
+      1032,
+      178
+     ],
+     [
+      1012,
+      194
+     ],
+     [
+      992,
+      180
+     ],
+     [
+      988,
+      130
+     ]
+    ],
+    [
+     [
+      1052,
+      81
+     ],
+     [
+      1062,
+      81
+     ],
+     [
+      1081,
+      120
+     ],
+     [
+      1078,
+      160
+     ],
+     [
+      1060,
+      175
+     ],
+     [
+      1043,
+      162
+     ],
+     [
+      1039,
+      120
+     ]
+    ],
+    [
+     [
+      1090,
+      74
+     ],
+     [
+      1100,
+      74
+     ],
+     [
+      1119,
+      105
+     ],
+     [
+      1115,
+      145
+     ],
+     [
+      1098,
+      156
+     ],
+     [
+      1082,
+      145
+     ],
+     [
+      1076,
+      105
+     ]
+    ]
+   ],
+   "rope_line_in_source": [
+    [
+     680,
+     39
+    ],
+    [
+     757,
+     55
+    ],
+    [
+     826,
+     82
+    ],
+    [
+     911,
+     105
+    ],
+    [
+     1011,
+     97
+    ],
+    [
+     1080,
+     82
+    ],
+    [
+     1142,
+     51
+    ]
+   ],
+   "origin": "CUT from Chris's original kitchen 10-kitchen.webp (no redraw), uniformly scaled",
+   "source": "/workspace/ant-colony/underground/rooms/10-kitchen/10-kitchen.webp",
+   "source_md5": "a88f50a4e9ec50e96a3dcd6100c20566",
+   "source_topleft": [
+    676,
+    35
+   ],
+   "source_png_size": [
+    471,
+    184
+   ],
+   "scale_from_source_px": 0.5071,
+   "placement": "rope left end hung on garland-stand-left hook tip [350, 487]"
+  },
+  {
+   "name": "lantern-stand-right",
+   "draw_order": 3,
+   "file": "lantern-stand-right.png",
+   "md5": "d30a36c333cd856e55fb9f5fef316a1e",
+   "png_size": [
+    81,
+    301
+   ],
+   "topleft_in_1080x1680": [
+    738,
+    502
+   ],
+   "png_box_xyxy": [
+    738,
+    502,
+    819,
+    803
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    738,
+    502,
+    818,
+    802
+   ],
+   "visible_size": [
+    80,
+    300
+   ],
+   "visible_size_world": [
+    13.8419,
+    51.9072
+   ],
+   "height_ratio_to_albert_130": 2.308,
+   "height_ratio_to_queen_visible_143": 2.096,
+   "bbox_centre": [
+    778.0,
+    652.0
+   ],
+   "foot_bottom_centre": [
+    778.0,
+    802
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      238.0,
+      -423.5
+     ],
+     "world": [
+      41.1797,
+      -73.2756
+     ],
+     "frac_of_hex_width_790.97": [
+      0.3009,
+      -0.53542
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      238.0,
+      49.5
+     ],
+     "world": [
+      41.1797,
+      8.5647
+     ],
+     "frac_of_hex_width_790.97": [
+      0.3009,
+      0.06258
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2853.18,
+     5008.065
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      238.0,
+      -273.5
+     ],
+     "world": [
+      41.1797,
+      -47.322
+     ],
+     "frac_of_hex_width_790.97": [
+      0.3009,
+      -0.34578
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      238.0,
+      199.5
+     ],
+     "world": [
+      41.1797,
+      34.5183
+     ],
+     "frac_of_hex_width_790.97": [
+      0.3009,
+      0.25222
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2853.18,
+     5034.018
+    ]
+   },
+   "origin": "Royal chamber set v1 generated shepherd-hook stand (copied unchanged, not scaled)",
+   "source": "/workspace/ant-colony/furniture/royal-chamber/lantern-stand-right.png",
+   "source_md5": "d30a36c333cd856e55fb9f5fef316a1e",
+   "why": "no ceiling: hanging lantern on a floor stand on the right floor-wall line",
+   "shadow": {
+    "file": "lantern-stand-right-shadow.png",
+    "md5": "46fafa6c0e0ee4e9cd0791f309fee14c",
+    "topleft": [
+     734,
+     782
+    ],
+    "size": [
+     88,
+     34
+    ],
+    "how": "soft contact ellipse under the visible base"
+   }
+  },
+  {
+   "name": "lantern-right",
+   "draw_order": 4,
+   "file": "lantern-right.png",
+   "md5": "3b7797a2a00f91bd7f5a815e9d38de00",
+   "png_size": [
+    39,
+    65
+   ],
+   "topleft_in_1080x1680": [
+    743,
+    547
+   ],
+   "png_box_xyxy": [
+    743,
+    547,
+    782,
+    612
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    744,
+    548,
+    781,
+    611
+   ],
+   "visible_size": [
+    37,
+    63
+   ],
+   "visible_size_world": [
+    6.4019,
+    10.9005
+   ],
+   "height_ratio_to_albert_130": 0.485,
+   "height_ratio_to_queen_visible_143": 0.44,
+   "bbox_centre": [
+    762.5,
+    579.5
+   ],
+   "foot_bottom_centre": [
+    762.5,
+    611
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      222.5,
+      -496.0
+     ],
+     "world": [
+      38.4978,
+      -85.8198
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2813,
+      -0.62708
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      222.5,
+      -23.0
+     ],
+     "world": [
+      38.4978,
+      -3.9795
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2813,
+      -0.02908
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2850.498,
+     4995.52
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      222.5,
+      -464.5
+     ],
+     "world": [
+      38.4978,
+      -80.3696
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2813,
+      -0.58725
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      222.5,
+      8.5
+     ],
+     "world": [
+      38.4978,
+      1.4707
+     ],
+     "frac_of_hex_width_790.97": [
+      0.2813,
+      0.01075
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2850.498,
+     5000.971
+    ]
+   },
+   "mask": "hand-traced selection polygon + GrabCut on source pixels (RGB untouched)",
+   "polygon_in_source": [
+    [
+     1300,
+     205
+    ],
+    [
+     1315,
+     205
+    ],
+    [
+     1345,
+     240
+    ],
+    [
+     1347,
+     328
+    ],
+    [
+     1270,
+     328
+    ],
+    [
+     1272,
+     240
+    ]
+   ],
+   "origin": "CUT from Chris's original kitchen 10-kitchen.webp (no redraw), uniformly scaled",
+   "source": "/workspace/ant-colony/underground/rooms/10-kitchen/10-kitchen.webp",
+   "source_md5": "a88f50a4e9ec50e96a3dcd6100c20566",
+   "source_topleft": [
+    1271,
+    202
+   ],
+   "source_png_size": [
+    76,
+    128
+   ],
+   "scale_from_source_px": 0.5071,
+   "placement": "hung from lantern-stand-right hook tip"
+  },
+  {
+   "name": "stone-sink-cloth-ladle",
+   "draw_order": 5,
+   "file": "stone-sink-cloth-ladle.png",
+   "md5": "ede812a81d18bbd61635b2664f61c0f0",
+   "png_size": [
+    195,
+    134
+   ],
+   "topleft_in_1080x1680": [
+    586,
+    672
+   ],
+   "png_box_xyxy": [
+    586,
+    672,
+    781,
+    806
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    587,
+    673,
+    780,
+    805
+   ],
+   "visible_size": [
+    193,
+    132
+   ],
+   "visible_size_world": [
+    33.3936,
+    22.8392
+   ],
+   "height_ratio_to_albert_130": 1.015,
+   "height_ratio_to_queen_visible_143": 0.922,
+   "bbox_centre": [
+    683.5,
+    739.0
+   ],
+   "foot_bottom_centre": [
+    683.5,
+    805
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      143.5,
+      -336.5
+     ],
+     "world": [
+      24.8289,
+      -58.2225
+     ],
+     "frac_of_hex_width_790.97": [
+      0.18142,
+      -0.42543
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      143.5,
+      136.5
+     ],
+     "world": [
+      24.8289,
+      23.6178
+     ],
+     "frac_of_hex_width_790.97": [
+      0.18142,
+      0.17257
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2836.829,
+     5023.118
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      143.5,
+      -270.5
+     ],
+     "world": [
+      24.8289,
+      -46.803
+     ],
+     "frac_of_hex_width_790.97": [
+      0.18142,
+      -0.34199
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      143.5,
+      202.5
+     ],
+     "world": [
+      24.8289,
+      35.0373
+     ],
+     "frac_of_hex_width_790.97": [
+      0.18142,
+      0.25601
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2836.829,
+     5034.537
+    ]
+   },
+   "mask": "kitchen scale-v1 furniture polygon (scale-v1-furniture-polys.json) + GrabCut on source pixels (RGB untouched)",
+   "polygon_in_source": [
+    [
+     970,
+     420
+    ],
+    [
+     1010,
+     390
+    ],
+    [
+     1250,
+     380
+    ],
+    [
+     1335,
+     400
+    ],
+    [
+     1340,
+     620
+    ],
+    [
+     1300,
+     645
+    ],
+    [
+     1000,
+     640
+    ],
+    [
+     960,
+     600
+    ]
+   ],
+   "origin": "CUT from Chris's original kitchen 10-kitchen.webp (no redraw), uniformly scaled",
+   "source": "/workspace/ant-colony/underground/rooms/10-kitchen/10-kitchen.webp",
+   "source_md5": "a88f50a4e9ec50e96a3dcd6100c20566",
+   "source_topleft": [
+    959,
+    388
+   ],
+   "source_png_size": [
+    385,
+    264
+   ],
+   "scale_from_source_px": 0.5071,
+   "placement": "foot = source foot (1151.5,650) mapped by the compose floor homography -> (683.3,805.0)",
+   "shadow": {
+    "file": "stone-sink-cloth-ladle-shadow.png",
+    "md5": "6b8ed66a16fa75096e3bec8002d1b49b",
+    "topleft": [
+     578,
+     756
+    ],
+    "size": [
+     211,
+     84
+    ],
+    "how": "soft contact ellipse under the visible base"
+   }
+  },
+  {
+   "name": "jar-shelf-left-with-lantern",
+   "draw_order": 6,
+   "file": "jar-shelf-left-with-lantern.png",
+   "md5": "4f592050ccf2c6a8546fa3ef6da2e4c8",
+   "png_size": [
+    165,
+    121
+   ],
+   "topleft_in_1080x1680": [
+    218,
+    688
+   ],
+   "png_box_xyxy": [
+    218,
+    688,
+    383,
+    809
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    219,
+    689,
+    382,
+    808
+   ],
+   "visible_size": [
+    163,
+    119
+   ],
+   "visible_size_world": [
+    28.2029,
+    20.5898
+   ],
+   "height_ratio_to_albert_130": 0.915,
+   "height_ratio_to_queen_visible_143": 0.832,
+   "bbox_centre": [
+    300.5,
+    748.5
+   ],
+   "foot_bottom_centre": [
+    300.5,
+    808
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -239.5,
+      -327.0
+     ],
+     "world": [
+      -41.4392,
+      -56.5788
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.30279,
+      -0.41342
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -239.5,
+      146.0
+     ],
+     "world": [
+      -41.4392,
+      25.2615
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.30279,
+      0.18458
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2770.561,
+     5024.761
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -239.5,
+      -267.5
+     ],
+     "world": [
+      -41.4392,
+      -46.2839
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.30279,
+      -0.33819
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -239.5,
+      205.5
+     ],
+     "world": [
+      -41.4392,
+      35.5564
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.30279,
+      0.25981
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2770.561,
+     5035.056
+    ]
+   },
+   "mask": "hand-traced selection polygon + GrabCut on source pixels (RGB untouched)",
+   "polygon_in_source": [
+    [
+     160,
+     300
+    ],
+    [
+     170,
+     282
+    ],
+    [
+     200,
+     265
+    ],
+    [
+     205,
+     240
+    ],
+    [
+     240,
+     232
+    ],
+    [
+     250,
+     215
+    ],
+    [
+     290,
+     215
+    ],
+    [
+     300,
+     230
+    ],
+    [
+     330,
+     222
+    ],
+    [
+     345,
+     205
+    ],
+    [
+     370,
+     200
+    ],
+    [
+     395,
+     205
+    ],
+    [
+     405,
+     160
+    ],
+    [
+     482,
+     160
+    ],
+    [
+     486,
+     300
+    ],
+    [
+     455,
+     305
+    ],
+    [
+     455,
+     325
+    ],
+    [
+     300,
+     360
+    ],
+    [
+     200,
+     395
+    ],
+    [
+     165,
+     390
+    ]
+   ],
+   "origin": "CUT from Chris's original kitchen 10-kitchen.webp (no redraw), uniformly scaled",
+   "source": "/workspace/ant-colony/underground/rooms/10-kitchen/10-kitchen.webp",
+   "source_md5": "a88f50a4e9ec50e96a3dcd6100c20566",
+   "source_topleft": [
+    162,
+    156
+   ],
+   "source_png_size": [
+    325,
+    238
+   ],
+   "scale_from_source_px": 0.5071,
+   "placement": "wall shelf, no walls: stood on the left floor-wall line (L-TL) at y 808",
+   "shadow": {
+    "file": "jar-shelf-left-with-lantern-shadow.png",
+    "md5": "3fe2b8c1da5c21183814c5238462548c",
+    "topleft": [
+     211,
+     767
+    ],
+    "size": [
+     179,
+     70
+    ],
+    "how": "soft contact ellipse under the visible base"
+   }
+  },
+  {
+   "name": "jar-shelf-right-upper",
+   "draw_order": 7,
+   "file": "jar-shelf-right-upper.png",
+   "md5": "0f5feeba22bb8e3a43b4e6e7efd4efc5",
+   "png_size": [
+    110,
+    63
+   ],
+   "topleft_in_1080x1680": [
+    740,
+    798
+   ],
+   "png_box_xyxy": [
+    740,
+    798,
+    850,
+    861
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    741,
+    799,
+    849,
+    860
+   ],
+   "visible_size": [
+    108,
+    61
+   ],
+   "visible_size_world": [
+    18.6866,
+    10.5545
+   ],
+   "height_ratio_to_albert_130": 0.469,
+   "height_ratio_to_queen_visible_143": 0.426,
+   "bbox_centre": [
+    795.0,
+    829.5
+   ],
+   "foot_bottom_centre": [
+    795.0,
+    860
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      255.0,
+      -246.0
+     ],
+     "world": [
+      44.1211,
+      -42.5639
+     ],
+     "frac_of_hex_width_790.97": [
+      0.32239,
+      -0.31101
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      255.0,
+      227.0
+     ],
+     "world": [
+      44.1211,
+      39.2764
+     ],
+     "frac_of_hex_width_790.97": [
+      0.32239,
+      0.28699
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2856.121,
+     5038.776
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      255.0,
+      -215.5
+     ],
+     "world": [
+      44.1211,
+      -37.2866
+     ],
+     "frac_of_hex_width_790.97": [
+      0.32239,
+      -0.27245
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      255.0,
+      257.5
+     ],
+     "world": [
+      44.1211,
+      44.5536
+     ],
+     "frac_of_hex_width_790.97": [
+      0.32239,
+      0.32555
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2856.121,
+     5044.054
+    ]
+   },
+   "mask": "hand-traced selection polygon + GrabCut on source pixels (RGB untouched)",
+   "polygon_in_source": [
+    [
+     1440,
+     330
+    ],
+    [
+     1525,
+     290
+    ],
+    [
+     1560,
+     280
+    ],
+    [
+     1620,
+     285
+    ],
+    [
+     1650,
+     300
+    ],
+    [
+     1660,
+     390
+    ],
+    [
+     1600,
+     400
+    ],
+    [
+     1520,
+     390
+    ],
+    [
+     1450,
+     360
+    ]
+   ],
+   "origin": "CUT from Chris's original kitchen 10-kitchen.webp (no redraw), uniformly scaled",
+   "source": "/workspace/ant-colony/underground/rooms/10-kitchen/10-kitchen.webp",
+   "source_md5": "a88f50a4e9ec50e96a3dcd6100c20566",
+   "source_topleft": [
+    1442,
+    279
+   ],
+   "source_png_size": [
+    217,
+    124
+   ],
+   "scale_from_source_px": 0.5071,
+   "placement": "wall shelf, no walls: stood on the right floor-wall line (TR-R)",
+   "shadow": {
+    "file": "jar-shelf-right-upper-shadow.png",
+    "md5": "1ece7dc3c5f62ce0a339568ad8205cb3",
+    "topleft": [
+     735,
+     832
+    ],
+    "size": [
+     120,
+     48
+    ],
+    "how": "soft contact ellipse under the visible base"
+   }
+  },
+  {
+   "name": "prep-table-board-mushrooms-garlic-firewood",
+   "draw_order": 8,
+   "file": "prep-table-board-mushrooms-garlic-firewood.png",
+   "md5": "6cd4b14aa13c09efca84dffe63a38086",
+   "png_size": [
+    269,
+    173
+   ],
+   "topleft_in_1080x1680": [
+    292,
+    695
+   ],
+   "png_box_xyxy": [
+    292,
+    695,
+    561,
+    868
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    293,
+    696,
+    560,
+    867
+   ],
+   "visible_size": [
+    267,
+    171
+   ],
+   "visible_size_world": [
+    46.1974,
+    29.5871
+   ],
+   "height_ratio_to_albert_130": 1.315,
+   "height_ratio_to_queen_visible_143": 1.195,
+   "bbox_centre": [
+    426.5,
+    781.5
+   ],
+   "foot_bottom_centre": [
+    426.5,
+    867
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -113.5,
+      -294.0
+     ],
+     "world": [
+      -19.6382,
+      -50.869
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.14349,
+      -0.3717
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -113.5,
+      179.0
+     ],
+     "world": [
+      -19.6382,
+      30.9713
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.14349,
+      0.2263
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2792.362,
+     5030.471
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -113.5,
+      -208.5
+     ],
+     "world": [
+      -19.6382,
+      -36.0755
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.14349,
+      -0.2636
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -113.5,
+      264.5
+     ],
+     "world": [
+      -19.6382,
+      45.7648
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.14349,
+      0.3344
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2792.362,
+     5045.265
+    ]
+   },
+   "mask": "kitchen scale-v1 table polygon (scale-v1-furniture-polys.json) with its bottom edge pulled up to the lower shelf/legs to drop the floor under the table, + GrabCut on source pixels (RGB untouched)",
+   "polygon_in_source": [
+    [
+     415,
+     520
+    ],
+    [
+     450,
+     420
+    ],
+    [
+     480,
+     395
+    ],
+    [
+     545,
+     332
+    ],
+    [
+     740,
+     332
+    ],
+    [
+     760,
+     298
+    ],
+    [
+     835,
+     298
+    ],
+    [
+     845,
+     295
+    ],
+    [
+     945,
+     295
+    ],
+    [
+     950,
+     380
+    ],
+    [
+     945,
+     560
+    ],
+    [
+     930,
+     600
+    ],
+    [
+     900,
+     600
+    ],
+    [
+     620,
+     625
+    ],
+    [
+     615,
+     690
+    ],
+    [
+     580,
+     700
+    ],
+    [
+     560,
+     700
+    ],
+    [
+     545,
+     560
+    ]
+   ],
+   "origin": "CUT from Chris's original kitchen 10-kitchen.webp (no redraw), uniformly scaled",
+   "source": "/workspace/ant-colony/underground/rooms/10-kitchen/10-kitchen.webp",
+   "source_md5": "a88f50a4e9ec50e96a3dcd6100c20566",
+   "source_topleft": [
+    418,
+    304
+   ],
+   "source_png_size": [
+    530,
+    341
+   ],
+   "scale_from_source_px": 0.5071,
+   "placement": "foot = source foot (683,707) mapped by the compose floor homography -> (427.1,866.6); back stands against the back floor-wall line",
+   "shadow": {
+    "file": "prep-table-board-mushrooms-garlic-firewood-shadow.png",
+    "md5": "23ed246b6ce73a990c9f3aed0ae990b3",
+    "topleft": [
+     282,
+     801
+    ],
+    "size": [
+     289,
+     114
+    ],
+    "how": "soft contact ellipse under the visible base"
+   }
+  },
+  {
+   "name": "lantern-stand-back-right",
+   "draw_order": 9,
+   "file": "lantern-stand-back-right.png",
+   "md5": "d69c0900b4f018f979adf5570f011c5a",
+   "png_size": [
+    81,
+    301
+   ],
+   "topleft_in_1080x1680": [
+    209,
+    600
+   ],
+   "png_box_xyxy": [
+    209,
+    600,
+    290,
+    901
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    210,
+    600,
+    290,
+    900
+   ],
+   "visible_size": [
+    80,
+    300
+   ],
+   "visible_size_world": [
+    13.8419,
+    51.9072
+   ],
+   "height_ratio_to_albert_130": 2.308,
+   "height_ratio_to_queen_visible_143": 2.096,
+   "bbox_centre": [
+    250.0,
+    750.0
+   ],
+   "foot_bottom_centre": [
+    250.0,
+    900
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -290.0,
+      -325.5
+     ],
+     "world": [
+      -50.1769,
+      -56.3193
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.36664,
+      -0.41152
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -290.0,
+      147.5
+     ],
+     "world": [
+      -50.1769,
+      25.521
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.36664,
+      0.18648
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2761.823,
+     5025.021
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -290.0,
+      -175.5
+     ],
+     "world": [
+      -50.1769,
+      -30.3657
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.36664,
+      -0.22188
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -290.0,
+      297.5
+     ],
+     "world": [
+      -50.1769,
+      51.4746
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.36664,
+      0.37612
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2761.823,
+     5050.975
+    ]
+   },
+   "origin": "Royal chamber set v1 generated shepherd-hook stand (copied unchanged, not scaled)",
+   "source": "/workspace/ant-colony/furniture/royal-chamber/lantern-stand-left.png",
+   "source_md5": "d69c0900b4f018f979adf5570f011c5a",
+   "why": "no ceiling: hanging lantern on a floor stand on the left floor-wall line",
+   "shadow": {
+    "file": "lantern-stand-back-right-shadow.png",
+    "md5": "46fafa6c0e0ee4e9cd0791f309fee14c",
+    "topleft": [
+     206,
+     880
+    ],
+    "size": [
+     88,
+     34
+    ],
+    "how": "soft contact ellipse under the visible base"
+   }
+  },
+  {
+   "name": "lantern-back-right",
+   "draw_order": 10,
+   "file": "lantern-back-right.png",
+   "md5": "74398d82e6b3330f3dce89c10eb575bb",
+   "png_size": [
+    31,
+    51
+   ],
+   "topleft_in_1080x1680": [
+    249,
+    646
+   ],
+   "png_box_xyxy": [
+    249,
+    646,
+    280,
+    697
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    250,
+    647,
+    279,
+    696
+   ],
+   "visible_size": [
+    29,
+    49
+   ],
+   "visible_size_world": [
+    5.0177,
+    8.4782
+   ],
+   "height_ratio_to_albert_130": 0.377,
+   "height_ratio_to_queen_visible_143": 0.342,
+   "bbox_centre": [
+    264.5,
+    671.5
+   ],
+   "foot_bottom_centre": [
+    264.5,
+    696
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -275.5,
+      -404.0
+     ],
+     "world": [
+      -47.6681,
+      -69.9016
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.34831,
+      -0.51077
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -275.5,
+      69.0
+     ],
+     "world": [
+      -47.6681,
+      11.9386
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.34831,
+      0.08723
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2764.332,
+     5011.439
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -275.5,
+      -379.5
+     ],
+     "world": [
+      -47.6681,
+      -65.6626
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.34831,
+      -0.47979
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -275.5,
+      93.5
+     ],
+     "world": [
+      -47.6681,
+      16.1777
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.34831,
+      0.11821
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2764.332,
+     5015.678
+    ]
+   },
+   "mask": "hand-traced selection polygon + GrabCut on source pixels (RGB untouched)",
+   "polygon_in_source": [
+    [
+     1150,
+     100
+    ],
+    [
+     1160,
+     100
+    ],
+    [
+     1182,
+     130
+    ],
+    [
+     1185,
+     200
+    ],
+    [
+     1128,
+     200
+    ],
+    [
+     1128,
+     130
+    ]
+   ],
+   "origin": "CUT from Chris's original kitchen 10-kitchen.webp (no redraw), uniformly scaled",
+   "source": "/workspace/ant-colony/underground/rooms/10-kitchen/10-kitchen.webp",
+   "source_md5": "a88f50a4e9ec50e96a3dcd6100c20566",
+   "source_topleft": [
+    1125,
+    104
+   ],
+   "source_png_size": [
+    62,
+    100
+   ],
+   "scale_from_source_px": 0.5071,
+   "placement": "hung from lantern-stand-back-right hook tip"
+  },
+  {
+   "name": "berries-stand-right",
+   "draw_order": 11,
+   "file": "berries-stand-right.png",
+   "md5": "d30a36c333cd856e55fb9f5fef316a1e",
+   "png_size": [
+    81,
+    301
+   ],
+   "topleft_in_1080x1680": [
+    812,
+    635
+   ],
+   "png_box_xyxy": [
+    812,
+    635,
+    893,
+    936
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    812,
+    635,
+    892,
+    935
+   ],
+   "visible_size": [
+    80,
+    300
+   ],
+   "visible_size_world": [
+    13.8419,
+    51.9072
+   ],
+   "height_ratio_to_albert_130": 2.308,
+   "height_ratio_to_queen_visible_143": 2.096,
+   "bbox_centre": [
+    852.0,
+    785.0
+   ],
+   "foot_bottom_centre": [
+    852.0,
+    935
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      312.0,
+      -290.5
+     ],
+     "world": [
+      53.9834,
+      -50.2634
+     ],
+     "frac_of_hex_width_790.97": [
+      0.39445,
+      -0.36727
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      312.0,
+      182.5
+     ],
+     "world": [
+      53.9834,
+      31.5769
+     ],
+     "frac_of_hex_width_790.97": [
+      0.39445,
+      0.23073
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2865.983,
+     5031.077
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      312.0,
+      -140.5
+     ],
+     "world": [
+      53.9834,
+      -24.3099
+     ],
+     "frac_of_hex_width_790.97": [
+      0.39445,
+      -0.17763
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      312.0,
+      332.5
+     ],
+     "world": [
+      53.9834,
+      57.5304
+     ],
+     "frac_of_hex_width_790.97": [
+      0.39445,
+      0.42037
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2865.983,
+     5057.03
+    ]
+   },
+   "origin": "Royal chamber set v1 generated shepherd-hook stand (copied unchanged, not scaled)",
+   "source": "/workspace/ant-colony/furniture/royal-chamber/lantern-stand-right.png",
+   "source_md5": "d30a36c333cd856e55fb9f5fef316a1e",
+   "why": "no ceiling: hanging berries on a floor stand on the right floor-wall line",
+   "shadow": {
+    "file": "berries-stand-right-shadow.png",
+    "md5": "46fafa6c0e0ee4e9cd0791f309fee14c",
+    "topleft": [
+     808,
+     915
+    ],
+    "size": [
+     88,
+     34
+    ],
+    "how": "soft contact ellipse under the visible base"
+   }
+  },
+  {
+   "name": "hanging-berries-right",
+   "draw_order": 12,
+   "file": "hanging-berries-right.png",
+   "md5": "33554cc149de1c96e6322d9b89e64ab3",
+   "png_size": [
+    69,
+    126
+   ],
+   "topleft_in_1080x1680": [
+    807,
+    678
+   ],
+   "png_box_xyxy": [
+    807,
+    678,
+    876,
+    804
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    808,
+    679,
+    875,
+    803
+   ],
+   "visible_size": [
+    67,
+    124
+   ],
+   "visible_size_world": [
+    11.5926,
+    21.455
+   ],
+   "height_ratio_to_albert_130": 0.954,
+   "height_ratio_to_queen_visible_143": 0.867,
+   "bbox_centre": [
+    841.5,
+    741.0
+   ],
+   "foot_bottom_centre": [
+    841.5,
+    803
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      301.5,
+      -334.5
+     ],
+     "world": [
+      52.1667,
+      -57.8765
+     ],
+     "frac_of_hex_width_790.97": [
+      0.38118,
+      -0.4229
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      301.5,
+      138.5
+     ],
+     "world": [
+      52.1667,
+      23.9638
+     ],
+     "frac_of_hex_width_790.97": [
+      0.38118,
+      0.1751
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2864.167,
+     5023.464
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      301.5,
+      -272.5
+     ],
+     "world": [
+      52.1667,
+      -47.149
+     ],
+     "frac_of_hex_width_790.97": [
+      0.38118,
+      -0.34451
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      301.5,
+      200.5
+     ],
+     "world": [
+      52.1667,
+      34.6913
+     ],
+     "frac_of_hex_width_790.97": [
+      0.38118,
+      0.25349
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2864.167,
+     5034.191
+    ]
+   },
+   "mask": "union of hand-traced selection polygons (one per item, plus the rope/rail) + light GrabCut on source pixels (RGB untouched)",
+   "polygons_in_source": [
+    [
+     [
+      1395,
+      155
+     ],
+     [
+      1410,
+      155
+     ],
+     [
+      1447,
+      230
+     ],
+     [
+      1445,
+      300
+     ],
+     [
+      1420,
+      330
+     ],
+     [
+      1385,
+      320
+     ],
+     [
+      1374,
+      250
+     ],
+     [
+      1385,
+      205
+     ]
+    ],
+    [
+     [
+      1450,
+      180
+     ],
+     [
+      1462,
+      180
+     ],
+     [
+      1480,
+      240
+     ],
+     [
+      1505,
+      300
+     ],
+     [
+      1500,
+      370
+     ],
+     [
+      1470,
+      402
+     ],
+     [
+      1440,
+      395
+     ],
+     [
+      1425,
+      340
+     ],
+     [
+      1430,
+      280
+     ],
+     [
+      1448,
+      240
+     ]
+    ]
+   ],
+   "origin": "CUT from Chris's original kitchen 10-kitchen.webp (no redraw), uniformly scaled",
+   "source": "/workspace/ant-colony/underground/rooms/10-kitchen/10-kitchen.webp",
+   "source_md5": "a88f50a4e9ec50e96a3dcd6100c20566",
+   "source_topleft": [
+    1371,
+    153
+   ],
+   "source_png_size": [
+    137,
+    249
+   ],
+   "scale_from_source_px": 0.5071,
+   "placement": "hung from berries-stand-right hook tip (strings meet there)"
+  },
+  {
+   "name": "stone-stove-fire-pots-logs",
+   "draw_order": 13,
+   "file": "stone-stove-fire-pots-logs.png",
+   "md5": "99e83a5f4f70b4b0b98b7c4a0ce4ac8f",
+   "png_size": [
+    227,
+    182
+   ],
+   "topleft_in_1080x1680": [
+    138,
+    805
+   ],
+   "png_box_xyxy": [
+    138,
+    805,
+    365,
+    987
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    139,
+    806,
+    364,
+    986
+   ],
+   "visible_size": [
+    225,
+    180
+   ],
+   "visible_size_world": [
+    38.9304,
+    31.1443
+   ],
+   "height_ratio_to_albert_130": 1.385,
+   "height_ratio_to_queen_visible_143": 1.258,
+   "bbox_centre": [
+    251.5,
+    896.0
+   ],
+   "foot_bottom_centre": [
+    251.5,
+    986
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -288.5,
+      -179.5
+     ],
+     "world": [
+      -49.9174,
+      -31.0578
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.36474,
+      -0.22694
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -288.5,
+      293.5
+     ],
+     "world": [
+      -49.9174,
+      50.7825
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.36474,
+      0.37106
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2762.083,
+     5050.283
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -288.5,
+      -89.5
+     ],
+     "world": [
+      -49.9174,
+      -15.4856
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.36474,
+      -0.11315
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -288.5,
+      383.5
+     ],
+     "world": [
+      -49.9174,
+      66.3547
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.36474,
+      0.48485
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2762.083,
+     5065.855
+    ]
+   },
+   "mask": "kitchen scale-v1 furniture polygon + GrabCut with floor-colour suppression on source pixels (RGB untouched); smoke wisp excluded",
+   "polygon_in_source": [
+    [
+     100,
+     640
+    ],
+    [
+     150,
+     600
+    ],
+    [
+     200,
+     520
+    ],
+    [
+     240,
+     400
+    ],
+    [
+     300,
+     380
+    ],
+    [
+     330,
+     470
+    ],
+    [
+     470,
+     520
+    ],
+    [
+     540,
+     560
+    ],
+    [
+     545,
+     700
+    ],
+    [
+     555,
+     780
+    ],
+    [
+     300,
+     810
+    ],
+    [
+     200,
+     800
+    ],
+    [
+     100,
+     790
+    ]
+   ],
+   "origin": "CUT from Chris's original kitchen 10-kitchen.webp (no redraw), uniformly scaled",
+   "source": "/workspace/ant-colony/underground/rooms/10-kitchen/10-kitchen.webp",
+   "source_md5": "a88f50a4e9ec50e96a3dcd6100c20566",
+   "source_topleft": [
+    103,
+    455
+   ],
+   "source_png_size": [
+    448,
+    358
+   ],
+   "scale_from_source_px": 0.5071,
+   "placement": "foot = source foot (327,811) mapped by the kitchen compose floor homography -> (252.2,986.4)",
+   "shadow": {
+    "file": "stone-stove-fire-pots-logs-shadow.png",
+    "md5": "9d7cd49aa0d41ae32674724fdf36a1cf",
+    "topleft": [
+     129,
+     930
+    ],
+    "size": [
+     245,
+     96
+    ],
+    "how": "soft contact ellipse under the visible base"
+   }
+  },
+  {
+   "name": "jar-shelf-right-lower-with-lantern",
+   "draw_order": 14,
+   "file": "jar-shelf-right-lower-with-lantern.png",
+   "md5": "8746037c1e509ce4e9bbbdaf1d23ce5d",
+   "png_size": [
+    188,
+    144
+   ],
+   "topleft_in_1080x1680": [
+    756,
+    847
+   ],
+   "png_box_xyxy": [
+    756,
+    847,
+    944,
+    991
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    757,
+    848,
+    944,
+    990
+   ],
+   "visible_size": [
+    187,
+    142
+   ],
+   "visible_size_world": [
+    32.3555,
+    24.5694
+   ],
+   "height_ratio_to_albert_130": 1.092,
+   "height_ratio_to_queen_visible_143": 0.992,
+   "bbox_centre": [
+    850.5,
+    919.0
+   ],
+   "foot_bottom_centre": [
+    850.5,
+    990
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      310.5,
+      -156.5
+     ],
+     "world": [
+      53.7239,
+      -27.0782
+     ],
+     "frac_of_hex_width_790.97": [
+      0.39256,
+      -0.19786
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      310.5,
+      316.5
+     ],
+     "world": [
+      53.7239,
+      54.7621
+     ],
+     "frac_of_hex_width_790.97": [
+      0.39256,
+      0.40014
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2865.724,
+     5054.262
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      310.5,
+      -85.5
+     ],
+     "world": [
+      53.7239,
+      -14.7935
+     ],
+     "frac_of_hex_width_790.97": [
+      0.39256,
+      -0.1081
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      310.5,
+      387.5
+     ],
+     "world": [
+      53.7239,
+      67.0468
+     ],
+     "frac_of_hex_width_790.97": [
+      0.39256,
+      0.4899
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2865.724,
+     5066.547
+    ]
+   },
+   "mask": "hand-traced selection polygon + GrabCut on source pixels (RGB untouched)",
+   "polygon_in_source": [
+    [
+     1340,
+     470
+    ],
+    [
+     1370,
+     400
+    ],
+    [
+     1430,
+     395
+    ],
+    [
+     1500,
+     410
+    ],
+    [
+     1505,
+     375
+    ],
+    [
+     1600,
+     375
+    ],
+    [
+     1640,
+     430
+    ],
+    [
+     1700,
+     450
+    ],
+    [
+     1712,
+     560
+    ],
+    [
+     1690,
+     660
+    ],
+    [
+     1620,
+     640
+    ],
+    [
+     1550,
+     600
+    ],
+    [
+     1450,
+     560
+    ],
+    [
+     1350,
+     500
+    ]
+   ],
+   "origin": "CUT from Chris's original kitchen 10-kitchen.webp (no redraw), uniformly scaled",
+   "source": "/workspace/ant-colony/underground/rooms/10-kitchen/10-kitchen.webp",
+   "source_md5": "a88f50a4e9ec50e96a3dcd6100c20566",
+   "source_topleft": [
+    1341,
+    370
+   ],
+   "source_png_size": [
+    371,
+    284
+   ],
+   "scale_from_source_px": 0.5071,
+   "placement": "wall shelf, no walls: stood on the right floor-wall line (TR-R), nudged inward",
+   "shadow": {
+    "file": "jar-shelf-right-lower-with-lantern-shadow.png",
+    "md5": "6283432e3adc490aced10bf421adc7b8",
+    "topleft": [
+     749,
+     943
+    ],
+    "size": [
+     203,
+     81
+    ],
+    "how": "soft contact ellipse under the visible base"
+   }
+  },
+  {
+   "name": "floor-jar-of-nuts",
+   "draw_order": 15,
+   "file": "floor-jar-of-nuts.png",
+   "md5": "568fa5b6c8bc031fb2656e95484eca18",
+   "png_size": [
+    54,
+    55
+   ],
+   "topleft_in_1080x1680": [
+    841,
+    1056
+   ],
+   "png_box_xyxy": [
+    841,
+    1056,
+    895,
+    1111
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    842,
+    1057,
+    894,
+    1110
+   ],
+   "visible_size": [
+    52,
+    53
+   ],
+   "visible_size_world": [
+    8.9972,
+    9.1703
+   ],
+   "height_ratio_to_albert_130": 0.408,
+   "height_ratio_to_queen_visible_143": 0.37,
+   "bbox_centre": [
+    868.0,
+    1083.5
+   ],
+   "foot_bottom_centre": [
+    868.0,
+    1110
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      328.0,
+      8.0
+     ],
+     "world": [
+      56.7518,
+      1.3842
+     ],
+     "frac_of_hex_width_790.97": [
+      0.41468,
+      0.01011
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      328.0,
+      481.0
+     ],
+     "world": [
+      56.7518,
+      83.2245
+     ],
+     "frac_of_hex_width_790.97": [
+      0.41468,
+      0.60811
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2868.752,
+     5082.724
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      328.0,
+      34.5
+     ],
+     "world": [
+      56.7518,
+      5.9693
+     ],
+     "frac_of_hex_width_790.97": [
+      0.41468,
+      0.04362
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      328.0,
+      507.5
+     ],
+     "world": [
+      56.7518,
+      87.8096
+     ],
+     "frac_of_hex_width_790.97": [
+      0.41468,
+      0.64162
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2868.752,
+     5087.31
+    ]
+   },
+   "mask": "kitchen scale-v1 furniture polygon (scale-v1-furniture-polys.json) + GrabCut on source pixels (RGB untouched)",
+   "polygon_in_source": [
+    [
+     1510,
+     730
+    ],
+    [
+     1560,
+     705
+    ],
+    [
+     1610,
+     730
+    ],
+    [
+     1615,
+     815
+    ],
+    [
+     1520,
+     820
+    ]
+   ],
+   "origin": "CUT from Chris's original kitchen 10-kitchen.webp (no redraw), uniformly scaled",
+   "source": "/workspace/ant-colony/underground/rooms/10-kitchen/10-kitchen.webp",
+   "source_md5": "a88f50a4e9ec50e96a3dcd6100c20566",
+   "source_topleft": [
+    1514,
+    717
+   ],
+   "source_png_size": [
+    106,
+    108
+   ],
+   "scale_from_source_px": 0.5071,
+   "placement": "moved from mapped (885.3,1045) to sit in front of the right lower shelf",
+   "shadow": {
+    "file": "floor-jar-of-nuts-shadow.png",
+    "md5": "d888aa58298f9f3eee286e5225736741",
+    "topleft": [
+     839,
+     1097
+    ],
+    "size": [
+     58,
+     23
+    ],
+    "how": "soft contact ellipse under the visible base"
+   }
+  },
+  {
+   "name": "utensil-stand-left",
+   "draw_order": 16,
+   "file": "utensil-stand-left.png",
+   "md5": "d69c0900b4f018f979adf5570f011c5a",
+   "png_size": [
+    81,
+    301
+   ],
+   "topleft_in_1080x1680": [
+    213,
+    915
+   ],
+   "png_box_xyxy": [
+    213,
+    915,
+    294,
+    1216
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    214,
+    915,
+    294,
+    1215
+   ],
+   "visible_size": [
+    80,
+    300
+   ],
+   "visible_size_world": [
+    13.8419,
+    51.9072
+   ],
+   "height_ratio_to_albert_130": 2.308,
+   "height_ratio_to_queen_visible_143": 2.096,
+   "bbox_centre": [
+    254.0,
+    1065.0
+   ],
+   "foot_bottom_centre": [
+    254.0,
+    1215
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -286.0,
+      -10.5
+     ],
+     "world": [
+      -49.4848,
+      -1.8168
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.36158,
+      -0.01327
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -286.0,
+      462.5
+     ],
+     "world": [
+      -49.4848,
+      80.0235
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.36158,
+      0.58473
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2762.515,
+     5079.524
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -286.0,
+      139.5
+     ],
+     "world": [
+      -49.4848,
+      24.1368
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.36158,
+      0.17637
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -286.0,
+      612.5
+     ],
+     "world": [
+      -49.4848,
+      105.9771
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.36158,
+      0.77437
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2762.515,
+     5105.477
+    ]
+   },
+   "origin": "Royal chamber set v1 generated shepherd-hook stand (copied unchanged, not scaled)",
+   "source": "/workspace/ant-colony/furniture/royal-chamber/lantern-stand-left.png",
+   "source_md5": "d69c0900b4f018f979adf5570f011c5a",
+   "why": "with utensil-stand-right forms a free-standing utensil rack (no wall)",
+   "shadow": {
+    "file": "utensil-stand-left-shadow.png",
+    "md5": "46fafa6c0e0ee4e9cd0791f309fee14c",
+    "topleft": [
+     210,
+     1195
+    ],
+    "size": [
+     88,
+     34
+    ],
+    "how": "soft contact ellipse under the visible base"
+   }
+  },
+  {
+   "name": "utensil-stand-right",
+   "draw_order": 17,
+   "file": "utensil-stand-right.png",
+   "md5": "d30a36c333cd856e55fb9f5fef316a1e",
+   "png_size": [
+    81,
+    301
+   ],
+   "topleft_in_1080x1680": [
+    401,
+    915
+   ],
+   "png_box_xyxy": [
+    401,
+    915,
+    482,
+    1216
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    401,
+    915,
+    481,
+    1215
+   ],
+   "visible_size": [
+    80,
+    300
+   ],
+   "visible_size_world": [
+    13.8419,
+    51.9072
+   ],
+   "height_ratio_to_albert_130": 2.308,
+   "height_ratio_to_queen_visible_143": 2.096,
+   "bbox_centre": [
+    441.0,
+    1065.0
+   ],
+   "foot_bottom_centre": [
+    441.0,
+    1215
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -99.0,
+      -10.5
+     ],
+     "world": [
+      -17.1294,
+      -1.8168
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.12516,
+      -0.01327
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -99.0,
+      462.5
+     ],
+     "world": [
+      -17.1294,
+      80.0235
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.12516,
+      0.58473
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2794.871,
+     5079.524
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -99.0,
+      139.5
+     ],
+     "world": [
+      -17.1294,
+      24.1368
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.12516,
+      0.17637
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -99.0,
+      612.5
+     ],
+     "world": [
+      -17.1294,
+      105.9771
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.12516,
+      0.77437
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2794.871,
+     5105.477
+    ]
+   },
+   "origin": "Royal chamber set v1 generated shepherd-hook stand (copied unchanged, not scaled)",
+   "source": "/workspace/ant-colony/furniture/royal-chamber/lantern-stand-right.png",
+   "source_md5": "d30a36c333cd856e55fb9f5fef316a1e",
+   "why": "with utensil-stand-left forms a free-standing utensil rack (no wall)",
+   "shadow": {
+    "file": "utensil-stand-right-shadow.png",
+    "md5": "46fafa6c0e0ee4e9cd0791f309fee14c",
+    "topleft": [
+     397,
+     1195
+    ],
+    "size": [
+     88,
+     34
+    ],
+    "how": "soft contact ellipse under the visible base"
+   }
+  },
+  {
+   "name": "hanging-utensil-rack",
+   "draw_order": 18,
+   "file": "hanging-utensil-rack.png",
+   "md5": "cc0d0f23cc85f766d4cf12eac55391f3",
+   "png_size": [
+    166,
+    89
+   ],
+   "topleft_in_1080x1680": [
+    259,
+    959
+   ],
+   "png_box_xyxy": [
+    259,
+    959,
+    425,
+    1048
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    260,
+    960,
+    424,
+    1047
+   ],
+   "visible_size": [
+    164,
+    87
+   ],
+   "visible_size_world": [
+    28.3759,
+    15.0531
+   ],
+   "height_ratio_to_albert_130": 0.669,
+   "height_ratio_to_queen_visible_143": 0.608,
+   "bbox_centre": [
+    342.0,
+    1003.5
+   ],
+   "foot_bottom_centre": [
+    342.0,
+    1047
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -198.0,
+      -72.0
+     ],
+     "world": [
+      -34.2587,
+      -12.4577
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.25033,
+      -0.09103
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -198.0,
+      401.0
+     ],
+     "world": [
+      -34.2587,
+      69.3826
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.25033,
+      0.50697
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2777.741,
+     5068.883
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -198.0,
+      -28.5
+     ],
+     "world": [
+      -34.2587,
+      -4.9312
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.25033,
+      -0.03603
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -198.0,
+      444.5
+     ],
+     "world": [
+      -34.2587,
+      76.9091
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.25033,
+      0.56197
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2777.741,
+     5076.409
+    ]
+   },
+   "mask": "union of hand-traced selection polygons (one per item, plus the rope/rail) + light GrabCut on source pixels (RGB untouched)",
+   "polygons_in_source": [
+    [
+     [
+      944,
+      197
+     ],
+     [
+      953,
+      197
+     ],
+     [
+      953,
+      280
+     ],
+     [
+      962,
+      295
+     ],
+     [
+      964,
+      312
+     ],
+     [
+      956,
+      322
+     ],
+     [
+      940,
+      322
+     ],
+     [
+      933,
+      310
+     ],
+     [
+      935,
+      293
+     ],
+     [
+      944,
+      280
+     ]
+    ],
+    [
+     [
+      1001,
+      193
+     ],
+     [
+      1011,
+      193
+     ],
+     [
+      1011,
+      275
+     ],
+     [
+      1018,
+      290
+     ],
+     [
+      1020,
+      318
+     ],
+     [
+      1010,
+      336
+     ],
+     [
+      993,
+      336
+     ],
+     [
+      984,
+      318
+     ],
+     [
+      988,
+      290
+     ],
+     [
+      1001,
+      275
+     ]
+    ],
+    [
+     [
+      1053,
+      197
+     ],
+     [
+      1065,
+      197
+     ],
+     [
+      1066,
+      285
+     ],
+     [
+      1074,
+      305
+     ],
+     [
+      1074,
+      335
+     ],
+     [
+      1062,
+      348
+     ],
+     [
+      1048,
+      348
+     ],
+     [
+      1038,
+      335
+     ],
+     [
+      1039,
+      305
+     ],
+     [
+      1052,
+      285
+     ]
+    ],
+    [
+     [
+      1099,
+      197
+     ],
+     [
+      1111,
+      197
+     ],
+     [
+      1111,
+      300
+     ],
+     [
+      1121,
+      312
+     ],
+     [
+      1121,
+      333
+     ],
+     [
+      1110,
+      344
+     ],
+     [
+      1094,
+      344
+     ],
+     [
+      1084,
+      333
+     ],
+     [
+      1086,
+      312
+     ],
+     [
+      1099,
+      300
+     ]
+    ],
+    [
+     [
+      1140,
+      197
+     ],
+     [
+      1152,
+      197
+     ],
+     [
+      1152,
+      300
+     ],
+     [
+      1163,
+      304
+     ],
+     [
+      1163,
+      347
+     ],
+     [
+      1126,
+      347
+     ],
+     [
+      1126,
+      304
+     ],
+     [
+      1140,
+      300
+     ]
+    ],
+    [
+     [
+      1184,
+      201
+     ],
+     [
+      1195,
+      201
+     ],
+     [
+      1195,
+      305
+     ],
+     [
+      1210,
+      315
+     ],
+     [
+      1214,
+      340
+     ],
+     [
+      1200,
+      358
+     ],
+     [
+      1182,
+      358
+     ],
+     [
+      1169,
+      340
+     ],
+     [
+      1172,
+      315
+     ],
+     [
+      1184,
+      305
+     ]
+    ],
+    [
+     [
+      1228,
+      205
+     ],
+     [
+      1240,
+      205
+     ],
+     [
+      1240,
+      316
+     ],
+     [
+      1250,
+      320
+     ],
+     [
+      1250,
+      366
+     ],
+     [
+      1216,
+      366
+     ],
+     [
+      1216,
+      320
+     ],
+     [
+      1228,
+      316
+     ]
+    ],
+    [
+     [
+      1085,
+      196
+     ],
+     [
+      1258,
+      203
+     ],
+     [
+      1258,
+      214
+     ],
+     [
+      1085,
+      208
+     ]
+    ]
+   ],
+   "origin": "CUT from Chris's original kitchen 10-kitchen.webp (no redraw), uniformly scaled",
+   "source": "/workspace/ant-colony/underground/rooms/10-kitchen/10-kitchen.webp",
+   "source_md5": "a88f50a4e9ec50e96a3dcd6100c20566",
+   "source_topleft": [
+    931,
+    193
+   ],
+   "source_png_size": [
+    328,
+    176
+   ],
+   "scale_from_source_px": 0.5071,
+   "placement": "utensil tops hung along the line between the two utensil-stand hook tips, left at [268, 960]"
+  },
+  {
+   "name": "jar-shelf-back-with-lantern",
+   "draw_order": 19,
+   "file": "jar-shelf-back-with-lantern.png",
+   "md5": "7ee8d02270aba2b92059d459ddce31b0",
+   "png_size": [
+    176,
+    111
+   ],
+   "topleft_in_1080x1680": [
+    657,
+    1165
+   ],
+   "png_box_xyxy": [
+    657,
+    1165,
+    833,
+    1276
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    658,
+    1166,
+    832,
+    1275
+   ],
+   "visible_size": [
+    174,
+    109
+   ],
+   "visible_size_world": [
+    30.1062,
+    18.8596
+   ],
+   "height_ratio_to_albert_130": 0.838,
+   "height_ratio_to_queen_visible_143": 0.762,
+   "bbox_centre": [
+    745.0,
+    1220.5
+   ],
+   "foot_bottom_centre": [
+    745.0,
+    1275
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      205.0,
+      145.0
+     ],
+     "world": [
+      35.4699,
+      25.0885
+     ],
+     "frac_of_hex_width_790.97": [
+      0.25918,
+      0.18332
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      205.0,
+      618.0
+     ],
+     "world": [
+      35.4699,
+      106.9288
+     ],
+     "frac_of_hex_width_790.97": [
+      0.25918,
+      0.78132
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2847.47,
+     5106.429
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      205.0,
+      199.5
+     ],
+     "world": [
+      35.4699,
+      34.5183
+     ],
+     "frac_of_hex_width_790.97": [
+      0.25918,
+      0.25222
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      205.0,
+      672.5
+     ],
+     "world": [
+      35.4699,
+      116.3586
+     ],
+     "frac_of_hex_width_790.97": [
+      0.25918,
+      0.85022
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2847.47,
+     5115.859
+    ]
+   },
+   "mask": "hand-traced selection polygon + GrabCut on source pixels (RGB untouched)",
+   "polygon_in_source": [
+    [
+     455,
+     300
+    ],
+    [
+     462,
+     280
+    ],
+    [
+     500,
+     270
+    ],
+    [
+     505,
+     205
+    ],
+    [
+     540,
+     205
+    ],
+    [
+     555,
+     190
+    ],
+    [
+     600,
+     195
+    ],
+    [
+     627,
+     185
+    ],
+    [
+     627,
+     108
+    ],
+    [
+     677,
+     108
+    ],
+    [
+     680,
+     190
+    ],
+    [
+     700,
+     190
+    ],
+    [
+     725,
+     182
+    ],
+    [
+     760,
+     180
+    ],
+    [
+     800,
+     185
+    ],
+    [
+     832,
+     235
+    ],
+    [
+     840,
+     255
+    ],
+    [
+     830,
+     262
+    ],
+    [
+     500,
+     330
+    ],
+    [
+     460,
+     330
+    ]
+   ],
+   "origin": "CUT from Chris's original kitchen 10-kitchen.webp (no redraw), uniformly scaled",
+   "source": "/workspace/ant-colony/underground/rooms/10-kitchen/10-kitchen.webp",
+   "source_md5": "a88f50a4e9ec50e96a3dcd6100c20566",
+   "source_topleft": [
+    459,
+    109
+   ],
+   "source_png_size": [
+    347,
+    218
+   ],
+   "scale_from_source_px": 0.5071,
+   "placement": "wall shelf, no free wall line left (table+sink fill the back line): set on the green floor as a low jar bench",
+   "shadow": {
+    "file": "jar-shelf-back-with-lantern-shadow.png",
+    "md5": "f26ede7b5793deb0d9bf67061f0fc6d5",
+    "topleft": [
+     650,
+     1232
+    ],
+    "size": [
+     190,
+     74
+    ],
+    "how": "soft contact ellipse under the visible base"
+   }
+  },
+  {
+   "name": "food-bundles-straw",
+   "draw_order": 20,
+   "file": "food-bundles-straw.png",
+   "md5": "3a31f0d21e47ed07a2af2b875163cbcc",
+   "png_size": [
+    122,
+    111
+   ],
+   "topleft_in_1080x1680": [
+    524,
+    1225
+   ],
+   "png_box_xyxy": [
+    524,
+    1225,
+    646,
+    1336
+   ],
+   "visible_bbox_alpha_gt127_xyxy": [
+    525,
+    1226,
+    645,
+    1335
+   ],
+   "visible_size": [
+    120,
+    109
+   ],
+   "visible_size_world": [
+    20.7629,
+    18.8596
+   ],
+   "height_ratio_to_albert_130": 0.838,
+   "height_ratio_to_queen_visible_143": 0.762,
+   "bbox_centre": [
+    585.0,
+    1280.5
+   ],
+   "foot_bottom_centre": [
+    585.0,
+    1335
+   ],
+   "centre_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      45.0,
+      205.0
+     ],
+     "world": [
+      7.7861,
+      35.4699
+     ],
+     "frac_of_hex_width_790.97": [
+      0.05689,
+      0.25918
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      45.0,
+      678.0
+     ],
+     "world": [
+      7.7861,
+      117.3102
+     ],
+     "frac_of_hex_width_790.97": [
+      0.05689,
+      0.85718
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2819.786,
+     5116.81
+    ]
+   },
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      45.0,
+      259.5
+     ],
+     "world": [
+      7.7861,
+      44.8997
+     ],
+     "frac_of_hex_width_790.97": [
+      0.05689,
+      0.32808
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      45.0,
+      732.5
+     ],
+     "world": [
+      7.7861,
+      126.74
+     ],
+     "frac_of_hex_width_790.97": [
+      0.05689,
+      0.92608
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2819.786,
+     5126.24
+    ]
+   },
+   "mask": "kitchen scale-v1 furniture polygon (scale-v1-furniture-polys.json) + GrabCut on source pixels (RGB untouched)",
+   "polygon_in_source": [
+    [
+     1300,
+     560
+    ],
+    [
+     1360,
+     520
+    ],
+    [
+     1460,
+     530
+    ],
+    [
+     1530,
+     560
+    ],
+    [
+     1540,
+     720
+    ],
+    [
+     1500,
+     745
+    ],
+    [
+     1310,
+     700
+    ]
+   ],
+   "origin": "CUT from Chris's original kitchen 10-kitchen.webp (no redraw), uniformly scaled",
+   "source": "/workspace/ant-colony/underground/rooms/10-kitchen/10-kitchen.webp",
+   "source_md5": "a88f50a4e9ec50e96a3dcd6100c20566",
+   "source_topleft": [
+    1303,
+    520
+   ],
+   "source_png_size": [
+    241,
+    219
+   ],
+   "scale_from_source_px": 0.5071,
+   "placement": "moved from mapped (822.8,932.9) to the front floor to free the right floor-wall line for the jar shelves",
+   "shadow": {
+    "file": "food-bundles-straw-shadow.png",
+    "md5": "926034100ca1df89de3e560b05add996",
+    "topleft": [
+     519,
+     1305
+    ],
+    "size": [
+     132,
+     52
+    ],
+    "how": "soft contact ellipse under the visible base"
+   }
+  }
+ ],
+ "room": "Kitchen furniture set v1 (cut from Chris's original 10-kitchen.webp)",
+ "created": "2026-11-13 (ET)",
+ "scale_derivation": {
+  "factor": 0.5071,
+  "factor_name": "kitchen source px (10-kitchen.webp 1712x1232) -> furniture px at the Royal/in-game scale (hex 791, 1 px = 0.1730239 world)",
+  "how": [
+   "The original kitchen is a perspective photo, not an in-hex picture. The pipeline composed it onto the SAME locked template as the Royal and nursery rooms (kitchen-clean-in-game-hex-meta.json: src_verts TL(520,615) TR(1300,598) R(1575,840) BR(1420,1215) BL(400,1215) L(95,905) -> dst_floor, hex width 790.97).",
+   "SIFT (20000 features, ratio 0.75, RANSAC affine) between 10-kitchen.webp and kitchen-clean-in-game-hex-no-outline.jpg on objects that were composed unscaled (scenery kept in the clean in-hex picture): utensil_rack: sx 0.5120 sy 0.7873 (131 inliers); grapes_back: sx 0.5071 sy 0.7762 (95 inliers); back_left_shelf: sx 0.4989 sy 0.7719 (79 inliers); lantern_back_left: sx 0.4963 sy 0.7706 (16 inliers); lantern_back_right: sx 0.5152 sy 0.7861 (19 inliers). Median horizontal scale 0.5071 -> used as the uniform factor.",
+   "Cross-check on the floor: compose floor homography x-scale at the furniture feet = 0.512 (stove), 0.539 (table), 0.561 (sink), 0.537 (straw), 0.518 (jar).",
+   "Cross-check with the recorded scale pass: kitchen scale-v1/v1b used 0.16 x source px for an Albert ~45 px tall (NOTE-scale-v1b scale_note). Re-targeting that to Albert 130 px gives 0.16 x 130/45 = 0.462, within 9% of 0.5071.",
+   "Uniform (aspect-preserving) scale: the compose stretches wall objects vertically (sy ~0.78 vs sx ~0.51); I did not stretch, so heights follow the width scale."
+  ],
+  "not_used": "scale-v1/v1b sprites (0.16) - shrunk for the old ~45 px ant"
+ },
+ "previews": {
+  "kitchen-on-v13": {
+   "v13": "/workspace/ant-colony/big-chamber/v13-noants-2026-11-13/big-chamber-v13-noants-clean.jpg",
+   "v13_md5": "cd5119a00eff77bbe32096706955b667",
+   "scale_template_to_v13": 1.0000380940050961,
+   "cells": [
+    {
+     "layer": "/workspace/fx/ki/out/kitchen-furniture.png",
+     "cell_index": 2,
+     "c_r": [
+      -1,
+      0
+     ],
+     "centre": [
+      3005.75,
+      2485.3030471967454
+     ],
+     "paste_topleft": [
+      2466,
+      1410
+     ]
+    }
+   ],
+   "files_note": "kitchen on v13 cell (c=-1,r=0), left neighbour of the royal preview cell (0,1)",
+   "files": {
+    "kitchen-furniture-on-v13-preview-v1.jpg": "638605bf5d6077af51043101334eca3e",
+    "kitchen-furniture-on-v13-preview-v1-zoom-crop.jpg": "99ce70f7abe5ed79b553e3eae116e40f"
+   },
+   "zoom_crop_xyxy": [
+    2015,
+    1455,
+    3995,
+    2985
+   ]
+  }
+ }
+}

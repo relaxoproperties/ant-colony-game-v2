@@ -1,0 +1,85 @@
+{
+ "kind": "corn",
+ "seed_id": "s10",
+ "patch_hires": "seed_patch_corn_s10_hires.png",
+ "patch_game": "seed_patch_corn_s10_game.png",
+ "patch_hires_px": [
+  4180,
+  4180
+ ],
+ "patch_game_px": [
+  2090,
+  2090
+ ],
+ "map_rect_px": {
+  "x": 4222,
+  "y": 4031,
+  "w": 209,
+  "h": 209
+ },
+ "world_rect_px": {
+  "x": 27009.959377472962,
+  "y": 26721.538696913743,
+  "w": 335.01746241097334,
+  "h": 335.01746241097334
+ },
+ "world_px_per_map_px": 1.6029543656027432,
+ "hires_px_per_map_px": 20,
+ "game_px_per_map_px": 10,
+ "why_resolutions": "hi-res 20 px per map px covers the closest zoom (C.ZMAX 4 x K 1.603 x 3x screen = 19.2); game-res 10 px per map px covers the default zoom (1.95 x 1.603 x 3 = 9.4)",
+ "seed": {
+  "centre_map": [
+   4327.0,
+   4135.3
+  ],
+  "length_map": 76.0,
+  "width_map": 40.8,
+  "angle_deg": 113.2,
+  "matches_blob_50pct_outline": {
+   "length": 67.7,
+   "width": 35.9,
+   "angle_deg": 114.2
+  }
+ },
+ "blend": {
+  "centre_map": [
+   4327.0,
+   4135.3
+  ],
+  "r_grass_fill_map": 73.4,
+  "r_full_map": 79.4,
+  "r_zero_map": 103.4,
+  "falloff": "smoothstep",
+  "old_blur_ring_max_r_map": 61.4,
+  "grass_fill_source_offset_map": [
+   -104,
+   251
+  ]
+ },
+ "shadow": {
+  "colour": "black",
+  "blur_sigma_map": 3.74,
+  "offset_map": [
+   1.87,
+   3.12
+  ],
+  "opacity": 0.45,
+  "light": "from upper left",
+  "v2_contact_shadow": {
+   "colour": "black",
+   "blur_sigma_map": 1.1,
+   "offset_map": [
+    0.85,
+    1.4
+   ],
+   "opacity": 0.55,
+   "note": "added in v2 so the seed sits on the grass; the acorn recipe shadow is kept as well"
+  }
+ },
+ "softening": {
+  "overall_sigma_map": 0.35,
+  "edge_sigma_map": 0.75,
+  "note": "v3: light blur so the seed sits in the painted grass; shadows use the softened outline"
+ },
+ "draw": "Same as the mound patch (js/ot2.js:32-35): after the map tiles, BEFORE fog, ants, items and UI, inside ot2DrawMap's map-px transform: ctx.drawImage(patch, x, y, w, h) with map_rect_px; imageSmoothingEnabled=true, imageSmoothingQuality='high'. Candidate only - not placed in the game."
+}

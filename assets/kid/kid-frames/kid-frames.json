@@ -1,0 +1,331 @@
+{
+ "note": "Kid ant sprites = Albert locked art scaled uniformly (area resample, premultiplied). anchor = floor contact pixel corner. idle: play [0..10,0,0,0] at 7 fps, faces camera. side: faces RIGHT; mirror (flip) for left; advance 1 frame per STEP 8.364 source px walked (=STEP*scale px).",
+ "K_IDLE_adult": 0.8283703973966172,
+ "K_SIDE_adult": 0.2027512636394711,
+ "sprites": {
+  "kid50/idle_00.png": {
+   "anchor_floor_contact": [
+    34,
+    78
+   ],
+   "scale": 0.4141851986983086,
+   "size": [
+    74,
+    92
+   ],
+   "md5": "4d75013813654111d35bd7f6907bebc8"
+  },
+  "kid50/idle_01.png": {
+   "anchor_floor_contact": [
+    34,
+    78
+   ],
+   "scale": 0.4141851986983086,
+   "size": [
+    74,
+    92
+   ],
+   "md5": "2ed50077f8275ee5020541797b53ce60"
+  },
+  "kid50/idle_02.png": {
+   "anchor_floor_contact": [
+    34,
+    78
+   ],
+   "scale": 0.4141851986983086,
+   "size": [
+    74,
+    92
+   ],
+   "md5": "f0a37e6401b1eeb73d0f9ba6d74669f8"
+  },
+  "kid50/idle_03.png": {
+   "anchor_floor_contact": [
+    34,
+    78
+   ],
+   "scale": 0.4141851986983086,
+   "size": [
+    74,
+    92
+   ],
+   "md5": "a4b4e7c9b725c62dd378a03037db0c06"
+  },
+  "kid50/idle_04.png": {
+   "anchor_floor_contact": [
+    34,
+    78
+   ],
+   "scale": 0.4141851986983086,
+   "size": [
+    74,
+    92
+   ],
+   "md5": "950de8a25c06640d7b2f15eb515011cc"
+  },
+  "kid50/idle_05.png": {
+   "anchor_floor_contact": [
+    34,
+    78
+   ],
+   "scale": 0.4141851986983086,
+   "size": [
+    74,
+    92
+   ],
+   "md5": "4276d09fdfd5bf85c4e36efd65ae8bde"
+  },
+  "kid50/idle_06.png": {
+   "anchor_floor_contact": [
+    34,
+    78
+   ],
+   "scale": 0.4141851986983086,
+   "size": [
+    74,
+    92
+   ],
+   "md5": "f937d47125272b4fefd0d47ddbb87870"
+  },
+  "kid50/idle_07.png": {
+   "anchor_floor_contact": [
+    34,
+    78
+   ],
+   "scale": 0.4141851986983086,
+   "size": [
+    74,
+    92
+   ],
+   "md5": "1e17e14a1440a360d6c49d52f4181da5"
+  },
+  "kid50/idle_08.png": {
+   "anchor_floor_contact": [
+    34,
+    78
+   ],
+   "scale": 0.4141851986983086,
+   "size": [
+    74,
+    92
+   ],
+   "md5": "3f987f8ccdd471664a1155b81437252c"
+  },
+  "kid50/idle_09.png": {
+   "anchor_floor_contact": [
+    34,
+    78
+   ],
+   "scale": 0.4141851986983086,
+   "size": [
+    74,
+    92
+   ],
+   "md5": "d8eadea7b22c75bdeb343666019e82fc"
+  },
+  "kid50/idle_10.png": {
+   "anchor_floor_contact": [
+    34,
+    78
+   ],
+   "scale": 0.4141851986983086,
+   "size": [
+    74,
+    92
+   ],
+   "md5": "44b1699346447b7fb8e73d1205fe8a82"
+  },
+  "kid50/side_00.png": {
+   "anchor_floor_contact": [
+    36,
+    46
+   ],
+   "scale": 0.10137563181973555,
+   "size": [
+    72,
+    51
+   ],
+   "md5": "8f834c18bcd56104a86de74941531eb5"
+  },
+  "kid50/side_01.png": {
+   "anchor_floor_contact": [
+    36,
+    46
+   ],
+   "scale": 0.10137563181973555,
+   "size": [
+    72,
+    51
+   ],
+   "md5": "5d8a596aa233c08a654042121e5f47ac"
+  },
+  "kid50/side_02.png": {
+   "anchor_floor_contact": [
+    36,
+    46
+   ],
+   "scale": 0.10137563181973555,
+   "size": [
+    72,
+    51
+   ],
+   "md5": "34cbb24ab24988407861117b0fdd8549"
+  },
+  "kid50/side_03.png": {
+   "anchor_floor_contact": [
+    36,
+    46
+   ],
+   "scale": 0.10137563181973555,
+   "size": [
+    72,
+    51
+   ],
+   "md5": "1e850f0c94057253a21a59408661c085"
+  },
+  "kid50/side_04.png": {
+   "anchor_floor_contact": [
+    36,
+    46
+   ],
+   "scale": 0.10137563181973555,
+   "size": [
+    72,
+    51
+   ],
+   "md5": "7e6e3f12fb8a7479e94d2f10aa7afd43"
+  },
+  "kid50/side_05.png": {
+   "anchor_floor_contact": [
+    36,
+    46
+   ],
+   "scale": 0.10137563181973555,
+   "size": [
+    72,
+    51
+   ],
+   "md5": "84bdbeb9bec9b3bb52175b818f39f465"
+  },
+  "kid50/side_06.png": {
+   "anchor_floor_contact": [
+    36,
+    46
+   ],
+   "scale": 0.10137563181973555,
+   "size": [
+    72,
+    51
+   ],
+   "md5": "2585e2d136d740461db9d1bd3dab45b5"
+  },
+  "kid50/side_07.png": {
+   "anchor_floor_contact": [
+    36,
+    46
+   ],
+   "scale": 0.10137563181973555,
+   "size": [
+    72,
+    51
+   ],
+   "md5": "1c4e4a77079e257535cea6073080337d"
+  },
+  "kid50/side_08.png": {
+   "anchor_floor_contact": [
+    36,
+    46
+   ],
+   "scale": 0.10137563181973555,
+   "size": [
+    72,
+    51
+   ],
+   "md5": "c445433e78c8f5f40901b9c5e1b42c29"
+  },
+  "kid50/side_09.png": {
+   "anchor_floor_contact": [
+    36,
+    46
+   ],
+   "scale": 0.10137563181973555,
+   "size": [
+    72,
+    51
+   ],
+   "md5": "6c787b44328feeb78a09492ae7546781"
+  },
+  "kid50/side_10.png": {
+   "anchor_floor_contact": [
+    36,
+    46
+   ],
+   "scale": 0.10137563181973555,
+   "size": [
+    72,
+    51
+   ],
+   "md5": "3a76a8e4a00a967a506de90d60ccd60b"
+  },
+  "kid50/side_11.png": {
+   "anchor_floor_contact": [
+    36,
+    46
+   ],
+   "scale": 0.10137563181973555,
+   "size": [
+    72,
+    51
+   ],
+   "md5": "f412b85b5c38cad66f5c8c83ea376a05"
+  },
+  "kid50/side_12.png": {
+   "anchor_floor_contact": [
+    36,
+    46
+   ],
+   "scale": 0.10137563181973555,
+   "size": [
+    72,
+    51
+   ],
+   "md5": "87255b206a245ac8bd77d469650a721d"
+  },
+  "kid50/side_13.png": {
+   "anchor_floor_contact": [
+    36,
+    46
+   ],
+   "scale": 0.10137563181973555,
+   "size": [
+    72,
+    51
+   ],
+   "md5": "d87c3d3beef1fc615da4a27d718e8729"
+  },
+  "kid50/side_14.png": {
+   "anchor_floor_contact": [
+    36,
+    46
+   ],
+   "scale": 0.10137563181973555,
+   "size": [
+    72,
+    51
+   ],
+   "md5": "ebc454567756f863ba3af798bdbbe889"
+  },
+  "kid50/side_15.png": {
+   "anchor_floor_contact": [
+    36,
+    46
+   ],
+   "scale": 0.10137563181973555,
+   "size": [
+    72,
+    51
+   ],
+   "md5": "d247198116dee3c60b415767bece2f77"
+  }
+ }
+}

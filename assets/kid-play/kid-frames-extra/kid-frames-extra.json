@@ -1,0 +1,85 @@
+{
+ "note": "Locked toward (wdo-plain) / away (wu-plain) strip frames at the kid scale 0.414185 (= idle), area resample, premultiplied; floor contact (65,181) wdo / (65,183) wu as in garden-v2.",
+ "sprites": {
+  "wdo_00.png": {
+   "anchor_floor_contact": [
+    30,
+    78
+   ],
+   "scale": 0.4141851986983086,
+   "source": "/workspace/ant-colony/art/LOCKED-WALKS-2026-11-09/toward-camera-wdo-plain/wdo-plain.png",
+   "source_md5": "75104df1bdb24aa5118ceea0fcd0ee81",
+   "md5": "001e55f3f7061b9406fd3e85d5152d19"
+  },
+  "wdo_01.png": {
+   "anchor_floor_contact": [
+    30,
+    78
+   ],
+   "scale": 0.4141851986983086,
+   "source": "/workspace/ant-colony/art/LOCKED-WALKS-2026-11-09/toward-camera-wdo-plain/wdo-plain.png",
+   "source_md5": "75104df1bdb24aa5118ceea0fcd0ee81",
+   "md5": "4221c7fbb7ef16ac92116b02915fa586"
+  },
+  "wdo_02.png": {
+   "anchor_floor_contact": [
+    30,
+    78
+   ],
+   "scale": 0.4141851986983086,
+   "source": "/workspace/ant-colony/art/LOCKED-WALKS-2026-11-09/toward-camera-wdo-plain/wdo-plain.png",
+   "source_md5": "75104df1bdb24aa5118ceea0fcd0ee81",
+   "md5": "001e55f3f7061b9406fd3e85d5152d19"
+  },
+  "wdo_03.png": {
+   "anchor_floor_contact": [
+    30,
+    78
+   ],
+   "scale": 0.4141851986983086,
+   "source": "/workspace/ant-colony/art/LOCKED-WALKS-2026-11-09/toward-camera-wdo-plain/wdo-plain.png",
+   "source_md5": "75104df1bdb24aa5118ceea0fcd0ee81",
+   "md5": "45528a53e55b1e88ab6ff9c0ab956e6e"
+  },
+  "wu_00.png": {
+   "anchor_floor_contact": [
+    30,
+    79
+   ],
+   "scale": 0.4141851986983086,
+   "source": "/workspace/ant-colony/art/LOCKED-WALKS-2026-11-09/away-wu-plain/wu-plain.png",
+   "source_md5": "33c58e02291190aae12552bc68f1d274",
+   "md5": "bfd0f3f65a094e92698c6a4957124730"
+  },
+  "wu_01.png": {
+   "anchor_floor_contact": [
+    30,
+    79
+   ],
+   "scale": 0.4141851986983086,
+   "source": "/workspace/ant-colony/art/LOCKED-WALKS-2026-11-09/away-wu-plain/wu-plain.png",
+   "source_md5": "33c58e02291190aae12552bc68f1d274",
+   "md5": "a96a97da641e60ee429ffb210d2b539d"
+  },
+  "wu_02.png": {
+   "anchor_floor_contact": [
+    30,
+    79
+   ],
+   "scale": 0.4141851986983086,
+   "source": "/workspace/ant-colony/art/LOCKED-WALKS-2026-11-09/away-wu-plain/wu-plain.png",
+   "source_md5": "33c58e02291190aae12552bc68f1d274",
+   "md5": "b8cc81890144605703e5a53d6dc47a63"
+  },
+  "wu_03.png": {
+   "anchor_floor_contact": [
+    30,
+    79
+   ],
+   "scale": 0.4141851986983086,
+   "source": "/workspace/ant-colony/art/LOCKED-WALKS-2026-11-09/away-wu-plain/wu-plain.png",
+   "source_md5": "33c58e02291190aae12552bc68f1d274",
+   "md5": "a04327407f09e2d7cf0e7e6808f97b54"
+  }
+ }
+}

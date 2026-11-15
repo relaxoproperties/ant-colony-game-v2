@@ -1,0 +1,28 @@
+/* Ant Colony - idea mini game (arrow). Self-contained; every class is prefixed "ag-". */
+.ag-root{position:fixed;inset:0;z-index:10000;background:#07060a;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;cursor:pointer}
+.ag-root.ag-in{position:absolute}
+.ag-fill{position:absolute;inset:-30px;background-size:cover;background-position:center;filter:blur(18px) brightness(.6)}
+.ag-bg{position:absolute;inset:-4% 0;background-size:100% 100%;-webkit-mask-image:linear-gradient(transparent,#000 9%,#000 91%,transparent);mask-image:linear-gradient(transparent,#000 9%,#000 91%,transparent)}
+.ag-scene{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);aspect-ratio:1328/1552;width:min(100%,calc(100vh * 1328 / 1552));overflow:visible}
+.ag-root.ag-in .ag-scene{width:min(100%,calc(var(--ag-h) * 1328 / 1552))}
+.ag-ff{position:absolute;width:5px;height:5px;margin:-2.5px;border-radius:50%;background:#ffd76a;box-shadow:0 0 6px 2px rgba(255,200,80,.75);opacity:0;pointer-events:none}
+.ag-icon{position:absolute;transform:translate(-50%,-50%);pointer-events:none;transition:filter .2s}
+.ag-icon img,.ag-icon svg{display:block;width:100%;height:auto}
+.ag-brain{left:50.3%;top:11.6%;width:18%;filter:drop-shadow(0 0 10px rgba(255,140,190,.45)) drop-shadow(0 4px 4px rgba(0,0,0,.5))}
+.ag-q{top:16.1%;width:10.5%;filter:drop-shadow(0 0 10px rgba(170,90,255,.55)) drop-shadow(0 4px 4px rgba(0,0,0,.5))}
+.ag-qL{left:13.6%}.ag-qR{left:87.5%}
+/* v2 multi mode: a side brain stands exactly where that side's ? stands (same brain look as .ag-brain) */
+.ag-brain.ag-brainL{left:13.6%;top:16.1%}.ag-brain.ag-brainR{left:87.5%;top:16.1%}
+.ag-icon.ag-pick{animation:ag-pulse .45s ease-in-out 3}
+.ag-brain.ag-pick{filter:drop-shadow(0 0 18px #fff3a0) drop-shadow(0 0 34px rgba(255,180,220,.95))}
+.ag-q.ag-pick{filter:drop-shadow(0 0 16px #fff3a0) drop-shadow(0 0 30px rgba(190,120,255,.95))}
+@keyframes ag-pulse{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.18)}}
+.ag-arrow{position:absolute;left:49.7%;top:57.5%;width:12.5%;height:26%;transform-origin:50% 100%;transform:translate(-50%,-100%) rotate(0deg);pointer-events:none;filter:drop-shadow(0 0 12px rgba(255,205,70,.45)) drop-shadow(0 6px 6px rgba(0,0,0,.55))}
+.ag-arrow svg{display:block;width:100%;height:100%}
+.ag-ant{position:absolute;left:51.5%;bottom:3.5%;width:35%;transform:translateX(-50%);transform-origin:50% 100%;pointer-events:none;animation:ag-sway 2.6s ease-in-out infinite;filter:drop-shadow(0 6px 6px rgba(0,0,0,.6))}
+.ag-ant img{display:block;width:100%;height:auto}
+@keyframes ag-sway{0%,100%{transform:translateX(-50%) rotate(-1.6deg) scaleY(1)}50%{transform:translateX(-50%) rotate(1.6deg) scaleY(.985)}}
+.ag-fx{position:absolute;inset:0;pointer-events:none;z-index:5}
+.ag-pop{position:absolute;transform:translate(-50%,-50%);will-change:transform,left,top,opacity;filter:drop-shadow(0 0 14px rgba(255,190,225,.8)) drop-shadow(0 4px 4px rgba(0,0,0,.5))}
+.ag-pop img{display:block;width:100%;height:auto}
+.ag-cap{position:absolute;left:0;right:0;text-align:center;color:#fff;font:700 23px/1 'Trebuchet MS','Segoe UI',Arial,sans-serif;text-shadow:0 1px 2px rgba(0,0,0,.85);opacity:0;transform:translateY(-50%);white-space:nowrap}

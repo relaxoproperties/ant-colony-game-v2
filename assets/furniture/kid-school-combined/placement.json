@@ -1,0 +1,2520 @@
+{
+ "what": "Kids School combined furniture set (Chris picked both concept options, 12:20 PM ET). Preview only: no game build, no publish.",
+ "created": "2026-11-13 (ET)",
+ "chris_words": [
+  "12:20 PM ET: Chris picked both (circle-time option A and little-desks option B) to be combined in one room.",
+  "Kid height CONFIRMED by Chris at 50% of Albert = 65 px."
+ ],
+ "GENERATED": "ALL furniture art is GENERATED (image generator, style-referenced to the Royal/nursery/school pieces), cut to transparency from white. Nothing of Chris's was redrawn. The seed cushions in this set are NEW generated art (2026-11-13), replacing the concept A cushions that read as macarons. Other pieces are the concept A/B cuts at the same Royal-set scale, except the two fixes noted below.",
+ "source_concept": {
+  "folder": "/workspace/ant-colony/furniture/concepts/kid-school/",
+  "note": "read-only; not modified."
+ },
+ "fixes": {
+  "cushions": "Concept A cushions were puffy discs that looked like macarons. They were replaced with new generated seed-shaped floor cushions in the same coral/yellow/mint palette, flatter, with a small leaf tab, viewed from a slight 3/4 overhead angle. Six cushions, rotated and some mirrored so they do not look stamped. Flagged GENERATED.",
+  "counting_frame": "Concept B had five berries on every rod. Berries were removed at the high-res cut (no freehand repaint of the frame) to leave counts 1, 2, 3, 4, 5 from top to bottom. The right cap of the last kept berry was copied from the original rightmost berry so the rod exits cleanly; the opened rod was filled from the existing empty-rod texture.",
+  "leaf_mat": "Concept B had squashed the leaf mat to 55% height to force a floor view, which flattened the veins unnaturally. This set uses the same cut at width 105 with no y-squash (105x43), so the leaf lies on the floor at its natural aspect."
+ },
+ "omitted_pieces": "None of the requested pieces were omitted. Both cubbies (A twig shelf and B hollow log) fit without crowding or overlap. All 6 seed cushions and all 6 desks are included.",
+ "layout": "Two clearly separate zones on v13 cell (1,0), with an open walkway between them. LEFT / mid-left: circle-time \u2014 petal rug with 6 seed cushions in a U open toward the back, leaf counting board behind the opening, twig cubby shelf at the back. RIGHT: little-desk classroom \u2014 two rows of three desks with stools facing the teacher leaf mat at the head of the rows, berry counting frame to the left of the teacher, hollow-log cubby on the right. Pixel overlap of furniture (alpha>127) is zero. All feet / mat centres are on the green floor hex.",
+ "canvas": [
+  1080,
+  1680
+ ],
+ "template": {
+  "name": "LOCKED 3-D hex template (green floor, yellow walls, red ceiling)",
+  "lock": "/workspace/kit/approved/NOTE-entrance-room-hex-LOCKED-2026-11-07.json",
+  "outline_overlay": "/workspace/builder-opening/shots/hex-3d-outline-color.jpg",
+  "outline_overlay_md5": "6e299814ac5b4c5bc595ac6a2117ecb0",
+  "dst_floor_green": [
+   [
+    342.2575,
+    733
+   ],
+   [
+    737.7425,
+    733
+   ],
+   [
+    935.4849,
+    1075.5
+   ],
+   [
+    737.7425,
+    1418
+   ],
+   [
+    342.2575,
+    1418
+   ],
+   [
+    144.5151,
+    1075.5
+   ]
+  ],
+  "floor_wall_back_line_y": 733,
+  "floor_hex_width_px": 790.9698687897874,
+  "CX": 540,
+  "CY_GREEN": 1075.5,
+  "CY_RED": 602.5
+ },
+ "world_scale": {
+  "in_game_hex_width_px": 791,
+  "template_to_791": 1.0000380940050961,
+  "ROOM_SCALE_world_per_px": 0.17302387549421078,
+  "source": "notes-pass-5-fix3/index.html HEX.w 136.8566720971564 / 790.9698687897874; same as Royal chamber set v1"
+ },
+ "v13": {
+  "file": "/workspace/ant-colony/big-chamber/v13-noants-2026-11-13/big-chamber-v13-noants-clean.jpg",
+  "md5": "cd5119a00eff77bbe32096706955b667",
+  "cell": [
+   1,
+   0
+  ],
+  "paste_topleft_on_v13": [
+   3652,
+   1410
+  ],
+  "cell_centre_on_v13": [
+   4192.25,
+   2485.3030471967454
+  ],
+  "zoom_crop_xyxy": [
+   3202,
+   1455,
+   5182,
+   2985
+  ],
+  "method": "same as nursery-v4 / playground-A / the kid-school concepts: setlib.preview pastes the 1080x1680 furniture layer at v13 cell (1,0) topleft"
+ },
+ "kid_height_px": 65,
+ "kid_height_note": "CONFIRMED by Chris: 50% of Albert 130 px = 65 px. Kids in the with-kids preview are the locked Albert idle frame 0, scaled at draw time to 65/287, not redrawn. Standing pose (no sitting art). Feet on the seat / stool points.",
+ "ants": {
+  "queen": {
+   "how": "Royal check render: queen_idle_front_strip_v1 frame 0, QS 0.7121334648300934, anchor (200,395), visible about 103x143, STANDING, at the front of the room for scale",
+   "feet_template": [
+    430,
+    1335
+   ],
+   "feet_v13_cell_1_0": [
+    4082,
+    2745
+   ],
+   "bbox_on_scale_check": [
+    372,
+    1196,
+    475,
+    1339
+   ]
+  },
+  "albert_teacher": {
+   "how": "locked idle frame 0 (antlib _base-v2 ant-idle_00.png = cutout of LOCKED-WALKS-2026-11-09/idle-facing-camera GIF), 130 px tall, anchor (135,334), standing on the teacher leaf mat. Never the round scout sheets.",
+   "feet_template": [
+    730.5,
+    1007.5
+   ],
+   "feet_v13_cell_1_0": [
+    4382.5,
+    2417.5
+   ],
+   "bbox_on_scale_check": [
+    685,
+    880,
+    776,
+    1007
+   ],
+   "scale": 0.4529616724738676
+  }
+ },
+ "scale_check": {
+  "albert": {
+   "height_px": 130,
+   "scale": 0.4529616724738676,
+   "sprite": "locked idle frame 0",
+   "feet": [
+    730.5,
+    1007.5
+   ],
+   "bbox": [
+    685,
+    880,
+    776,
+    1007
+   ],
+   "role": "teacher, standing on the leaf mat"
+  },
+  "queen": {
+   "canonical_width_px": 198.6,
+   "canonical_note": "198.6 = QUEEN_DOWN_W 27.4867 world x1.25 / ROOM_SCALE. Visible body about 103x143. Rendered the same way as Royal set v1 (QS 0.7121334648300934, anchor (200,395)).",
+   "room_px_per_queen_px": 0.7121334648300934,
+   "sprite": "/workspace/notes-pass-5-fix3/assets/queen/queen_idle_front_strip_v1.png",
+   "sprite_md5": "551e7661af78d596e8a53017459d6193",
+   "feet": [
+    430,
+    1335
+   ],
+   "bbox": [
+    372,
+    1196,
+    475,
+    1339
+   ]
+  }
+ },
+ "teacher_spot": {
+  "template": [
+   730.5,
+   1007.5
+  ],
+  "v13_cell_1_0": [
+   4382.5,
+   2417.5
+  ],
+  "zoom_crop": [
+   1180.5,
+   962.5
+  ]
+ },
+ "draw_order_note": "For each piece, draw its shadow (if any) at shadow.topleft, then the piece at topleft_in_1080x1680. Order is draw_order: flat mats (leaf-mat, petal-rug) first, then standing pieces back-to-front by foot y.",
+ "overlap_check": "Furniture pixels with alpha>127 were checked pairwise; overlap is zero.",
+ "outputs": {
+  "kid-school-combined-furniture.png": {
+   "md5": "b8b16462e92f18f8f28432eb8a2f43fe",
+   "size": [
+    1080,
+    1680
+   ]
+  },
+  "kid-school-combined-furniture-programming.png": {
+   "md5": "76bfdcaabe02d3405df87ae48b32d5a0",
+   "size": [
+    1080,
+    1680
+   ]
+  },
+  "kid-school-combined-furniture-programming-view.jpg": {
+   "md5": "80d7a404ef6bc062627c1eee6191669f",
+   "size": [
+    1080,
+    1680
+   ]
+  },
+  "kid-school-combined-furniture-scale-check.jpg": {
+   "md5": "914c5a65ed39eb05b7c05b1096712fcb",
+   "size": [
+    1080,
+    1680
+   ]
+  }
+ },
+ "pieces": [
+  {
+   "name": "leaf-mat",
+   "draw_order": 0,
+   "file": "kid-school-combined-leaf-mat.png",
+   "md5": "876a06612eff25ba21e94c57c5db9ca2",
+   "from_option": "B (unsquashed; natural aspect, no 55% y-squash)",
+   "png_size": [
+    105,
+    43
+   ],
+   "topleft_in_1080x1680": [
+    678,
+    986
+   ],
+   "png_box_xyxy": [
+    678,
+    986,
+    783,
+    1029
+   ],
+   "visible_bbox_xyxy": [
+    678,
+    986,
+    783,
+    1029
+   ],
+   "visible_size": [
+    105,
+    43
+   ],
+   "visible_size_world": [
+    18.1675,
+    7.44
+   ],
+   "height_ratio_to_albert_130": 0.331,
+   "height_ratio_to_kid_65": 0.662,
+   "foot_bottom_centre": null,
+   "foot_offsets": null,
+   "flat_on_floor": true,
+   "mirrored": false,
+   "anchors": {
+    "teacher_spot": [
+     730.5,
+     1007.5
+    ]
+   },
+   "shadow": "none (flat floor mat / rug)",
+   "floor_contains_foot_or_centre": true,
+   "anchors_with_spaces": {
+    "teacher_spot": {
+     "template": [
+      730.5,
+      1007.5
+     ],
+     "v13_cell_1_0": [
+      4382.5,
+      2417.5
+     ],
+     "zoom_crop": [
+      1180.5,
+      962.5
+     ]
+    }
+   }
+  },
+  {
+   "name": "petal-rug",
+   "draw_order": 1,
+   "file": "kid-school-combined-petal-rug.png",
+   "md5": "2ebf380af40d663c3310dd2b238679c5",
+   "from_option": "A",
+   "png_size": [
+    125,
+    62
+   ],
+   "topleft_in_1080x1680": [
+    322,
+    1004
+   ],
+   "png_box_xyxy": [
+    322,
+    1004,
+    447,
+    1066
+   ],
+   "visible_bbox_xyxy": [
+    322,
+    1004,
+    447,
+    1066
+   ],
+   "visible_size": [
+    125,
+    62
+   ],
+   "visible_size_world": [
+    21.628,
+    10.7275
+   ],
+   "height_ratio_to_albert_130": 0.477,
+   "height_ratio_to_kid_65": 0.954,
+   "foot_bottom_centre": null,
+   "foot_offsets": null,
+   "flat_on_floor": true,
+   "mirrored": false,
+   "anchors": {
+    "centre": [
+     384.5,
+     1035.0
+    ]
+   },
+   "shadow": "none (flat floor mat / rug)",
+   "floor_contains_foot_or_centre": true,
+   "anchors_with_spaces": {
+    "centre": {
+     "template": [
+      384.5,
+      1035.0
+     ],
+     "v13_cell_1_0": [
+      4036.5,
+      2445.0
+     ],
+     "zoom_crop": [
+      834.5,
+      990.0
+     ]
+    }
+   }
+  },
+  {
+   "name": "cubby-shelf-twig",
+   "draw_order": 2,
+   "file": "kid-school-combined-cubby-shelf-twig.png",
+   "md5": "c8827f4e39e27bac51ff565ce099fedb",
+   "from_option": "A",
+   "png_size": [
+    150,
+    86
+   ],
+   "topleft_in_1080x1680": [
+    425,
+    764
+   ],
+   "png_box_xyxy": [
+    425,
+    764,
+    575,
+    850
+   ],
+   "visible_bbox_xyxy": [
+    425,
+    764,
+    575,
+    850
+   ],
+   "visible_size": [
+    150,
+    86
+   ],
+   "visible_size_world": [
+    25.9536,
+    14.8801
+   ],
+   "height_ratio_to_albert_130": 0.662,
+   "height_ratio_to_kid_65": 1.323,
+   "foot_bottom_centre": [
+    500.0,
+    850
+   ],
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -40.0,
+      -225.5
+     ],
+     "world": [
+      -6.921,
+      -39.0169
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.05057,
+      -0.28509
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -40.0,
+      247.5
+     ],
+     "world": [
+      -6.921,
+      42.8234
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.05057,
+      0.31291
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2805.079,
+     5042.323
+    ]
+   },
+   "flat_on_floor": false,
+   "mirrored": false,
+   "anchors": {
+    "kid_reach_spot_front_centre": [
+     499.9,
+     850.0
+    ]
+   },
+   "shadow": {
+    "file": "kid-school-combined-cubby-shelf-twig-shadow.png",
+    "md5": "f0d00b39904d6a75a05bba0c5d57bd7f",
+    "topleft": [
+     419,
+     813
+    ],
+    "size": [
+     163,
+     64
+    ],
+    "how": "soft contact ellipse under the visible base"
+   },
+   "floor_contains_foot_or_centre": true,
+   "foot_v13_cell_1_0": [
+    4152.0,
+    2260
+   ],
+   "anchors_with_spaces": {
+    "kid_reach_spot_front_centre": {
+     "template": [
+      499.9,
+      850.0
+     ],
+     "v13_cell_1_0": [
+      4151.9,
+      2260.0
+     ],
+     "zoom_crop": [
+      949.9,
+      805.0
+     ]
+    }
+   }
+  },
+  {
+   "name": "counting-board-leaf-easel",
+   "draw_order": 3,
+   "file": "kid-school-combined-counting-board-leaf-easel.png",
+   "md5": "a5de3abb8c5ad3c414d64b8ac0f65311",
+   "from_option": "A",
+   "png_size": [
+    61,
+    105
+   ],
+   "topleft_in_1080x1680": [
+    354,
+    795
+   ],
+   "png_box_xyxy": [
+    354,
+    795,
+    415,
+    900
+   ],
+   "visible_bbox_xyxy": [
+    354,
+    795,
+    415,
+    900
+   ],
+   "visible_size": [
+    61,
+    105
+   ],
+   "visible_size_world": [
+    10.5545,
+    18.1675
+   ],
+   "height_ratio_to_albert_130": 0.808,
+   "height_ratio_to_kid_65": 1.615,
+   "foot_bottom_centre": [
+    384.5,
+    900
+   ],
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -155.5,
+      -175.5
+     ],
+     "world": [
+      -26.9052,
+      -30.3657
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.19659,
+      -0.22188
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -155.5,
+      297.5
+     ],
+     "world": [
+      -26.9052,
+      51.4746
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.19659,
+      0.37612
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2785.095,
+     5050.975
+    ]
+   },
+   "flat_on_floor": false,
+   "mirrored": false,
+   "anchors": {
+    "board_centre": [
+     384.5,
+     831.6
+    ]
+   },
+   "shadow": {
+    "file": "kid-school-combined-counting-board-leaf-easel-shadow.png",
+    "md5": "9ffbd866ef5f08570262f5dc1127c7e9",
+    "topleft": [
+     351,
+     885
+    ],
+    "size": [
+     67,
+     26
+    ],
+    "how": "soft contact ellipse under the visible base"
+   },
+   "floor_contains_foot_or_centre": true,
+   "foot_v13_cell_1_0": [
+    4036.5,
+    2310
+   ],
+   "anchors_with_spaces": {
+    "board_centre": {
+     "template": [
+      384.5,
+      831.6
+     ],
+     "v13_cell_1_0": [
+      4036.5,
+      2241.6
+     ],
+     "zoom_crop": [
+      834.5,
+      786.6
+     ]
+    }
+   }
+  },
+  {
+   "name": "counting-frame-berry-abacus",
+   "draw_order": 4,
+   "file": "kid-school-combined-counting-frame-berry-abacus.png",
+   "md5": "555c40598375da4bb36f85008c2adbcb",
+   "from_option": "B (berries edited to 1,2,3,4,5 on the five rods; frame pixels otherwise from B)",
+   "png_size": [
+    86,
+    100
+   ],
+   "topleft_in_1080x1680": [
+    612,
+    820
+   ],
+   "png_box_xyxy": [
+    612,
+    820,
+    698,
+    920
+   ],
+   "visible_bbox_xyxy": [
+    612,
+    820,
+    698,
+    920
+   ],
+   "visible_size": [
+    86,
+    100
+   ],
+   "visible_size_world": [
+    14.8801,
+    17.3024
+   ],
+   "height_ratio_to_albert_130": 0.769,
+   "height_ratio_to_kid_65": 1.538,
+   "foot_bottom_centre": [
+    655.0,
+    920
+   ],
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      115.0,
+      -155.5
+     ],
+     "world": [
+      19.8977,
+      -26.9052
+     ],
+     "frac_of_hex_width_790.97": [
+      0.14539,
+      -0.19659
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      115.0,
+      317.5
+     ],
+     "world": [
+      19.8977,
+      54.9351
+     ],
+     "frac_of_hex_width_790.97": [
+      0.14539,
+      0.40141
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2831.898,
+     5054.435
+    ]
+   },
+   "flat_on_floor": false,
+   "mirrored": false,
+   "anchors": {
+    "frame_centre": [
+     655.0,
+     857.4
+    ]
+   },
+   "shadow": {
+    "file": "kid-school-combined-counting-frame-berry-abacus-shadow.png",
+    "md5": "b23bdf57f3abf2b0d1b3e4e4ac2e7523",
+    "topleft": [
+     608,
+     898
+    ],
+    "size": [
+     94,
+     38
+    ],
+    "how": "soft contact ellipse under the visible base"
+   },
+   "floor_contains_foot_or_centre": true,
+   "foot_v13_cell_1_0": [
+    4307.0,
+    2330
+   ],
+   "anchors_with_spaces": {
+    "frame_centre": {
+     "template": [
+      655.0,
+      857.4
+     ],
+     "v13_cell_1_0": [
+      4307.0,
+      2267.4
+     ],
+     "zoom_crop": [
+      1105.0,
+      812.4
+     ]
+    }
+   }
+  },
+  {
+   "name": "cubby-log",
+   "draw_order": 5,
+   "file": "kid-school-combined-cubby-log.png",
+   "md5": "fdd90fd5dd6b22b1c8d53c72f7e2b413",
+   "from_option": "B",
+   "png_size": [
+    112,
+    82
+   ],
+   "topleft_in_1080x1680": [
+    794,
+    916
+   ],
+   "png_box_xyxy": [
+    794,
+    916,
+    906,
+    998
+   ],
+   "visible_bbox_xyxy": [
+    794,
+    916,
+    906,
+    998
+   ],
+   "visible_size": [
+    112,
+    82
+   ],
+   "visible_size_world": [
+    19.3787,
+    14.188
+   ],
+   "height_ratio_to_albert_130": 0.631,
+   "height_ratio_to_kid_65": 1.262,
+   "foot_bottom_centre": [
+    850.0,
+    998
+   ],
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      310.0,
+      -77.5
+     ],
+     "world": [
+      53.6374,
+      -13.4094
+     ],
+     "frac_of_hex_width_790.97": [
+      0.39192,
+      -0.09798
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      310.0,
+      395.5
+     ],
+     "world": [
+      53.6374,
+      68.4309
+     ],
+     "frac_of_hex_width_790.97": [
+      0.39192,
+      0.50002
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2865.637,
+     5067.931
+    ]
+   },
+   "flat_on_floor": false,
+   "mirrored": false,
+   "anchors": {
+    "kid_reach_spot_front_centre": [
+     854.5,
+     998.2
+    ]
+   },
+   "shadow": {
+    "file": "kid-school-combined-cubby-log-shadow.png",
+    "md5": "116135a0a57576ab09baf4bd8458c46a",
+    "topleft": [
+     788,
+     970
+    ],
+    "size": [
+     124,
+     48
+    ],
+    "how": "soft contact ellipse under the visible base"
+   },
+   "floor_contains_foot_or_centre": true,
+   "foot_v13_cell_1_0": [
+    4502.0,
+    2408
+   ],
+   "anchors_with_spaces": {
+    "kid_reach_spot_front_centre": {
+     "template": [
+      854.5,
+      998.2
+     ],
+     "v13_cell_1_0": [
+      4506.5,
+      2408.2
+     ],
+     "zoom_crop": [
+      1304.5,
+      953.2
+     ]
+    }
+   }
+  },
+  {
+   "name": "seed-cushion-1-pink",
+   "draw_order": 6,
+   "file": "kid-school-combined-seed-cushion-1-pink.png",
+   "md5": "d8783333e847a86b781a551866b8cd8a",
+   "from_option": "A (new flatter generated seed-cushion art, same coral/yellow/mint palette)",
+   "png_size": [
+    51,
+    54
+   ],
+   "topleft_in_1080x1680": [
+    237,
+    982
+   ],
+   "png_box_xyxy": [
+    237,
+    982,
+    288,
+    1036
+   ],
+   "visible_bbox_xyxy": [
+    238,
+    982,
+    287,
+    1035
+   ],
+   "visible_size": [
+    49,
+    53
+   ],
+   "visible_size_world": [
+    8.4782,
+    9.1703
+   ],
+   "height_ratio_to_albert_130": 0.408,
+   "height_ratio_to_kid_65": 0.815,
+   "foot_bottom_centre": [
+    262.5,
+    1035
+   ],
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -277.5,
+      -40.5
+     ],
+     "world": [
+      -48.0141,
+      -7.0075
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.35084,
+      -0.0512
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -277.5,
+      432.5
+     ],
+     "world": [
+      -48.0141,
+      74.8328
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.35084,
+      0.5468
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2763.986,
+     5074.333
+    ]
+   },
+   "flat_on_floor": false,
+   "mirrored": false,
+   "anchors": {
+    "seat": [
+     262.5,
+     1008.5
+    ]
+   },
+   "shadow": {
+    "file": "kid-school-combined-seed-cushion-1-pink-shadow.png",
+    "md5": "7e21358dc77ad314e0a65842138a7302",
+    "topleft": [
+     234,
+     1022
+    ],
+    "size": [
+     57,
+     23
+    ],
+    "how": "soft contact ellipse under the visible base"
+   },
+   "floor_contains_foot_or_centre": true,
+   "rotation_deg": -20,
+   "GENERATED": "new flatter seed-cushion art, generated 2026-11-13, style-referenced to Royal/nursery/school and the kid-school desk and petal rug; cut from white. Replaces the concept A macaron-like cushions.",
+   "foot_v13_cell_1_0": [
+    3914.5,
+    2445
+   ],
+   "anchors_with_spaces": {
+    "seat": {
+     "template": [
+      262.5,
+      1008.5
+     ],
+     "v13_cell_1_0": [
+      3914.5,
+      2418.5
+     ],
+     "zoom_crop": [
+      712.5,
+      963.5
+     ]
+    }
+   }
+  },
+  {
+   "name": "seed-cushion-6-mint",
+   "draw_order": 7,
+   "file": "kid-school-combined-seed-cushion-6-mint.png",
+   "md5": "7390e99e174ecb40ae5cf80aa44d9943",
+   "from_option": "A (new flatter generated seed-cushion art, same coral/yellow/mint palette)",
+   "png_size": [
+    53,
+    54
+   ],
+   "topleft_in_1080x1680": [
+    481,
+    982
+   ],
+   "png_box_xyxy": [
+    481,
+    982,
+    534,
+    1036
+   ],
+   "visible_bbox_xyxy": [
+    482,
+    983,
+    533,
+    1035
+   ],
+   "visible_size": [
+    51,
+    52
+   ],
+   "visible_size_world": [
+    8.8242,
+    8.9972
+   ],
+   "height_ratio_to_albert_130": 0.4,
+   "height_ratio_to_kid_65": 0.8,
+   "foot_bottom_centre": [
+    507.5,
+    1035
+   ],
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -32.5,
+      -40.5
+     ],
+     "world": [
+      -5.6233,
+      -7.0075
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.04109,
+      -0.0512
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -32.5,
+      432.5
+     ],
+     "world": [
+      -5.6233,
+      74.8328
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.04109,
+      0.5468
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2806.377,
+     5074.333
+    ]
+   },
+   "flat_on_floor": false,
+   "mirrored": true,
+   "anchors": {
+    "seat": [
+     507.5,
+     1009.0
+    ]
+   },
+   "shadow": {
+    "file": "kid-school-combined-seed-cushion-6-mint-shadow.png",
+    "md5": "670239a2c16e8ed8e1738f56aa21de05",
+    "topleft": [
+     479,
+     1022
+    ],
+    "size": [
+     57,
+     23
+    ],
+    "how": "soft contact ellipse under the visible base"
+   },
+   "floor_contains_foot_or_centre": true,
+   "rotation_deg": 20,
+   "GENERATED": "new flatter seed-cushion art, generated 2026-11-13, style-referenced to Royal/nursery/school and the kid-school desk and petal rug; cut from white. Replaces the concept A macaron-like cushions.",
+   "foot_v13_cell_1_0": [
+    4159.5,
+    2445
+   ],
+   "anchors_with_spaces": {
+    "seat": {
+     "template": [
+      507.5,
+      1009.0
+     ],
+     "v13_cell_1_0": [
+      4159.5,
+      2419.0
+     ],
+     "zoom_crop": [
+      957.5,
+      964.0
+     ]
+    }
+   }
+  },
+  {
+   "name": "seed-cushion-2-yellow",
+   "draw_order": 8,
+   "file": "kid-school-combined-seed-cushion-2-yellow.png",
+   "md5": "5a08a8ae6de0d28c2005c3cdedee3773",
+   "from_option": "A (new flatter generated seed-cushion art, same coral/yellow/mint palette)",
+   "png_size": [
+    60,
+    40
+   ],
+   "topleft_in_1080x1680": [
+    267,
+    1048
+   ],
+   "png_box_xyxy": [
+    267,
+    1048,
+    327,
+    1088
+   ],
+   "visible_bbox_xyxy": [
+    267,
+    1049,
+    326,
+    1088
+   ],
+   "visible_size": [
+    59,
+    39
+   ],
+   "visible_size_world": [
+    10.2084,
+    6.7479
+   ],
+   "height_ratio_to_albert_130": 0.3,
+   "height_ratio_to_kid_65": 0.6,
+   "foot_bottom_centre": [
+    296.5,
+    1088
+   ],
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -243.5,
+      12.5
+     ],
+     "world": [
+      -42.1313,
+      2.1628
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.30785,
+      0.0158
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -243.5,
+      485.5
+     ],
+     "world": [
+      -42.1313,
+      84.0031
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.30785,
+      0.6138
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2769.869,
+     5083.503
+    ]
+   },
+   "flat_on_floor": false,
+   "mirrored": false,
+   "anchors": {
+    "seat": [
+     296.5,
+     1068.5
+    ]
+   },
+   "shadow": {
+    "file": "kid-school-combined-seed-cushion-2-yellow-shadow.png",
+    "md5": "b312f981631c29db82b8d7da7027c50e",
+    "topleft": [
+     264,
+     1073
+    ],
+    "size": [
+     65,
+     26
+    ],
+    "how": "soft contact ellipse under the visible base"
+   },
+   "floor_contains_foot_or_centre": true,
+   "rotation_deg": 10,
+   "GENERATED": "new flatter seed-cushion art, generated 2026-11-13, style-referenced to Royal/nursery/school and the kid-school desk and petal rug; cut from white. Replaces the concept A macaron-like cushions.",
+   "foot_v13_cell_1_0": [
+    3948.5,
+    2498
+   ],
+   "anchors_with_spaces": {
+    "seat": {
+     "template": [
+      296.5,
+      1068.5
+     ],
+     "v13_cell_1_0": [
+      3948.5,
+      2478.5
+     ],
+     "zoom_crop": [
+      746.5,
+      1023.5
+     ]
+    }
+   }
+  },
+  {
+   "name": "seed-cushion-5-yellow",
+   "draw_order": 9,
+   "file": "kid-school-combined-seed-cushion-5-yellow.png",
+   "md5": "0aa5e30fabd70290690734f5ab6dc97e",
+   "from_option": "A (new flatter generated seed-cushion art, same coral/yellow/mint palette)",
+   "png_size": [
+    60,
+    40
+   ],
+   "topleft_in_1080x1680": [
+    443,
+    1048
+   ],
+   "png_box_xyxy": [
+    443,
+    1048,
+    503,
+    1088
+   ],
+   "visible_bbox_xyxy": [
+    444,
+    1049,
+    503,
+    1088
+   ],
+   "visible_size": [
+    59,
+    39
+   ],
+   "visible_size_world": [
+    10.2084,
+    6.7479
+   ],
+   "height_ratio_to_albert_130": 0.3,
+   "height_ratio_to_kid_65": 0.6,
+   "foot_bottom_centre": [
+    473.5,
+    1088
+   ],
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -66.5,
+      12.5
+     ],
+     "world": [
+      -11.5061,
+      2.1628
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.08407,
+      0.0158
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -66.5,
+      485.5
+     ],
+     "world": [
+      -11.5061,
+      84.0031
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.08407,
+      0.6138
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2800.494,
+     5083.503
+    ]
+   },
+   "flat_on_floor": false,
+   "mirrored": true,
+   "anchors": {
+    "seat": [
+     473.5,
+     1068.5
+    ]
+   },
+   "shadow": {
+    "file": "kid-school-combined-seed-cushion-5-yellow-shadow.png",
+    "md5": "b312f981631c29db82b8d7da7027c50e",
+    "topleft": [
+     441,
+     1073
+    ],
+    "size": [
+     65,
+     26
+    ],
+    "how": "soft contact ellipse under the visible base"
+   },
+   "floor_contains_foot_or_centre": true,
+   "rotation_deg": -10,
+   "GENERATED": "new flatter seed-cushion art, generated 2026-11-13, style-referenced to Royal/nursery/school and the kid-school desk and petal rug; cut from white. Replaces the concept A macaron-like cushions.",
+   "foot_v13_cell_1_0": [
+    4125.5,
+    2498
+   ],
+   "anchors_with_spaces": {
+    "seat": {
+     "template": [
+      473.5,
+      1068.5
+     ],
+     "v13_cell_1_0": [
+      4125.5,
+      2478.5
+     ],
+     "zoom_crop": [
+      923.5,
+      1023.5
+     ]
+    }
+   }
+  },
+  {
+   "name": "seed-cushion-3-mint",
+   "draw_order": 10,
+   "file": "kid-school-combined-seed-cushion-3-mint.png",
+   "md5": "ec115874a2f804e5a8ae16b6846ae4b7",
+   "from_option": "A (new flatter generated seed-cushion art, same coral/yellow/mint palette)",
+   "png_size": [
+    62,
+    41
+   ],
+   "topleft_in_1080x1680": [
+    321,
+    1069
+   ],
+   "png_box_xyxy": [
+    321,
+    1069,
+    383,
+    1110
+   ],
+   "visible_bbox_xyxy": [
+    322,
+    1070,
+    382,
+    1110
+   ],
+   "visible_size": [
+    60,
+    40
+   ],
+   "visible_size_world": [
+    10.3814,
+    6.921
+   ],
+   "height_ratio_to_albert_130": 0.308,
+   "height_ratio_to_kid_65": 0.615,
+   "foot_bottom_centre": [
+    352.0,
+    1110
+   ],
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -188.0,
+      34.5
+     ],
+     "world": [
+      -32.5285,
+      5.9693
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.23768,
+      0.04362
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -188.0,
+      507.5
+     ],
+     "world": [
+      -32.5285,
+      87.8096
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.23768,
+      0.64162
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2779.472,
+     5087.31
+    ]
+   },
+   "flat_on_floor": false,
+   "mirrored": false,
+   "anchors": {
+    "seat": [
+     352.0,
+     1090.0
+    ]
+   },
+   "shadow": {
+    "file": "kid-school-combined-seed-cushion-3-mint-shadow.png",
+    "md5": "c33ea4ac2fc3269a084635c515bf05f1",
+    "topleft": [
+     319,
+     1095
+    ],
+    "size": [
+     66,
+     26
+    ],
+    "how": "soft contact ellipse under the visible base"
+   },
+   "floor_contains_foot_or_centre": true,
+   "rotation_deg": 25,
+   "GENERATED": "new flatter seed-cushion art, generated 2026-11-13, style-referenced to Royal/nursery/school and the kid-school desk and petal rug; cut from white. Replaces the concept A macaron-like cushions.",
+   "foot_v13_cell_1_0": [
+    4004.0,
+    2520
+   ],
+   "anchors_with_spaces": {
+    "seat": {
+     "template": [
+      352.0,
+      1090.0
+     ],
+     "v13_cell_1_0": [
+      4004.0,
+      2500.0
+     ],
+     "zoom_crop": [
+      802.0,
+      1045.0
+     ]
+    }
+   }
+  },
+  {
+   "name": "seed-cushion-4-pink",
+   "draw_order": 11,
+   "file": "kid-school-combined-seed-cushion-4-pink.png",
+   "md5": "27f68a73ea593b4ffb327841e4870748",
+   "from_option": "A (new flatter generated seed-cushion art, same coral/yellow/mint palette)",
+   "png_size": [
+    63,
+    39
+   ],
+   "topleft_in_1080x1680": [
+    386,
+    1072
+   ],
+   "png_box_xyxy": [
+    386,
+    1072,
+    449,
+    1111
+   ],
+   "visible_bbox_xyxy": [
+    387,
+    1073,
+    449,
+    1110
+   ],
+   "visible_size": [
+    62,
+    37
+   ],
+   "visible_size_world": [
+    10.7275,
+    6.4019
+   ],
+   "height_ratio_to_albert_130": 0.285,
+   "height_ratio_to_kid_65": 0.569,
+   "foot_bottom_centre": [
+    418.0,
+    1110
+   ],
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -122.0,
+      34.5
+     ],
+     "world": [
+      -21.1089,
+      5.9693
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.15424,
+      0.04362
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -122.0,
+      507.5
+     ],
+     "world": [
+      -21.1089,
+      87.8096
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.15424,
+      0.64162
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2790.891,
+     5087.31
+    ]
+   },
+   "flat_on_floor": false,
+   "mirrored": true,
+   "anchors": {
+    "seat": [
+     418.0,
+     1091.5
+    ]
+   },
+   "shadow": {
+    "file": "kid-school-combined-seed-cushion-4-pink-shadow.png",
+    "md5": "4375fe102beb4a874fb60fb91750fcac",
+    "topleft": [
+     384,
+     1094
+    ],
+    "size": [
+     68,
+     27
+    ],
+    "how": "soft contact ellipse under the visible base"
+   },
+   "floor_contains_foot_or_centre": true,
+   "rotation_deg": -25,
+   "GENERATED": "new flatter seed-cushion art, generated 2026-11-13, style-referenced to Royal/nursery/school and the kid-school desk and petal rug; cut from white. Replaces the concept A macaron-like cushions.",
+   "foot_v13_cell_1_0": [
+    4070.0,
+    2520
+   ],
+   "anchors_with_spaces": {
+    "seat": {
+     "template": [
+      418.0,
+      1091.5
+     ],
+     "v13_cell_1_0": [
+      4070.0,
+      2501.5
+     ],
+     "zoom_crop": [
+      868.0,
+      1046.5
+     ]
+    }
+   }
+  },
+  {
+   "name": "desk-row1-1",
+   "draw_order": 12,
+   "file": "kid-school-combined-desk-row1-1.png",
+   "md5": "92a068c80a3a03af2abe097a53aee201",
+   "from_option": "B",
+   "png_size": [
+    72,
+    70
+   ],
+   "topleft_in_1080x1680": [
+    589,
+    1040
+   ],
+   "png_box_xyxy": [
+    589,
+    1040,
+    661,
+    1110
+   ],
+   "visible_bbox_xyxy": [
+    589,
+    1040,
+    661,
+    1110
+   ],
+   "visible_size": [
+    72,
+    70
+   ],
+   "visible_size_world": [
+    12.4577,
+    12.1117
+   ],
+   "height_ratio_to_albert_130": 0.538,
+   "height_ratio_to_kid_65": 1.077,
+   "foot_bottom_centre": [
+    625.0,
+    1110
+   ],
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      85.0,
+      34.5
+     ],
+     "world": [
+      14.707,
+      5.9693
+     ],
+     "frac_of_hex_width_790.97": [
+      0.10746,
+      0.04362
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      85.0,
+      507.5
+     ],
+     "world": [
+      14.707,
+      87.8096
+     ],
+     "frac_of_hex_width_790.97": [
+      0.10746,
+      0.64162
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2826.707,
+     5087.31
+    ]
+   },
+   "flat_on_floor": false,
+   "mirrored": false,
+   "anchors": {
+    "stool_seat": [
+     607.2,
+     1086.7
+    ],
+    "desk_top": [
+     616.9,
+     1048.2
+    ]
+   },
+   "shadow": {
+    "file": "kid-school-combined-desk-row1-1-shadow.png",
+    "md5": "ead5769a3f58fc04b999aa4e700c6b51",
+    "topleft": [
+     586,
+     1092
+    ],
+    "size": [
+     78,
+     31
+    ],
+    "how": "soft contact ellipse under the visible base"
+   },
+   "floor_contains_foot_or_centre": true,
+   "foot_v13_cell_1_0": [
+    4277.0,
+    2520
+   ],
+   "anchors_with_spaces": {
+    "stool_seat": {
+     "template": [
+      607.2,
+      1086.7
+     ],
+     "v13_cell_1_0": [
+      4259.2,
+      2496.7
+     ],
+     "zoom_crop": [
+      1057.2,
+      1041.7
+     ]
+    },
+    "desk_top": {
+     "template": [
+      616.9,
+      1048.2
+     ],
+     "v13_cell_1_0": [
+      4268.9,
+      2458.2
+     ],
+     "zoom_crop": [
+      1066.9,
+      1003.2
+     ]
+    }
+   }
+  },
+  {
+   "name": "desk-row1-2",
+   "draw_order": 13,
+   "file": "kid-school-combined-desk-row1-2.png",
+   "md5": "8541f5e33300a33b55ef872a15260586",
+   "from_option": "B",
+   "png_size": [
+    72,
+    70
+   ],
+   "topleft_in_1080x1680": [
+    694,
+    1040
+   ],
+   "png_box_xyxy": [
+    694,
+    1040,
+    766,
+    1110
+   ],
+   "visible_bbox_xyxy": [
+    694,
+    1040,
+    766,
+    1110
+   ],
+   "visible_size": [
+    72,
+    70
+   ],
+   "visible_size_world": [
+    12.4577,
+    12.1117
+   ],
+   "height_ratio_to_albert_130": 0.538,
+   "height_ratio_to_kid_65": 1.077,
+   "foot_bottom_centre": [
+    730.0,
+    1110
+   ],
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      190.0,
+      34.5
+     ],
+     "world": [
+      32.8745,
+      5.9693
+     ],
+     "frac_of_hex_width_790.97": [
+      0.24021,
+      0.04362
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      190.0,
+      507.5
+     ],
+     "world": [
+      32.8745,
+      87.8096
+     ],
+     "frac_of_hex_width_790.97": [
+      0.24021,
+      0.64162
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2844.875,
+     5087.31
+    ]
+   },
+   "flat_on_floor": false,
+   "mirrored": true,
+   "anchors": {
+    "stool_seat": [
+     747.8,
+     1086.7
+    ],
+    "desk_top": [
+     738.1,
+     1048.2
+    ]
+   },
+   "shadow": {
+    "file": "kid-school-combined-desk-row1-2-shadow.png",
+    "md5": "ead5769a3f58fc04b999aa4e700c6b51",
+    "topleft": [
+     691,
+     1092
+    ],
+    "size": [
+     78,
+     31
+    ],
+    "how": "soft contact ellipse under the visible base"
+   },
+   "floor_contains_foot_or_centre": true,
+   "foot_v13_cell_1_0": [
+    4382.0,
+    2520
+   ],
+   "anchors_with_spaces": {
+    "stool_seat": {
+     "template": [
+      747.8,
+      1086.7
+     ],
+     "v13_cell_1_0": [
+      4399.8,
+      2496.7
+     ],
+     "zoom_crop": [
+      1197.8,
+      1041.7
+     ]
+    },
+    "desk_top": {
+     "template": [
+      738.1,
+      1048.2
+     ],
+     "v13_cell_1_0": [
+      4390.1,
+      2458.2
+     ],
+     "zoom_crop": [
+      1188.1,
+      1003.2
+     ]
+    }
+   }
+  },
+  {
+   "name": "desk-row1-3",
+   "draw_order": 14,
+   "file": "kid-school-combined-desk-row1-3.png",
+   "md5": "92a068c80a3a03af2abe097a53aee201",
+   "from_option": "B",
+   "png_size": [
+    72,
+    70
+   ],
+   "topleft_in_1080x1680": [
+    799,
+    1040
+   ],
+   "png_box_xyxy": [
+    799,
+    1040,
+    871,
+    1110
+   ],
+   "visible_bbox_xyxy": [
+    799,
+    1040,
+    871,
+    1110
+   ],
+   "visible_size": [
+    72,
+    70
+   ],
+   "visible_size_world": [
+    12.4577,
+    12.1117
+   ],
+   "height_ratio_to_albert_130": 0.538,
+   "height_ratio_to_kid_65": 1.077,
+   "foot_bottom_centre": [
+    835.0,
+    1110
+   ],
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      295.0,
+      34.5
+     ],
+     "world": [
+      51.042,
+      5.9693
+     ],
+     "frac_of_hex_width_790.97": [
+      0.37296,
+      0.04362
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      295.0,
+      507.5
+     ],
+     "world": [
+      51.042,
+      87.8096
+     ],
+     "frac_of_hex_width_790.97": [
+      0.37296,
+      0.64162
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2863.042,
+     5087.31
+    ]
+   },
+   "flat_on_floor": false,
+   "mirrored": false,
+   "anchors": {
+    "stool_seat": [
+     817.2,
+     1086.7
+    ],
+    "desk_top": [
+     826.9,
+     1048.2
+    ]
+   },
+   "shadow": {
+    "file": "kid-school-combined-desk-row1-3-shadow.png",
+    "md5": "ead5769a3f58fc04b999aa4e700c6b51",
+    "topleft": [
+     796,
+     1092
+    ],
+    "size": [
+     78,
+     31
+    ],
+    "how": "soft contact ellipse under the visible base"
+   },
+   "floor_contains_foot_or_centre": true,
+   "foot_v13_cell_1_0": [
+    4487.0,
+    2520
+   ],
+   "anchors_with_spaces": {
+    "stool_seat": {
+     "template": [
+      817.2,
+      1086.7
+     ],
+     "v13_cell_1_0": [
+      4469.2,
+      2496.7
+     ],
+     "zoom_crop": [
+      1267.2,
+      1041.7
+     ]
+    },
+    "desk_top": {
+     "template": [
+      826.9,
+      1048.2
+     ],
+     "v13_cell_1_0": [
+      4478.9,
+      2458.2
+     ],
+     "zoom_crop": [
+      1276.9,
+      1003.2
+     ]
+    }
+   }
+  },
+  {
+   "name": "desk-row2-1",
+   "draw_order": 15,
+   "file": "kid-school-combined-desk-row2-1.png",
+   "md5": "92a068c80a3a03af2abe097a53aee201",
+   "from_option": "B",
+   "png_size": [
+    72,
+    70
+   ],
+   "topleft_in_1080x1680": [
+    589,
+    1155
+   ],
+   "png_box_xyxy": [
+    589,
+    1155,
+    661,
+    1225
+   ],
+   "visible_bbox_xyxy": [
+    589,
+    1155,
+    661,
+    1225
+   ],
+   "visible_size": [
+    72,
+    70
+   ],
+   "visible_size_world": [
+    12.4577,
+    12.1117
+   ],
+   "height_ratio_to_albert_130": 0.538,
+   "height_ratio_to_kid_65": 1.077,
+   "foot_bottom_centre": [
+    625.0,
+    1225
+   ],
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      85.0,
+      149.5
+     ],
+     "world": [
+      14.707,
+      25.8671
+     ],
+     "frac_of_hex_width_790.97": [
+      0.10746,
+      0.18901
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      85.0,
+      622.5
+     ],
+     "world": [
+      14.707,
+      107.7074
+     ],
+     "frac_of_hex_width_790.97": [
+      0.10746,
+      0.78701
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2826.707,
+     5107.207
+    ]
+   },
+   "flat_on_floor": false,
+   "mirrored": false,
+   "anchors": {
+    "stool_seat": [
+     607.2,
+     1201.7
+    ],
+    "desk_top": [
+     616.9,
+     1163.2
+    ]
+   },
+   "shadow": {
+    "file": "kid-school-combined-desk-row2-1-shadow.png",
+    "md5": "ead5769a3f58fc04b999aa4e700c6b51",
+    "topleft": [
+     586,
+     1207
+    ],
+    "size": [
+     78,
+     31
+    ],
+    "how": "soft contact ellipse under the visible base"
+   },
+   "floor_contains_foot_or_centre": true,
+   "foot_v13_cell_1_0": [
+    4277.0,
+    2635
+   ],
+   "anchors_with_spaces": {
+    "stool_seat": {
+     "template": [
+      607.2,
+      1201.7
+     ],
+     "v13_cell_1_0": [
+      4259.2,
+      2611.7
+     ],
+     "zoom_crop": [
+      1057.2,
+      1156.7
+     ]
+    },
+    "desk_top": {
+     "template": [
+      616.9,
+      1163.2
+     ],
+     "v13_cell_1_0": [
+      4268.9,
+      2573.2
+     ],
+     "zoom_crop": [
+      1066.9,
+      1118.2
+     ]
+    }
+   }
+  },
+  {
+   "name": "desk-row2-2",
+   "draw_order": 16,
+   "file": "kid-school-combined-desk-row2-2.png",
+   "md5": "8541f5e33300a33b55ef872a15260586",
+   "from_option": "B",
+   "png_size": [
+    72,
+    70
+   ],
+   "topleft_in_1080x1680": [
+    694,
+    1155
+   ],
+   "png_box_xyxy": [
+    694,
+    1155,
+    766,
+    1225
+   ],
+   "visible_bbox_xyxy": [
+    694,
+    1155,
+    766,
+    1225
+   ],
+   "visible_size": [
+    72,
+    70
+   ],
+   "visible_size_world": [
+    12.4577,
+    12.1117
+   ],
+   "height_ratio_to_albert_130": 0.538,
+   "height_ratio_to_kid_65": 1.077,
+   "foot_bottom_centre": [
+    730.0,
+    1225
+   ],
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      190.0,
+      149.5
+     ],
+     "world": [
+      32.8745,
+      25.8671
+     ],
+     "frac_of_hex_width_790.97": [
+      0.24021,
+      0.18901
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      190.0,
+      622.5
+     ],
+     "world": [
+      32.8745,
+      107.7074
+     ],
+     "frac_of_hex_width_790.97": [
+      0.24021,
+      0.78701
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2844.875,
+     5107.207
+    ]
+   },
+   "flat_on_floor": false,
+   "mirrored": true,
+   "anchors": {
+    "stool_seat": [
+     747.8,
+     1201.7
+    ],
+    "desk_top": [
+     738.1,
+     1163.2
+    ]
+   },
+   "shadow": {
+    "file": "kid-school-combined-desk-row2-2-shadow.png",
+    "md5": "ead5769a3f58fc04b999aa4e700c6b51",
+    "topleft": [
+     691,
+     1207
+    ],
+    "size": [
+     78,
+     31
+    ],
+    "how": "soft contact ellipse under the visible base"
+   },
+   "floor_contains_foot_or_centre": true,
+   "foot_v13_cell_1_0": [
+    4382.0,
+    2635
+   ],
+   "anchors_with_spaces": {
+    "stool_seat": {
+     "template": [
+      747.8,
+      1201.7
+     ],
+     "v13_cell_1_0": [
+      4399.8,
+      2611.7
+     ],
+     "zoom_crop": [
+      1197.8,
+      1156.7
+     ]
+    },
+    "desk_top": {
+     "template": [
+      738.1,
+      1163.2
+     ],
+     "v13_cell_1_0": [
+      4390.1,
+      2573.2
+     ],
+     "zoom_crop": [
+      1188.1,
+      1118.2
+     ]
+    }
+   }
+  },
+  {
+   "name": "desk-row2-3",
+   "draw_order": 17,
+   "file": "kid-school-combined-desk-row2-3.png",
+   "md5": "92a068c80a3a03af2abe097a53aee201",
+   "from_option": "B",
+   "png_size": [
+    72,
+    70
+   ],
+   "topleft_in_1080x1680": [
+    799,
+    1155
+   ],
+   "png_box_xyxy": [
+    799,
+    1155,
+    871,
+    1225
+   ],
+   "visible_bbox_xyxy": [
+    799,
+    1155,
+    871,
+    1225
+   ],
+   "visible_size": [
+    72,
+    70
+   ],
+   "visible_size_world": [
+    12.4577,
+    12.1117
+   ],
+   "height_ratio_to_albert_130": 0.538,
+   "height_ratio_to_kid_65": 1.077,
+   "foot_bottom_centre": [
+    835.0,
+    1225
+   ],
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      295.0,
+      149.5
+     ],
+     "world": [
+      51.042,
+      25.8671
+     ],
+     "frac_of_hex_width_790.97": [
+      0.37296,
+      0.18901
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      295.0,
+      622.5
+     ],
+     "world": [
+      51.042,
+      107.7074
+     ],
+     "frac_of_hex_width_790.97": [
+      0.37296,
+      0.78701
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2863.042,
+     5107.207
+    ]
+   },
+   "flat_on_floor": false,
+   "mirrored": false,
+   "anchors": {
+    "stool_seat": [
+     817.2,
+     1201.7
+    ],
+    "desk_top": [
+     826.9,
+     1163.2
+    ]
+   },
+   "shadow": {
+    "file": "kid-school-combined-desk-row2-3-shadow.png",
+    "md5": "ead5769a3f58fc04b999aa4e700c6b51",
+    "topleft": [
+     796,
+     1207
+    ],
+    "size": [
+     78,
+     31
+    ],
+    "how": "soft contact ellipse under the visible base"
+   },
+   "floor_contains_foot_or_centre": true,
+   "foot_v13_cell_1_0": [
+    4487.0,
+    2635
+   ],
+   "anchors_with_spaces": {
+    "stool_seat": {
+     "template": [
+      817.2,
+      1201.7
+     ],
+     "v13_cell_1_0": [
+      4469.2,
+      2611.7
+     ],
+     "zoom_crop": [
+      1267.2,
+      1156.7
+     ]
+    },
+    "desk_top": {
+     "template": [
+      826.9,
+      1163.2
+     ],
+     "v13_cell_1_0": [
+      4478.9,
+      2573.2
+     ],
+     "zoom_crop": [
+      1276.9,
+      1118.2
+     ]
+    }
+   }
+  }
+ ],
+ "kids_in_with_kids_preview": [
+  {
+   "on": "seed-cushion-3-mint",
+   "anchor": "seat",
+   "feet_template": [
+    352.0,
+    1090.0
+   ],
+   "feet": {
+    "template": [
+     352.0,
+     1090.0
+    ],
+    "v13_cell_1_0": [
+     4004.0,
+     2500.0
+    ],
+    "zoom_crop": [
+     802.0,
+     1045.0
+    ]
+   }
+  },
+  {
+   "on": "seed-cushion-4-pink",
+   "anchor": "seat",
+   "feet_template": [
+    418.0,
+    1091.5
+   ],
+   "feet": {
+    "template": [
+     418.0,
+     1091.5
+    ],
+    "v13_cell_1_0": [
+     4070.0,
+     2501.5
+    ],
+    "zoom_crop": [
+     868.0,
+     1046.5
+    ]
+   }
+  },
+  {
+   "on": "desk-row1-1",
+   "anchor": "stool_seat",
+   "feet_template": [
+    607.2,
+    1086.7
+   ],
+   "feet": {
+    "template": [
+     607.2,
+     1086.7
+    ],
+    "v13_cell_1_0": [
+     4259.2,
+     2496.7
+    ],
+    "zoom_crop": [
+     1057.2,
+     1041.7
+    ]
+   }
+  },
+  {
+   "on": "desk-row1-3",
+   "anchor": "stool_seat",
+   "feet_template": [
+    817.2,
+    1086.7
+   ],
+   "feet": {
+    "template": [
+     817.2,
+     1086.7
+    ],
+    "v13_cell_1_0": [
+     4469.2,
+     2496.7
+    ],
+    "zoom_crop": [
+     1267.2,
+     1041.7
+    ]
+   }
+  },
+  {
+   "on": "desk-row2-2",
+   "anchor": "stool_seat",
+   "feet_template": [
+    747.8,
+    1201.7
+   ],
+   "feet": {
+    "template": [
+     747.8,
+     1201.7
+    ],
+    "v13_cell_1_0": [
+     4399.8,
+     2611.7
+    ],
+    "zoom_crop": [
+     1197.8,
+     1156.7
+    ]
+   }
+  }
+ ],
+ "previews": {
+  "folder": "/workspace/ant-colony/furniture/previews/",
+  "files": {
+   "kid-school-combined-on-v13-preview-v1-zoom-crop.jpg": {
+    "md5": "5c91c9a65695349378ab5202d542d30f",
+    "zoom_crop_xyxy": [
+     3202,
+     1455,
+     5182,
+     2985
+    ],
+    "paste_topleft_on_v13": [
+     3652,
+     1410
+    ],
+    "cell_centre_on_v13": [
+     4192.25,
+     2485.3030471967454
+    ],
+    "kid_bboxes_v13": []
+   },
+   "kid-school-combined-on-v13-with-kids-preview-v1-zoom-crop.jpg": {
+    "md5": "4a32ac8205ddebca1dd41ed0c578d5c2",
+    "zoom_crop_xyxy": [
+     3202,
+     1455,
+     5182,
+     2985
+    ],
+    "paste_topleft_on_v13": [
+     3652,
+     1410
+    ],
+    "cell_centre_on_v13": [
+     4192.25,
+     2485.3030471967454
+    ],
+    "kid_bboxes_v13": [
+     [
+      3981,
+      2436,
+      4026,
+      2500
+     ],
+     [
+      4047,
+      2438,
+      4092,
+      2502
+     ],
+     [
+      4236,
+      2433,
+      4281,
+      2497
+     ],
+     [
+      4446,
+      2433,
+      4491,
+      2497
+     ],
+     [
+      4377,
+      2548,
+      4422,
+      2612
+     ]
+    ]
+   }
+  },
+  "jpeg": "q98 4:4:4 (quality=98, subsampling=0)"
+ },
+ "clean_floor": "No scattered debris, toy blocks, candles, loose toys, clutter, lettering or numbers. Learning graphics are coloured pebbles and berries only. No painted ants in the furniture art."
+}

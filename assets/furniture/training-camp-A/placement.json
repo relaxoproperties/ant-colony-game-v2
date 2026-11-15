@@ -1,0 +1,1037 @@
+{
+ "what": "Training Camp A production furniture set (Chris picked option A, 12:36 PM ET: \"I like the gym on the left\"). Preview only: not for building-v1, no game build, no publish.",
+ "created": "2026-11-13 (ET)",
+ "GENERATED": "ALL equipment art is GENERATED (image generator, style-referenced to the Royal chamber, nursery and school pieces), cut to transparency from white for the concept. Nothing of Chris's was redrawn; there was nothing of his to cut for a gym. These pieces are cut from the concept A art at the same scale (no rescaling, no redesign).",
+ "source_concept": {
+  "folder": "/workspace/ant-colony/furniture/concepts/training-camp/",
+  "MD5SUMS_md5": "32a7f00e6ab9c48d06fcec21273ddf44",
+  "combined_A_md5": "42652c6beea3ef8257a388b1ef18fb1d",
+  "placement_md5": "98f7695294e71a143ef4e20839ddf15d",
+  "note": "read-only; not modified. Hi-res cuts used for the layer split: /workspace/fx/tc/cut/A-*.png (the same cuts the concept was downscaled from; the concept pieces equal a LANCZOS resize of them, maxdiff 0)."
+ },
+ "canvas": [
+  1080,
+  1680
+ ],
+ "template": {
+  "name": "LOCKED 3-D hex template (green floor, yellow walls, red ceiling)",
+  "lock": "/workspace/kit/approved/NOTE-entrance-room-hex-LOCKED-2026-11-07.json",
+  "outline_overlay": "/workspace/builder-opening/shots/hex-3d-outline-color.jpg",
+  "outline_overlay_md5": "6e299814ac5b4c5bc595ac6a2117ecb0",
+  "dst_floor_green": [
+   [
+    342.2575,
+    733
+   ],
+   [
+    737.7425,
+    733
+   ],
+   [
+    935.4849,
+    1075.5
+   ],
+   [
+    737.7425,
+    1418
+   ],
+   [
+    342.2575,
+    1418
+   ],
+   [
+    144.5151,
+    1075.5
+   ]
+  ],
+  "floor_hex_width_px": 790.9698687897874,
+  "CX": 540,
+  "CY_GREEN": 1075.5,
+  "CY_RED": 602.5
+ },
+ "world_scale": {
+  "in_game_hex_width_px": 791,
+  "template_to_791": 1.0000380940050961,
+  "ROOM_SCALE_world_per_px": 0.17302387549421078
+ },
+ "v13": {
+  "file": "/workspace/ant-colony/big-chamber/v13-noants-2026-11-13/big-chamber-v13-noants-clean.jpg",
+  "md5": "cd5119a00eff77bbe32096706955b667",
+  "cell": [
+   1,
+   0
+  ],
+  "paste_topleft_on_v13": [
+   3652,
+   1410
+  ],
+  "cell_centre_on_v13": [
+   4192.25,
+   2485.3030471967454
+  ],
+  "zoom_crop_xyxy": [
+   3202,
+   1455,
+   5182,
+   2985
+  ],
+  "method": "setlib.preview pastes the 1080x1680 furniture layer at v13 cell (1,0), same as the concept and playground-A"
+ },
+ "ants": {
+  "queen": {
+   "how": "Royal check render: queen_idle_front_strip_v1 frame 0, QS 0.7121334648300934, anchor (200,395), visible about 103x143, STANDING",
+   "feet_template": [
+    770,
+    1300
+   ],
+   "feet_v13_cell_1_0": [
+    4422,
+    2710
+   ],
+   "bbox_on_scale_check": [
+    712,
+    1161,
+    815,
+    1304
+   ]
+  },
+  "albert": {
+   "how": "locked idle frame 0 (/workspace/ant-colony/art/classroom-anims-v1/_base-v2/ant-idle_00.png = cutout of LOCKED-WALKS-2026-11-09/idle-facing-camera, md5 661a608e6e3652e70c884e5f874839a5), 130 px tall (scale 130/287), anchor (135,334). Never the round scout sheets.",
+   "feet_template": [
+    624.4,
+    929.4
+   ],
+   "feet_note": "beside the rack: the concept's stand_spot_left_of_rack, carried over unchanged for the preview (a placement choice from the concept, not a measured point)",
+   "bbox_on_scale_check": [
+    579,
+    802,
+    670,
+    929
+   ]
+  },
+  "extra_alberts_in_with_ants_previews": [
+   {
+    "on": "chin-up-frame-twig",
+    "point": "stand_spot_under_bar",
+    "feet_template": [
+     430.3,
+     889.9
+    ]
+   },
+   {
+    "on": "balance-beam-log",
+    "point": "beam_top_middle",
+    "feet_template": [
+     568.9,
+     1141.4
+    ]
+   }
+  ],
+  "no_action_art": "There is no hang, lift or balance-walk art; every ant in the previews is STANDING (the locked idle frame)."
+ },
+ "draw_order_note": "For each piece in draw_order: its shadow at shadow.topleft, then its layers in layers_in_draw_order (skip the reference full). Pieces back to front by foot y: chin-up frame, barbell rack, mirror, balance beam.",
+ "filled_hidden_areas": {
+  "barbell_frame_back": "where the bar hid the BACK prong of each Y hook, the post was filled by copying/blending the post pixels directly above and below (and continuing from the left in the open gap between the prongs), plus up to 3 px of rack under the bar edges. About 1,100 hi-res px per hook, about 5x5 px at set scale. Hidden at rest; shows only when the barbell is lifted.",
+  "barbell_moving": "where the FRONT prong of each hook hid the bar, the bar was filled by interpolating the bar pixels to the left and right along the bar (same position across the bar). 1,891 hi-res px total, about 5x5 px per hook at set scale. Hidden at rest under frame-front.",
+  "numbers": {
+   "left_back_prong": 1103,
+   "right_back_prong": 1093
+  }
+ },
+ "checks": {
+  "chin-up-frame-twig": {
+   "composite_vs_concept_full_premultiplied_maxdiff": 0.0,
+   "pixels_diff_over_8": 0,
+   "alpha_maxdiff": 0,
+   "alpha_pixels_diff_over_8": 0
+  },
+  "barbell-rack-pebble": {
+   "composite_vs_concept_full_premultiplied_maxdiff": 13.4,
+   "pixels_diff_over_8": 6,
+   "alpha_maxdiff": 26,
+   "alpha_pixels_diff_over_8": 14
+  },
+  "barbell_hires": {
+   "moving_px": 73303,
+   "frame_back_px": 97582,
+   "frame_front_px": 2798,
+   "moving_and_frame_front_overlap_px(filled bar under prongs)": 1891,
+   "moving_and_frame_back_overlap_px(filled rack behind bar)": 2196,
+   "frame_back_and_front_overlap_px": 0,
+   "pixels_outside_original_silhouette": 0
+  },
+  "rack_back_edge_extension_px_hires": 28,
+  "rack_back_filled_px_hires": {
+   "left_back_prong": 1103,
+   "right_back_prong": 1093
+  },
+  "barbell_filled_px_hires_under_front_prongs": 1891,
+  "barbell_hires_reconstruct_vs_cut": {
+   "px_changed": 234,
+   "maxdiff": 117,
+   "alpha_outside_original": 0
+  },
+  "chinup_hires_back_plus_front_vs_cut_maxdiff": 0,
+  "combined_vs_concept_combined": {
+   "pixels_changed": 434,
+   "pixels_diff_over_8": 138,
+   "maxdiff": 255
+  }
+ },
+ "outputs": {
+  "training-camp-A-furniture.png": {
+   "md5": "f6bc9749aaf6b89190f7a21ed28f6919",
+   "size": [
+    1080,
+    1680
+   ]
+  },
+  "training-camp-A-furniture-programming.png": {
+   "md5": "21f35e551b2bb083240bb280c6004727",
+   "size": [
+    1080,
+    1680
+   ]
+  },
+  "training-camp-A-furniture-programming-view.jpg": {
+   "md5": "e2770dd58cf8608b4280cf1ced8f626f",
+   "size": [
+    1080,
+    1680
+   ]
+  },
+  "training-camp-A-furniture-scale-check.jpg": {
+   "md5": "03f775af0834b7e5917ceef8528defd9",
+   "size": [
+    1080,
+    1680
+   ]
+  }
+ },
+ "pieces": [
+  {
+   "name": "chin-up-frame-twig",
+   "draw_order": 0,
+   "topleft_in_1080x1680": [
+    338,
+    702
+   ],
+   "png_size": [
+    185,
+    203
+   ],
+   "visible_bbox_xyxy": [
+    338,
+    702,
+    523,
+    905
+   ],
+   "visible_size": [
+    185,
+    203
+   ],
+   "height_ratio_to_albert_130": 1.562,
+   "anchor_foot_bottom_centre": [
+    430,
+    905
+   ],
+   "anchor_foot_v13_cell_1_0": [
+    4082,
+    2315
+   ],
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -110,
+      -170.5
+     ],
+     "world": [
+      -19.0326,
+      -29.5006
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.13907,
+      -0.21556
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -110,
+      302.5
+     ],
+     "world": [
+      -19.0326,
+      52.3397
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.13907,
+      0.38244
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2792.967,
+     5051.84
+    ]
+   },
+   "layers_in_draw_order": [
+    {
+     "layer": "frame-back",
+     "file": "training-camp-A-chin-up-frame-twig-frame-back.png",
+     "md5": "48ec5149f3b740ddee98627bf9174412",
+     "what": "fixed: the 2 posts (incl. their tops above the bar), the angled braces and the base logs; drawn UNDER a hanging ant",
+     "draw_order_within_piece": 0,
+     "png_size": [
+      185,
+      203
+     ],
+     "topleft_in_1080x1680": [
+      338,
+      702
+     ],
+     "png_box_xyxy": [
+      338,
+      702,
+      523,
+      905
+     ],
+     "visible_bbox_alpha_gt127_xyxy": [
+      338,
+      702,
+      523,
+      905
+     ]
+    },
+    {
+     "layer": "frame-front",
+     "file": "training-camp-A-chin-up-frame-twig-frame-front.png",
+     "md5": "a6ee0bc611e0b83637ad29a2170cc948",
+     "what": "fixed: the crossbar (the chin-up bar) and its 2 twine lashings; drawn OVER a hanging ant so the hands can sit behind the bar",
+     "draw_order_within_piece": 1,
+     "png_size": [
+      185,
+      203
+     ],
+     "topleft_in_1080x1680": [
+      338,
+      702
+     ],
+     "png_box_xyxy": [
+      338,
+      702,
+      523,
+      905
+     ],
+     "visible_bbox_alpha_gt127_xyxy": [
+      341,
+      706,
+      518,
+      728
+     ]
+    },
+    {
+     "layer": "full (all layers flattened, reference)",
+     "file": "training-camp-A-chin-up-frame-twig-full.png",
+     "md5": "b1cee61194eb1754dbe233058a0c2de9",
+     "note": "reference only (byte-identical to the concept piece); do not draw in addition to the layers"
+    }
+   ],
+   "layers_pixel_aligned": "all layers of this piece share png_size and topleft_in_1080x1680",
+   "shadow": {
+    "file": "training-camp-A-chin-up-frame-twig-shadow.png",
+    "md5": "ab2f53bb68194e2da738d1ecfd8663ae",
+    "topleft": [
+     330,
+     858
+    ],
+    "size": [
+     201,
+     81
+    ],
+    "how": "soft contact ellipse under the visible base (byte-identical copy of the concept shadow)"
+   },
+   "points": {
+    "hang_point_bar_centre": {
+     "template": [
+      430.3,
+      719.7
+     ],
+     "v13_full_preview": [
+      4082.3,
+      2129.7
+     ],
+     "zoom_crop": [
+      880.3,
+      674.7
+     ]
+    },
+    "stand_spot_under_bar": {
+     "template": [
+      430.3,
+      889.9
+     ],
+     "v13_full_preview": [
+      4082.3,
+      2299.9
+     ],
+     "zoom_crop": [
+      880.3,
+      844.9
+     ]
+    },
+    "feet_when_hanging_straight": {
+     "template": [
+      430.3,
+      849.7
+     ],
+     "v13_full_preview": [
+      4082.3,
+      2259.7
+     ],
+     "zoom_crop": [
+      880.3,
+      804.7
+     ]
+    }
+   },
+   "points_method": {
+    "hang_point_bar_centre": "x = midpoint of the posts' inner edges (median over rows 150-649 of the hi-res cut: 107 and 711); y = centre of the crossbar (alpha>127 rows 63-92) in that column",
+    "stand_spot_under_bar": "same x; y = floor line under the bar, interpolated between the bottoms of the base logs under each post centre (hi-res rows 862 and 799)",
+    "feet_when_hanging_straight": "hang y + 130 (grip at the top of a 130 px Albert, hanging straight down). A raised-arms pose would lift the feet higher."
+   },
+   "concept_points_for_reference_template": {
+    "hang_point_bar_centre": [
+     428.4,
+     720.1
+    ],
+    "stand_spot_under_bar": [
+     428.4,
+     885.1
+    ]
+   },
+   "how_used": "CHIN-UPS: Albert walks to stand_spot_under_bar, reaches up, grips the bar at hang_point_bar_centre and hangs; animate the ant, the frame never moves.",
+   "GENERATED": true,
+   "source_generated_concept_image": "/workspace/ant-colony/furniture/concepts/training-camp/generated-sources/A-chinup.jpg",
+   "scale_from_cut": 0.22602739726027396,
+   "chin_up": {
+    "bar_centre_height_above_floor_px": 170.2,
+    "bar_thickness_px": 6.8,
+    "inner_gap_between_posts_px": 136.3,
+    "albert_visible_width_px": 92,
+    "side_clearance_each_side_px": 22.1,
+    "feet_clearance_above_floor_when_hanging_px": 40.2
+   },
+   "pivot": null,
+   "ant_between_layers": "Draw frame-back, then the hanging ant, then frame-front so the hands can sit behind the bar. If the hands should be over the bar, draw the ant after both layers. Nothing moves; the frame is fixed."
+  },
+  {
+   "name": "barbell-rack-pebble",
+   "draw_order": 1,
+   "topleft_in_1080x1680": [
+    676,
+    820
+   ],
+   "png_size": [
+    129,
+    115
+   ],
+   "visible_bbox_xyxy": [
+    676,
+    820,
+    805,
+    935
+   ],
+   "visible_size": [
+    129,
+    115
+   ],
+   "height_ratio_to_albert_130": 0.885,
+   "anchor_foot_bottom_centre": [
+    740,
+    935
+   ],
+   "anchor_foot_v13_cell_1_0": [
+    4392,
+    2345
+   ],
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      200,
+      -140.5
+     ],
+     "world": [
+      34.6048,
+      -24.3099
+     ],
+     "frac_of_hex_width_790.97": [
+      0.25285,
+      -0.17763
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      200,
+      332.5
+     ],
+     "world": [
+      34.6048,
+      57.5304
+     ],
+     "frac_of_hex_width_790.97": [
+      0.25285,
+      0.42037
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2846.605,
+     5057.03
+    ]
+   },
+   "layers_in_draw_order": [
+    {
+     "layer": "frame-back",
+     "file": "training-camp-A-barbell-rack-pebble-frame-back.png",
+     "md5": "74726fe1568fb89e436d533c76a26542",
+     "what": "fixed rack: base, uprights, side knots and the BACK prong of each Y hook; drawn UNDER the barbell. Small FILL where the bar hid the back prongs (see flags)",
+     "draw_order_within_piece": 0,
+     "png_size": [
+      129,
+      115
+     ],
+     "topleft_in_1080x1680": [
+      676,
+      820
+     ],
+     "png_box_xyxy": [
+      676,
+      820,
+      805,
+      935
+     ],
+     "visible_bbox_alpha_gt127_xyxy": [
+      702,
+      826,
+      785,
+      935
+     ]
+    },
+    {
+     "layer": "moving-barbell",
+     "file": "training-camp-A-barbell-rack-pebble-moving-barbell.png",
+     "md5": "7614c0d717b96fd5ebd06d06608879e5",
+     "what": "MOVING: twig bar + both pebble weights + the right collar; lifts straight up off the hooks. Small FILL of the bar where the front prongs hid it (see flags)",
+     "draw_order_within_piece": 1,
+     "png_size": [
+      129,
+      115
+     ],
+     "topleft_in_1080x1680": [
+      676,
+      820
+     ],
+     "png_box_xyxy": [
+      676,
+      820,
+      805,
+      935
+     ],
+     "visible_bbox_alpha_gt127_xyxy": [
+      676,
+      820,
+      805,
+      869
+     ]
+    },
+    {
+     "layer": "frame-front",
+     "file": "training-camp-A-barbell-rack-pebble-frame-front.png",
+     "md5": "20ca075f3d855aca79523f4cc032aaed",
+     "what": "fixed: the FRONT prong tip of each Y hook (in front of the bar); drawn OVER the barbell",
+     "draw_order_within_piece": 2,
+     "png_size": [
+      129,
+      115
+     ],
+     "topleft_in_1080x1680": [
+      676,
+      820
+     ],
+     "png_box_xyxy": [
+      676,
+      820,
+      805,
+      935
+     ],
+     "visible_bbox_alpha_gt127_xyxy": [
+      716,
+      834,
+      776,
+      852
+     ]
+    },
+    {
+     "layer": "full (all layers flattened, reference)",
+     "file": "training-camp-A-barbell-rack-pebble-full.png",
+     "md5": "37c759301fb1d5874a1c6dbd8ca107e0",
+     "note": "reference only (byte-identical to the concept piece); do not draw in addition to the layers"
+    }
+   ],
+   "layers_pixel_aligned": "all layers of this piece share png_size and topleft_in_1080x1680",
+   "shadow": {
+    "file": "training-camp-A-barbell-rack-pebble-shadow.png",
+    "md5": "b7d8d5b642849f9ac59edb4f6c9154a3",
+    "topleft": [
+     670,
+     903
+    ],
+    "size": [
+     141,
+     55
+    ],
+    "how": "soft contact ellipse under the visible base (byte-identical copy of the concept shadow)"
+   },
+   "points": {
+    "barbell_grip_centre": {
+     "template": [
+      746.3,
+      843.1
+     ],
+     "v13_full_preview": [
+      4398.3,
+      2253.1
+     ],
+     "zoom_crop": [
+      1196.3,
+      798.1
+     ]
+    },
+    "hook_rest_left": {
+     "template": [
+      718.9,
+      848.1
+     ],
+     "v13_full_preview": [
+      4370.9,
+      2258.1
+     ],
+     "zoom_crop": [
+      1168.9,
+      803.1
+     ]
+    },
+    "hook_rest_right": {
+     "template": [
+      773.7,
+      838.2
+     ],
+     "v13_full_preview": [
+      4425.7,
+      2248.2
+     ],
+     "zoom_crop": [
+      1223.7,
+      793.2
+     ]
+    },
+    "lifter_stand_spot_in_front": {
+     "template": [
+      746.3,
+      921.1
+     ],
+     "v13_full_preview": [
+      4398.3,
+      2331.1
+     ],
+     "zoom_crop": [
+      1196.3,
+      876.1
+     ]
+    },
+    "barbell_layer_pivot": {
+     "template": [
+      746.3,
+      843.1
+     ],
+     "v13_full_preview": [
+      4398.3,
+      2253.1
+     ],
+     "zoom_crop": [
+      1196.3,
+      798.1
+     ]
+    }
+   },
+   "points_method": {
+    "barbell_grip_centre": "bar centre line (straight-line fit of the bar's top and bottom edges, residual <1 hi-res px) at the midpoint between the two front hook prongs",
+    "hook_rest_left/right": "bar centre line at the centre of each front hook prong (prong edges read from the hi-res cut at 10x zoom: 259-288 and 609-637)",
+    "lifter_stand_spot_in_front": "grip x; y = bottom edge of the rack's base plank in that column (the rack's front floor line). Albert stands here IN FRONT of the rack (draw him after the rack).",
+    "barbell_layer_pivot": "same as the grip centre; the layer moves vertically"
+   },
+   "concept_points_for_reference_template": {
+    "barbell_grip_centre": [
+     742.4,
+     843.4
+    ],
+    "stand_spot_left_of_rack": [
+     624.4,
+     929.4
+    ]
+   },
+   "how_used": "LIFTING: Albert stands at stand_spot_left_of_rack, steps in under the bar; the barbell layer is lifted off the hooks (moves up/down), the rack stays.",
+   "GENERATED": true,
+   "source_generated_concept_image": "/workspace/ant-colony/furniture/concepts/training-camp/generated-sources/A-barbell.jpg",
+   "scale_from_cut": 0.15625,
+   "barbell": {
+    "bar_rest_height_above_rack_front_floor_px": 78.0,
+    "hook_spacing_px": 54.8,
+    "bar_thickness_px": 5.0,
+    "lift_motion": "translate the moving-barbell layer straight up (negative y) from its rest topleft; at rest it sits in the Y hooks. No lift height is given here (no lift art exists)."
+   },
+   "pivot": {
+    "barbell_layer_pivot": {
+     "template": [
+      746.3,
+      843.1
+     ],
+     "v13_full_preview": [
+      4398.3,
+      2253.1
+     ],
+     "zoom_crop": [
+      1196.3,
+      798.1
+     ]
+    }
+   },
+   "draw_order_note": "shadow, frame-back, moving-barbell, frame-front. When the barbell is lifted above the hook tips it may also be drawn after frame-front."
+  },
+  {
+   "name": "mirror-floor-stand",
+   "draw_order": 2,
+   "topleft_in_1080x1680": [
+    249,
+    910
+   ],
+   "png_size": [
+    52,
+    150
+   ],
+   "visible_bbox_xyxy": [
+    249,
+    910,
+    301,
+    1060
+   ],
+   "visible_size": [
+    52,
+    150
+   ],
+   "height_ratio_to_albert_130": 1.154,
+   "anchor_foot_bottom_centre": [
+    275,
+    1060
+   ],
+   "anchor_foot_v13_cell_1_0": [
+    3927,
+    2470
+   ],
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -265,
+      -15.5
+     ],
+     "world": [
+      -45.8513,
+      -2.6819
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.33503,
+      -0.0196
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -265,
+      457.5
+     ],
+     "world": [
+      -45.8513,
+      79.1584
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.33503,
+      0.5784
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2766.149,
+     5078.658
+    ]
+   },
+   "layers_in_draw_order": [
+    {
+     "layer": "full",
+     "file": "training-camp-A-mirror-floor-stand.png",
+     "md5": "ffd7a3a3dbeed918f75c58d9f9603c3f",
+     "what": "single fixed piece: oval twig-rim mirror on its own twig floor stand (no walls); glass shows only a blurred empty room",
+     "draw_order_within_piece": 0,
+     "png_size": [
+      52,
+      150
+     ],
+     "topleft_in_1080x1680": [
+      249,
+      910
+     ],
+     "png_box_xyxy": [
+      249,
+      910,
+      301,
+      1060
+     ],
+     "visible_bbox_alpha_gt127_xyxy": [
+      249,
+      910,
+      301,
+      1060
+     ]
+    }
+   ],
+   "layers_pixel_aligned": "all layers of this piece share png_size and topleft_in_1080x1680",
+   "shadow": {
+    "file": "training-camp-A-mirror-floor-stand-shadow.png",
+    "md5": "d888aa58298f9f3eee286e5225736741",
+    "topleft": [
+     246,
+     1047
+    ],
+    "size": [
+     58,
+     23
+    ],
+    "how": "soft contact ellipse under the visible base (byte-identical copy of the concept shadow)"
+   },
+   "points": {
+    "stand_spot_in_front": {
+     "template": [
+      275.0,
+      1059.9
+     ],
+     "v13_full_preview": [
+      3927.0,
+      2469.9
+     ],
+     "zoom_crop": [
+      725.0,
+      1014.9
+     ]
+    }
+   },
+   "points_method": {
+    "stand_spot_in_front": "x = centre of the visible mirror (bbox centre); y = floor line at the bottom of the stand's front leg (lowest visible row). Albert stands here in front of the mirror (draw him after it)."
+   },
+   "concept_points_for_reference_template": {
+    "stand_spot_in_front": [
+     274.9,
+     1072.0
+    ]
+   },
+   "how_used": "FORM CHECK / idle: Albert stands in front and flexes; mirror is fixed on its own floor stand (no walls). The glass shows only a blurred empty room, no figures.",
+   "GENERATED": true,
+   "source_generated_concept_image": "/workspace/ant-colony/furniture/concepts/training-camp/generated-sources/A-mirror.jpg",
+   "scale_from_cut": 0.14084507042253522,
+   "pivot": null
+  },
+  {
+   "name": "balance-beam-log",
+   "draw_order": 3,
+   "topleft_in_1080x1680": [
+    460,
+    1119
+   ],
+   "png_size": [
+    210,
+    81
+   ],
+   "visible_bbox_xyxy": [
+    460,
+    1119,
+    670,
+    1200
+   ],
+   "visible_size": [
+    210,
+    81
+   ],
+   "height_ratio_to_albert_130": 0.623,
+   "anchor_foot_bottom_centre": [
+    565,
+    1200
+   ],
+   "anchor_foot_v13_cell_1_0": [
+    4217,
+    2610
+   ],
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      25,
+      124.5
+     ],
+     "world": [
+      4.3256,
+      21.5415
+     ],
+     "frac_of_hex_width_790.97": [
+      0.03161,
+      0.1574
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      25,
+      597.5
+     ],
+     "world": [
+      4.3256,
+      103.3818
+     ],
+     "frac_of_hex_width_790.97": [
+      0.03161,
+      0.7554
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2816.326,
+     5102.882
+    ]
+   },
+   "layers_in_draw_order": [
+    {
+     "layer": "full",
+     "file": "training-camp-A-balance-beam-log.png",
+     "md5": "979a8cd2b5ea5193337a00246ba59ffe",
+     "what": "single fixed piece: peeled log on 2 stumps",
+     "draw_order_within_piece": 0,
+     "png_size": [
+      210,
+      81
+     ],
+     "topleft_in_1080x1680": [
+      460,
+      1119
+     ],
+     "png_box_xyxy": [
+      460,
+      1119,
+      670,
+      1200
+     ],
+     "visible_bbox_alpha_gt127_xyxy": [
+      460,
+      1119,
+      670,
+      1200
+     ]
+    }
+   ],
+   "layers_pixel_aligned": "all layers of this piece share png_size and topleft_in_1080x1680",
+   "shadow": {
+    "file": "training-camp-A-balance-beam-log-shadow.png",
+    "md5": "41b2a37d59a32d69881032670b7df8a6",
+    "topleft": [
+     450,
+     1147
+    ],
+    "size": [
+     230,
+     91
+    ],
+    "how": "soft contact ellipse under the visible base (byte-identical copy of the concept shadow)"
+   },
+   "points": {
+    "beam_top_left_mount_over_left_stump": {
+     "template": [
+      492.5,
+      1155.2
+     ],
+     "v13_full_preview": [
+      4144.5,
+      2565.2
+     ],
+     "zoom_crop": [
+      942.5,
+      1110.2
+     ]
+    },
+    "beam_top_middle": {
+     "template": [
+      568.9,
+      1141.4
+     ],
+     "v13_full_preview": [
+      4220.9,
+      2551.4
+     ],
+     "zoom_crop": [
+      1018.9,
+      1096.4
+     ]
+    },
+    "beam_top_right_end_over_right_stump": {
+     "template": [
+      645.4,
+      1127.7
+     ],
+     "v13_full_preview": [
+      4297.4,
+      2537.7
+     ],
+     "zoom_crop": [
+      1095.4,
+      1082.7
+     ]
+    },
+    "log_left_end_x": 460.2,
+    "log_right_end_x": 669.8
+   },
+   "points_method": {
+    "walk_line": "the lit top crest of the log: brightest row (5-px smoothed) of the log top face per column, straight-line fit over hi-res x 250-950 (slope -0.1800); it runs about 33 hi-res px below the top silhouette",
+    "mount/end points": "crest at the centre of each stump (stump columns 90-269 and 933-1119 in the hi-res cut); middle = crest midway between them",
+    "log_left_end_x/right_end_x": "horizontal extent of the log (walkable limit)"
+   },
+   "concept_points_for_reference_template": {
+    "beam_top_left_end_mount": [
+     476.3,
+     1153.3
+    ],
+    "beam_top_middle": [
+     564.7,
+     1138.9
+    ],
+    "beam_top_right_end": [
+     655.0,
+     1124.4
+    ]
+   },
+   "how_used": "BALANCE: Albert steps up at the left end and walks along the beam top line to the right end; beam is fixed.",
+   "GENERATED": true,
+   "source_generated_concept_image": "/workspace/ant-colony/furniture/concepts/training-camp/generated-sources/A-beam.jpg",
+   "scale_from_cut": 0.18056749785038692,
+   "pivot": null
+  }
+ ],
+ "previews": {
+  "folder": "/workspace/ant-colony/furniture/previews/",
+  "files": {
+   "training-camp-A-on-v13-preview-v1.jpg": "03b96d2c0964ac39ef0ec569dfefc2d2",
+   "training-camp-A-on-v13-preview-v1-zoom-crop.jpg": "8bde5bc6bdf0b3f36644fc0bf07e685b",
+   "training-camp-A-on-v13-preview-v1-with-ants.jpg": "35ab0d1e9f048b0868e239994b331e29",
+   "training-camp-A-on-v13-preview-v1-with-ants-zoom-crop.jpg": "c55021f85f36828cd1a517e824a820e5"
+  },
+  "md5sums_file": "training-camp-A-previews-MD5SUMS",
+  "jpeg": "q98 4:4:4"
+ }
+}

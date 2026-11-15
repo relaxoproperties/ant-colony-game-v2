@@ -1,0 +1,1335 @@
+{
+ "what": "Playground A production furniture set (Chris picked option A, 12:05 PM ET). Preview only: no game build, no publish.",
+ "created": "2026-11-13 (ET)",
+ "chris_words": [
+  "12:05 PM ET: Chris picked Playground A (the twig swing set, leaf slide, acorn-cap merry-go-round and twig seesaw in classic rows).",
+  "Kid height CONFIRMED by Chris at 50% of Albert = 65 px (no longer a placeholder)."
+ ],
+ "GENERATED": "ALL equipment art is GENERATED (image generator, style-referenced to the Royal chamber, nursery and school pieces), then cut to transparency from a white background. Nothing of Chris's was redrawn; there was nothing of his to cut for a playground. Source cuts live in the untouched concepts/playground folder and in /workspace/fx/pg/layers/.",
+ "source_concept": {
+  "folder": "/workspace/ant-colony/furniture/concepts/playground/",
+  "note": "read-only; not modified. Unchanged piece PNGs and the seesaw full and shadow are byte-identical copies."
+ },
+ "canvas": [
+  1080,
+  1680
+ ],
+ "template": {
+  "name": "LOCKED 3-D hex template (green floor, yellow walls, red ceiling)",
+  "lock": "/workspace/kit/approved/NOTE-entrance-room-hex-LOCKED-2026-11-07.json",
+  "outline_overlay": "/workspace/builder-opening/shots/hex-3d-outline-color.jpg",
+  "outline_overlay_md5": "6e299814ac5b4c5bc595ac6a2117ecb0",
+  "dst_floor_green": [
+   [
+    342.2575,
+    733
+   ],
+   [
+    737.7425,
+    733
+   ],
+   [
+    935.4849,
+    1075.5
+   ],
+   [
+    737.7425,
+    1418
+   ],
+   [
+    342.2575,
+    1418
+   ],
+   [
+    144.5151,
+    1075.5
+   ]
+  ],
+  "floor_wall_back_line_y": 733,
+  "floor_hex_width_px": 790.9698687897874,
+  "CX": 540,
+  "CY_GREEN": 1075.5,
+  "CY_RED": 602.5
+ },
+ "world_scale": {
+  "in_game_hex_width_px": 791,
+  "template_to_791": 1.0000380940050961,
+  "ROOM_SCALE_world_per_px": 0.17302387549421078,
+  "source": "notes-pass-5-fix3/index.html HEX.w 136.8566720971564 / 790.9698687897874; same as Royal chamber set v1"
+ },
+ "v13": {
+  "file": "/workspace/ant-colony/big-chamber/v13-noants-2026-11-13/big-chamber-v13-noants-clean.jpg",
+  "md5": "cd5119a00eff77bbe32096706955b667",
+  "cell": [
+   1,
+   0
+  ],
+  "paste_topleft_on_v13": [
+   3652,
+   1410
+  ],
+  "cell_centre_on_v13": [
+   4192.25,
+   2485.3030471967454
+  ],
+  "zoom_crop_xyxy": [
+   3202,
+   1455,
+   5182,
+   2985
+  ],
+  "method": "same as nursery-v4 / the concept: setlib.preview pastes the 1080x1680 furniture layer at v13 cell (1,0) topleft"
+ },
+ "kid_height_px": 65,
+ "kid_height_note": "CONFIRMED by Chris: 50% of Albert 130 px = 65 px. Kids in the with-kids preview are the locked Albert idle frame 0, scaled at draw time to 65/287, not redrawn. Standing pose (no sitting art). Feet on the ride spot.",
+ "ants": {
+  "queen": {
+   "how": "Royal check render: queen_idle_front_strip_v1 frame 0, QS 0.7121334648300934, anchor (200,395), visible about 103x143, STANDING",
+   "feet_template": [
+    705,
+    1320
+   ],
+   "feet_v13_cell_1_0": [
+    4357,
+    2730
+   ],
+   "bbox_on_scale_check": [
+    647,
+    1181,
+    750,
+    1324
+   ]
+  },
+  "albert": {
+   "how": "locked idle frame 0 (antlib _base-v2 ant-idle_00.png = cutout of LOCKED-WALKS-2026-11-09/idle-facing-camera GIF), 130 px tall, anchor (135,334). Never the round scout sheets.",
+   "feet_template": [
+    590,
+    1335
+   ],
+   "feet_v13_cell_1_0": [
+    4242,
+    2745
+   ],
+   "bbox_on_scale_check": [
+    545,
+    1208,
+    636,
+    1335
+   ],
+   "scale": 0.4529616724738676
+  }
+ },
+ "scale_check": {
+  "albert": {
+   "height_px": 130,
+   "scale": 0.4529616724738676,
+   "sprite": "locked idle frame 0",
+   "feet": [
+    590,
+    1335
+   ],
+   "bbox": [
+    545,
+    1208,
+    636,
+    1335
+   ]
+  },
+  "queen": {
+   "canonical_width_px": 198.6,
+   "canonical_note": "198.6 = QUEEN_DOWN_W 27.4867 world x1.25 / ROOM_SCALE. Visible body about 103x143. Rendered the same way as Royal set v1 (QS 0.7121334648300934, anchor (200,395)).",
+   "room_px_per_queen_px": 0.7121334648300934,
+   "sprite": "/workspace/notes-pass-5-fix3/assets/queen/queen_idle_front_strip_v1.png",
+   "sprite_md5": "551e7661af78d596e8a53017459d6193",
+   "feet": [
+    705,
+    1320
+   ],
+   "bbox": [
+    647,
+    1181,
+    750,
+    1324
+   ]
+  }
+ },
+ "draw_order_note": "For each piece, draw its shadow at shadow.topleft, then its layers in layers_in_draw_order (skip the reference full). Piece order is draw_order (back to front by foot y): swing-set, slide, merry-go-round, seesaw. Seesaw: frame-back, then moving-plank, then frame-front.",
+ "no_art_under_moving_parts": "The merry-go-round stump top and the seesaw fulcrum top have no art under the moving part (the layers were split from one generated image). A later animation may need small fill-ins there; nothing was painted in. The swing frame has no hidden pixels under the seats.",
+ "outputs": {
+  "playground-A-furniture.png": {
+   "md5": "b34770d390216a6bf619751a3969c2b4",
+   "size": [
+    1080,
+    1680
+   ]
+  },
+  "playground-A-furniture-programming.png": {
+   "md5": "05ca0dcd195da1904e1e2f0dbed0da18",
+   "size": [
+    1080,
+    1680
+   ]
+  },
+  "playground-A-furniture-programming-view.jpg": {
+   "md5": "e80d83b877fd1910ceacf20999c9fd85",
+   "size": [
+    1080,
+    1680
+   ]
+  },
+  "playground-A-furniture-scale-check.jpg": {
+   "md5": "2c9a177a218d1121d5559aa20fd62ea0",
+   "size": [
+    1080,
+    1680
+   ]
+  }
+ },
+ "pieces": [
+  {
+   "name": "swing-set-twig-aframe",
+   "draw_order": 0,
+   "topleft_in_1080x1680": [
+    465,
+    742
+   ],
+   "png_size": [
+    150,
+    118
+   ],
+   "visible_bbox_xyxy": [
+    465,
+    742,
+    615,
+    860
+   ],
+   "visible_size": [
+    150,
+    118
+   ],
+   "visible_size_world": [
+    25.9536,
+    20.4168
+   ],
+   "height_ratio_to_albert_130": 0.908,
+   "height_ratio_to_queen_visible_143": 0.825,
+   "foot_bottom_centre": [
+    540,
+    860
+   ],
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      0,
+      -215.5
+     ],
+     "world": [
+      0.0,
+      -37.2866
+     ],
+     "frac_of_hex_width_790.97": [
+      0.0,
+      -0.27245
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      0,
+      257.5
+     ],
+     "world": [
+      0.0,
+      44.5536
+     ],
+     "frac_of_hex_width_790.97": [
+      0.0,
+      0.32555
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2812.0,
+     5044.054
+    ]
+   },
+   "layers_in_draw_order": [
+    {
+     "layer": "frame",
+     "file": "playground-A-swing-set-twig-aframe-frame.png",
+     "md5": "461f6dfb3b8854dd8ed3eaae42f25431",
+     "what": "fixed twig A-frame (no art under the hanging swings)",
+     "draw_order_within_piece": 0,
+     "png_size": [
+      150,
+      118
+     ],
+     "topleft_in_1080x1680": [
+      465,
+      742
+     ],
+     "png_box_xyxy": [
+      465,
+      742,
+      615,
+      860
+     ]
+    },
+    {
+     "layer": "moving-swings",
+     "file": "playground-A-swing-set-twig-aframe-moving-swings.png",
+     "md5": "5d7c8584b3ef9b351f3516bb4e7d7699",
+     "what": "2 leaf seats + their fiber chains; pivots at the chain tops on the crossbar",
+     "draw_order_within_piece": 1,
+     "png_size": [
+      150,
+      118
+     ],
+     "topleft_in_1080x1680": [
+      465,
+      742
+     ],
+     "png_box_xyxy": [
+      465,
+      742,
+      615,
+      860
+     ]
+    },
+    {
+     "layer": "full (all layers flattened, reference)",
+     "file": "playground-A-swing-set-twig-aframe-full.png",
+     "md5": "26007f5701b912afff1bf35ae38b2589",
+     "note": "reference only; do not draw in addition to the layers"
+    }
+   ],
+   "layers_pixel_aligned": "all layers of this piece share png_size and topleft_in_1080x1680",
+   "shadow": {
+    "file": "playground-A-swing-set-twig-aframe-shadow.png",
+    "md5": "50734a64057e0432bbb1ea4c4f812b38",
+    "topleft": [
+     458,
+     811
+    ],
+    "size": [
+     165,
+     64
+    ],
+    "how": "soft contact ellipse under the visible base (copied from the concept; not regenerated)"
+   },
+   "anchors": {
+    "swing1_pivot": {
+     "template": [
+      516.0,
+      757.2
+     ],
+     "v13_full_preview": [
+      4168.0,
+      2167.2
+     ],
+     "zoom_crop": [
+      966.0,
+      712.2
+     ],
+     "closeup": [
+      456.0,
+      112.2
+     ]
+    },
+    "swing1_seat": {
+     "template": [
+      516.6,
+      820.1
+     ],
+     "v13_full_preview": [
+      4168.6,
+      2230.1
+     ],
+     "zoom_crop": [
+      966.6,
+      775.1
+     ],
+     "closeup": [
+      456.6,
+      175.1
+     ]
+    },
+    "swing2_pivot": {
+     "template": [
+      562.2,
+      756.4
+     ],
+     "v13_full_preview": [
+      4214.2,
+      2166.4
+     ],
+     "zoom_crop": [
+      1012.2,
+      711.4
+     ],
+     "closeup": [
+      502.2,
+      111.4
+     ]
+    },
+    "swing2_seat": {
+     "template": [
+      562.4,
+      817.1
+     ],
+     "v13_full_preview": [
+      4214.4,
+      2227.1
+     ],
+     "zoom_crop": [
+      1012.4,
+      772.1
+     ],
+     "closeup": [
+      502.4,
+      172.1
+     ]
+    }
+   },
+   "source_generated": "generated-sources/A-swing.jpg",
+   "scale_from_cut": 0.15167095115681234,
+   "GENERATED": true,
+   "pivot": {
+    "swing1_chain_top_on_crossbar": {
+     "template": [
+      516.0,
+      757.2
+     ],
+     "v13_full_preview": [
+      4168.0,
+      2167.2
+     ],
+     "zoom_crop": [
+      966.0,
+      712.2
+     ],
+     "closeup": [
+      456.0,
+      112.2
+     ]
+    },
+    "swing2_chain_top_on_crossbar": {
+     "template": [
+      562.2,
+      756.4
+     ],
+     "v13_full_preview": [
+      4214.2,
+      2166.4
+     ],
+     "zoom_crop": [
+      1012.2,
+      711.4
+     ],
+     "closeup": [
+      502.2,
+      111.4
+     ]
+    }
+   },
+   "seat_ride_points_for_65px_kids": {
+    "swing1_seat": {
+     "template": [
+      516.6,
+      820.1
+     ],
+     "v13_full_preview": [
+      4168.6,
+      2230.1
+     ],
+     "zoom_crop": [
+      966.6,
+      775.1
+     ],
+     "closeup": [
+      456.6,
+      175.1
+     ]
+    },
+    "swing2_seat": {
+     "template": [
+      562.4,
+      817.1
+     ],
+     "v13_full_preview": [
+      4214.4,
+      2227.1
+     ],
+     "zoom_crop": [
+      1012.4,
+      772.1
+     ],
+     "closeup": [
+      502.4,
+      172.1
+     ]
+    }
+   }
+  },
+  {
+   "name": "slide-leaf-chute",
+   "draw_order": 1,
+   "topleft_in_1080x1680": [
+    268,
+    898
+   ],
+   "png_size": [
+    124,
+    112
+   ],
+   "visible_bbox_xyxy": [
+    268,
+    898,
+    392,
+    1010
+   ],
+   "visible_size": [
+    124,
+    112
+   ],
+   "visible_size_world": [
+    21.455,
+    19.3787
+   ],
+   "height_ratio_to_albert_130": 0.862,
+   "height_ratio_to_queen_visible_143": 0.783,
+   "foot_bottom_centre": [
+    330,
+    1010
+   ],
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -210,
+      -65.5
+     ],
+     "world": [
+      -36.335,
+      -11.3331
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.2655,
+      -0.08281
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -210,
+      407.5
+     ],
+     "world": [
+      -36.335,
+      70.5072
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.2655,
+      0.51519
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2775.665,
+     5070.007
+    ]
+   },
+   "layers_in_draw_order": [
+    {
+     "layer": "full",
+     "file": "playground-A-slide-leaf-chute.png",
+     "md5": "8cb2af58d9d95081f7e10ee88fbd0508",
+     "what": "single fixed piece: lashed-twig ladder + green leaf chute (no moving part)",
+     "draw_order_within_piece": 0,
+     "png_size": [
+      124,
+      112
+     ],
+     "topleft_in_1080x1680": [
+      268,
+      898
+     ],
+     "png_box_xyxy": [
+      268,
+      898,
+      392,
+      1010
+     ]
+    }
+   ],
+   "layers_pixel_aligned": "all layers of this piece share png_size and topleft_in_1080x1680",
+   "shadow": {
+    "file": "playground-A-slide-leaf-chute-shadow.png",
+    "md5": "84f6da15dd3edaceadeecc437b22cbba",
+    "topleft": [
+     262,
+     979
+    ],
+    "size": [
+     136,
+     53
+    ],
+    "how": "soft contact ellipse under the visible base (copied from the concept; not regenerated)"
+   },
+   "anchors": {
+    "ladder_foot": {
+     "template": [
+      279.9,
+      997.7
+     ],
+     "v13_full_preview": [
+      3931.9,
+      2407.7
+     ],
+     "zoom_crop": [
+      729.9,
+      952.7
+     ],
+     "closeup": [
+      219.9,
+      352.7
+     ]
+    },
+    "top_platform": {
+     "template": [
+      288.6,
+      921.7
+     ],
+     "v13_full_preview": [
+      3940.6,
+      2331.7
+     ],
+     "zoom_crop": [
+      738.6,
+      876.7
+     ],
+     "closeup": [
+      228.6,
+      276.7
+     ]
+    },
+    "chute_start": {
+     "template": [
+      306.0,
+      918.6
+     ],
+     "v13_full_preview": [
+      3958.0,
+      2328.6
+     ],
+     "zoom_crop": [
+      756.0,
+      873.6
+     ],
+     "closeup": [
+      246.0,
+      273.6
+     ]
+    },
+    "chute_exit": {
+     "template": [
+      384.3,
+      999.2
+     ],
+     "v13_full_preview": [
+      4036.3,
+      2409.2
+     ],
+     "zoom_crop": [
+      834.3,
+      954.2
+     ],
+     "closeup": [
+      324.3,
+      354.2
+     ]
+    }
+   },
+   "source_generated": "generated-sources/A-slide.jpg",
+   "scale_from_cut": 0.15819209039548024,
+   "GENERATED": true,
+   "pivot": null,
+   "seat_ride_points_for_65px_kids": {
+    "ladder_foot": {
+     "template": [
+      279.9,
+      997.7
+     ],
+     "v13_full_preview": [
+      3931.9,
+      2407.7
+     ],
+     "zoom_crop": [
+      729.9,
+      952.7
+     ],
+     "closeup": [
+      219.9,
+      352.7
+     ]
+    },
+    "top_platform": {
+     "template": [
+      288.6,
+      921.7
+     ],
+     "v13_full_preview": [
+      3940.6,
+      2331.7
+     ],
+     "zoom_crop": [
+      738.6,
+      876.7
+     ],
+     "closeup": [
+      228.6,
+      276.7
+     ]
+    },
+    "chute_start": {
+     "template": [
+      306.0,
+      918.6
+     ],
+     "v13_full_preview": [
+      3958.0,
+      2328.6
+     ],
+     "zoom_crop": [
+      756.0,
+      873.6
+     ],
+     "closeup": [
+      246.0,
+      273.6
+     ]
+    },
+    "chute_exit": {
+     "template": [
+      384.3,
+      999.2
+     ],
+     "v13_full_preview": [
+      4036.3,
+      2409.2
+     ],
+     "zoom_crop": [
+      834.3,
+      954.2
+     ],
+     "closeup": [
+      324.3,
+      354.2
+     ]
+    }
+   }
+  },
+  {
+   "name": "merry-go-round-acorn-cap",
+   "draw_order": 2,
+   "topleft_in_1080x1680": [
+    575,
+    980
+   ],
+   "png_size": [
+    160,
+    105
+   ],
+   "visible_bbox_xyxy": [
+    575,
+    980,
+    735,
+    1085
+   ],
+   "visible_size": [
+    160,
+    105
+   ],
+   "visible_size_world": [
+    27.6838,
+    18.1675
+   ],
+   "height_ratio_to_albert_130": 0.808,
+   "height_ratio_to_queen_visible_143": 0.734,
+   "foot_bottom_centre": [
+    655,
+    1085
+   ],
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      115,
+      9.5
+     ],
+     "world": [
+      19.8977,
+      1.6437
+     ],
+     "frac_of_hex_width_790.97": [
+      0.14539,
+      0.01201
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      115,
+      482.5
+     ],
+     "world": [
+      19.8977,
+      83.484
+     ],
+     "frac_of_hex_width_790.97": [
+      0.14539,
+      0.61001
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2831.898,
+     5082.984
+    ]
+   },
+   "layers_in_draw_order": [
+    {
+     "layer": "frame",
+     "file": "playground-A-merry-go-round-acorn-cap-frame.png",
+     "md5": "454656c6cd25fb9fed1efa24b959724f",
+     "what": "fixed stump axle base; no art on the stump top under the spinning deck",
+     "draw_order_within_piece": 0,
+     "png_size": [
+      160,
+      105
+     ],
+     "topleft_in_1080x1680": [
+      575,
+      980
+     ],
+     "png_box_xyxy": [
+      575,
+      980,
+      735,
+      1085
+     ]
+    },
+    {
+     "layer": "moving-top",
+     "file": "playground-A-merry-go-round-acorn-cap-moving-top.png",
+     "md5": "6203965d08e2923790b06bcb93d23267",
+     "what": "spinning top: acorn-cap deck + 4 twig rails + hub post; spins around the hub axis",
+     "draw_order_within_piece": 1,
+     "png_size": [
+      160,
+      105
+     ],
+     "topleft_in_1080x1680": [
+      575,
+      980
+     ],
+     "png_box_xyxy": [
+      575,
+      980,
+      735,
+      1085
+     ]
+    },
+    {
+     "layer": "full (all layers flattened, reference)",
+     "file": "playground-A-merry-go-round-acorn-cap-full.png",
+     "md5": "d31474e59ef827693153d39a328b76cf",
+     "note": "reference only; do not draw in addition to the layers"
+    }
+   ],
+   "layers_pixel_aligned": "all layers of this piece share png_size and topleft_in_1080x1680",
+   "shadow": {
+    "file": "playground-A-merry-go-round-acorn-cap-shadow.png",
+    "md5": "753012dc47c41513bcd31ddd76442124",
+    "topleft": [
+     568,
+     1034
+    ],
+    "size": [
+     175,
+     66
+    ],
+    "how": "soft contact ellipse under the visible base (copied from the concept; not regenerated)"
+   },
+   "anchors": {
+    "spin_axis_hub_base": {
+     "template": [
+      655.0,
+      1021.2
+     ],
+     "v13_full_preview": [
+      4307.0,
+      2431.2
+     ],
+     "zoom_crop": [
+      1105.0,
+      976.2
+     ],
+     "closeup": [
+      595.0,
+      376.2
+     ]
+    },
+    "ride_front_left": {
+     "template": [
+      632.6,
+      1037.6
+     ],
+     "v13_full_preview": [
+      4284.6,
+      2447.6
+     ],
+     "zoom_crop": [
+      1082.6,
+      992.6
+     ],
+     "closeup": [
+      572.6,
+      392.6
+     ]
+    },
+    "ride_front_right": {
+     "template": [
+      679.6,
+      1037.6
+     ],
+     "v13_full_preview": [
+      4331.6,
+      2447.6
+     ],
+     "zoom_crop": [
+      1129.6,
+      992.6
+     ],
+     "closeup": [
+      619.6,
+      392.6
+     ]
+    },
+    "ride_back": {
+     "template": [
+      655.0,
+      1008.8
+     ],
+     "v13_full_preview": [
+      4307.0,
+      2418.8
+     ],
+     "zoom_crop": [
+      1105.0,
+      963.8
+     ],
+     "closeup": [
+      595.0,
+      363.8
+     ]
+    }
+   },
+   "source_generated": "generated-sources/A-merry.jpg",
+   "scale_from_cut": 0.19184652278177458,
+   "GENERATED": true,
+   "pivot": {
+    "spin_axis": {
+     "template": [
+      655.0,
+      1021.2
+     ],
+     "v13_full_preview": [
+      4307.0,
+      2431.2
+     ],
+     "zoom_crop": [
+      1105.0,
+      976.2
+     ],
+     "closeup": [
+      595.0,
+      376.2
+     ]
+    }
+   },
+   "seat_ride_points_for_65px_kids": {
+    "ride_front_left": {
+     "template": [
+      632.6,
+      1037.6
+     ],
+     "v13_full_preview": [
+      4284.6,
+      2447.6
+     ],
+     "zoom_crop": [
+      1082.6,
+      992.6
+     ],
+     "closeup": [
+      572.6,
+      392.6
+     ]
+    },
+    "ride_front_right": {
+     "template": [
+      679.6,
+      1037.6
+     ],
+     "v13_full_preview": [
+      4331.6,
+      2447.6
+     ],
+     "zoom_crop": [
+      1129.6,
+      992.6
+     ],
+     "closeup": [
+      619.6,
+      392.6
+     ]
+    },
+    "ride_back": {
+     "template": [
+      655.0,
+      1008.8
+     ],
+     "v13_full_preview": [
+      4307.0,
+      2418.8
+     ],
+     "zoom_crop": [
+      1105.0,
+      963.8
+     ],
+     "closeup": [
+      595.0,
+      363.8
+     ]
+    }
+   }
+  },
+  {
+   "name": "seesaw-leaf-seats",
+   "draw_order": 3,
+   "topleft_in_1080x1680": [
+    325,
+    1119
+   ],
+   "png_size": [
+    200,
+    96
+   ],
+   "visible_bbox_xyxy": [
+    325,
+    1119,
+    525,
+    1215
+   ],
+   "visible_size": [
+    200,
+    96
+   ],
+   "visible_size_world": [
+    34.6048,
+    16.6103
+   ],
+   "height_ratio_to_albert_130": 0.738,
+   "height_ratio_to_queen_visible_143": 0.671,
+   "foot_bottom_centre": [
+    425,
+    1215
+   ],
+   "foot_offsets": {
+    "from_floor_green_centre_540_1075.5": {
+     "px": [
+      -115,
+      139.5
+     ],
+     "world": [
+      -19.8977,
+      24.1368
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.14539,
+      0.17637
+     ]
+    },
+    "from_ceiling_red_centre_540_602.5_=game_HEX_centre": {
+     "px": [
+      -115,
+      612.5
+     ],
+     "world": [
+      -19.8977,
+      105.9771
+     ],
+     "frac_of_hex_width_790.97": [
+      -0.14539,
+      0.77437
+     ]
+    },
+    "world_abs_if_room_at_HEX_2812_4999.5": [
+     2792.102,
+     5105.477
+    ]
+   },
+   "layers_in_draw_order": [
+    {
+     "layer": "frame-back",
+     "file": "playground-A-seesaw-leaf-seats-frame-back.png",
+     "md5": "50ed6d21a1b0c9c6d14f73a9f03f19b2",
+     "what": "fixed fulcrum stand (A-frame legs, cross-braces, pebble) drawn UNDER the plank; no art on the fulcrum top under the plank",
+     "draw_order_within_piece": 0,
+     "png_size": [
+      200,
+      96
+     ],
+     "topleft_in_1080x1680": [
+      325,
+      1119
+     ],
+     "png_box_xyxy": [
+      325,
+      1119,
+      525,
+      1215
+     ]
+    },
+    {
+     "layer": "moving-plank",
+     "file": "playground-A-seesaw-leaf-seats-moving-plank.png",
+     "md5": "228edede84ff74d3b4aec047b4af2640",
+     "what": "split-twig plank + 2 leaf seat pads + 2 T handles + the back bump and the left-of-bracket plank sliver moved out of the old frame layer; tilts around the pivot bolt",
+     "draw_order_within_piece": 1,
+     "png_size": [
+      200,
+      96
+     ],
+     "topleft_in_1080x1680": [
+      325,
+      1119
+     ],
+     "png_box_xyxy": [
+      325,
+      1119,
+      525,
+      1215
+     ]
+    },
+    {
+     "layer": "frame-front",
+     "file": "playground-A-seesaw-leaf-seats-frame-front.png",
+     "md5": "346d3dab1dde17a0ed211344a517acd7",
+     "what": "front fulcrum bracket (the bolted head in front of the plank), drawn OVER the plank",
+     "draw_order_within_piece": 2,
+     "png_size": [
+      200,
+      96
+     ],
+     "topleft_in_1080x1680": [
+      325,
+      1119
+     ],
+     "png_box_xyxy": [
+      325,
+      1119,
+      525,
+      1215
+     ]
+    },
+    {
+     "layer": "full (all layers flattened, reference)",
+     "file": "playground-A-seesaw-leaf-seats-full.png",
+     "md5": "448522a5f4989eb095bb3deb02642187",
+     "note": "reference only; do not draw in addition to the layers"
+    }
+   ],
+   "layers_pixel_aligned": "all layers of this piece share png_size and topleft_in_1080x1680",
+   "shadow": {
+    "file": "playground-A-seesaw-leaf-seats-shadow.png",
+    "md5": "40e2239ecb6b5378394996a60e5689e2",
+    "topleft": [
+     316,
+     1166
+    ],
+    "size": [
+     219,
+     85
+    ],
+    "how": "soft contact ellipse under the visible base (copied from the concept; not regenerated)"
+   },
+   "anchors": {
+    "pivot_bolt": {
+     "template": [
+      440.0,
+      1170.2
+     ],
+     "v13_full_preview": [
+      4092.0,
+      2580.2
+     ],
+     "zoom_crop": [
+      890.0,
+      1125.2
+     ],
+     "closeup": [
+      380.0,
+      525.2
+     ]
+    },
+    "seat_left": {
+     "template": [
+      346.3,
+      1180.8
+     ],
+     "v13_full_preview": [
+      3998.3,
+      2590.8
+     ],
+     "zoom_crop": [
+      796.3,
+      1135.8
+     ],
+     "closeup": [
+      286.3,
+      535.8
+     ]
+    },
+    "seat_right": {
+     "template": [
+      503.7,
+      1136.4
+     ],
+     "v13_full_preview": [
+      4155.7,
+      2546.4
+     ],
+     "zoom_crop": [
+      953.7,
+      1091.4
+     ],
+     "closeup": [
+      443.7,
+      491.4
+     ]
+    }
+   },
+   "source_generated": "generated-sources/A-seesaw.jpg",
+   "scale_from_cut": 0.1932367149758454,
+   "GENERATED": true,
+   "pivot": {
+    "fulcrum_pivot_bolt": {
+     "template": [
+      440.0,
+      1170.2
+     ],
+     "v13_full_preview": [
+      4092.0,
+      2580.2
+     ],
+     "zoom_crop": [
+      890.0,
+      1125.2
+     ],
+     "closeup": [
+      380.0,
+      525.2
+     ]
+    }
+   },
+   "seat_ride_points_for_65px_kids": {
+    "seat_left": {
+     "template": [
+      346.3,
+      1180.8
+     ],
+     "v13_full_preview": [
+      3998.3,
+      2590.8
+     ],
+     "zoom_crop": [
+      796.3,
+      1135.8
+     ],
+     "closeup": [
+      286.3,
+      535.8
+     ]
+    },
+    "seat_right": {
+     "template": [
+      503.7,
+      1136.4
+     ],
+     "v13_full_preview": [
+      4155.7,
+      2546.4
+     ],
+     "zoom_crop": [
+      953.7,
+      1091.4
+     ],
+     "closeup": [
+      443.7,
+      491.4
+     ]
+    }
+   },
+   "seesaw_sliver_fix": {
+    "what": "The concept frame layer held a sliver of plank: (1) the isolated rounded bump on the back of the plank (a separate component), and (2) a strip of horizontal plank grain on the left of the front fulcrum bracket. Those pixels were moved from the frame to the plank at the high-res cut (no repainting). The remaining frame was then split into frame-back (stand, under the plank) and frame-front (bracket head, over the plank). After the move, the high-res back+plank+front composite matches the original full on every visible pixel.",
+    "high_res_pixels_moved_to_plank": {
+     "back_bump_cap": 695,
+     "left_of_bracket_sliver": 325
+    },
+    "draw_order": "shadow, then frame-back (base), then moving-plank, then frame-front (bracket)"
+   }
+  }
+ ],
+ "kids_in_with_kids_preview": [
+  {
+   "on": "swing-set-twig-aframe",
+   "anchor": "swing2_seat",
+   "feet_template": [
+    562.4,
+    817.1
+   ],
+   "feet_v13_cell_1_0": [
+    4214.4,
+    2227.1
+   ],
+   "how": "locked Albert idle frame 0 drawn at 65 px (65/287), feet on this ride spot"
+  },
+  {
+   "on": "seesaw-leaf-seats",
+   "anchor": "seat_left",
+   "feet_template": [
+    346.3,
+    1180.8
+   ],
+   "feet_v13_cell_1_0": [
+    3998.3,
+    2590.8
+   ],
+   "how": "locked Albert idle frame 0 drawn at 65 px (65/287), feet on this ride spot"
+  }
+ ],
+ "previews": {
+  "folder": "/workspace/ant-colony/furniture/previews/",
+  "files": [
+   "playground-A-on-v13-preview-v1-zoom-crop.jpg",
+   "playground-A-on-v13-with-kids-preview-v1-zoom-crop.jpg",
+   "MD5SUMS-playground-A-previews-v1"
+  ],
+  "jpeg": "q98 4:4:4 (quality=98, subsampling=0)",
+  "zoom_crop_xyxy": [
+   3202,
+   1455,
+   5182,
+   2985
+  ],
+  "paste_topleft_on_v13": [
+   3652,
+   1410
+  ]
+ },
+ "clean_floor": "No scattered debris, toy blocks, candles, loose toys, clutter or lettering. Each piece has only its soft contact shadow."
+}
