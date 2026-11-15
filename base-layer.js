@@ -134,6 +134,13 @@
       if (!basementReady) { setTimeout(go, 40); return; }
       emergeT0 = performance.now() - BC.EMERGE_SECONDS * 1000 - 1;
       begin('underground');
+      // Snap the camera to the real arrival view. The descending transition
+      // does this in the real flow; the hook skips it, so without this the
+      // camera stays at the start view and placed items sit off-screen.
+      if (window.openingDemo) {
+        var E = window.openingDemo.downEnd();
+        window.openingDemo.setView({ spp: E.spp, lookX: BC.SPIRAL_W.x, lookY: E.lookY });
+      }
     };
     go();
   }
