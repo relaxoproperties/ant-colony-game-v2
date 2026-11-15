@@ -103,6 +103,11 @@ loads.push(fetch('assets/landing-path.json').then(r=>{if(!r.ok)throw new Error('
 // hidden under the opaque video, so its first-draw cost (0.8-1.2 s headless, more on a phone) is paid before the flight.
 let gateWarm=false;
 function warmMap(){if(!(art.map&&art.map.width>1))return;const t0=performance.now(),d=view.d;ctx.save();ctx.setTransform(d,0,0,d,0,0);ctx.translate(view.x,view.y);ctx.scale(view.s,view.s);applyWorld();ctx.drawImage(art.map,0,0,WORLD.w,WORLD.h);ctx.restore();olog('map-hd first draw under the video '+Math.round(performance.now()-t0)+' ms')}
+// BASE: from the other game — keep both surface pictures decoded while she is downstairs, so the UP tap has no delay.
+// A 2x2 draw every 0.3 s keeps the browser's decoded copy alive (cold first draw measured ~1008 ms, warm 6 ms).
+const WARM=document.createElement('canvas');WARM.width=WARM.height=2;const wctx=WARM.getContext('2d');
+setInterval(()=>{if(document.hidden||state==='intro'||state==='landing'||!(art.map&&art.map.complete))return;
+ try{if(art.map&&art.map.complete)wctx.drawImage(art.map,0,0,2,2);if(art.wide&&art.wide.complete)wctx.drawImage(art.wide,0,0,2,2)}catch(e){}},300);
 const gateOpen=()=>{if(ready||gateWarm)return;gateWarm=true;warmMap();requestAnimationFrame(()=>{ready=true;olog('opening gate ready');if(video.ended)videoDone=true;if(videoDone&&state==='intro')begin('landing')})};
 Promise.all(loads).then(gateOpen).catch(e=>{olog('opening gate error '+(e&&e.message));gateOpen()});
 function syncFloors(){
