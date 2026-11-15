@@ -63,9 +63,155 @@
   }
   function removeItem(id) {
     for (var i = placed.length - 1; i >= 0; i--) {
-      if (placed[i].id === id) { placed.splice(i, 1); renderMenu(); return true; }
+      if (placed[i].id === id) { placed.splice(i, 1); renderMenu(); onItemRemoved(id); return true; }
     }
     return false;
+  }
+
+  // ---- CHECKPOINT 2: the queen controller (ported from v1, index.html ~469-510) ----
+  // v1's QN system, in world coords (v1's queenTo took chamber-image px and
+  // converted with toW; placed positions here are already world coords).
+  // She walks with her locked walk art; every other moment she uses the
+  // established front idle strip. She only takes over AFTER she has arrived
+  // underground AND the player places an item (queenFree). Before that,
+  // checkpoint 1's arrival (pinned at APPEAR, landing frame + breathe) is untouched.
+  var QN = { mode: 'idle', path: [], until: 0, cb: null, wf: 0, flip: false, home: null, busy: false, settled: false };
+  var QSPD = 36; // world units per second (v1)
+  var QT = 0, qLastNow = 0; // queen clock (v1's T), advanced in the draw step
+  var EAT_WAIT_S = 3, DRINK_WAIT_S = 3, LAY_WAIT_S = 2, BED_WAIT_S = 2; // v1 EGG_CYCLE values
+  var queenFree = false;
+  var runningScriptId = null;
+  var pendingScripts = []; // {id, cx, floorY} — an item placed while she is busy waits its turn
+  function queenTo(wx, wy, cb) { QN.mode = 'walk'; QN.path = [{ x: wx, y: wy }]; QN.cb = cb || null; }
+  function queenWait(s, cb) { QN.mode = 'act'; QN.until = QT + s; QN.cb = cb || null; }
+  function queenHome(cb) {
+    if (QN.home) queenTo(QN.home.x, QN.home.y, function () { QN.mode = 'idle'; cb && cb(); });
+    else { QN.mode = 'idle'; cb && cb(); }
+  }
+  function stepQueen(dt) {
+    if (QN.mode === 'walk') {
+      var left = QSPD * dt;
+      while (left > 0 && QN.path.length) {
+        var p = QN.path[0], dx = p.x - queen.x, dy = p.y - queen.y, d = Math.hypot(dx, dy);
+        if (Math.abs(dx) > 1e-3) QN.flip = dx > 0;
+        var s = Math.min(left, d);
+        queen.x += dx / (d || 1) * s; queen.y += dy / (d || 1) * s; left -= s;
+        QN.wf += s / (QUEEN_UNDER_W * 0.06);
+        if (s >= d - 1e-6) QN.path.shift();
+      }
+      if (!QN.path.length) { QN.mode = 'idle'; var cb = QN.cb; QN.cb = null; cb && cb(); }
+    } else if (QN.mode === 'act' && QT >= QN.until) {
+      QN.mode = 'idle'; var cb2 = QN.cb; QN.cb = null; cb2 && cb2();
+    }
+  }
+  // v1 Q3: the established front idle strip (11 cells 400x420, order 0..10,0,0,0
+  // at 7 fps, anchor 200,395 = feet), drawn at her current size.
+  var Q3 = { cellW: 400, cellH: 420, ax: 200, ay: 395, fps: 7, order: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 0, 0, 0] };
+  var Q3_BODY_MATCH = (104 / 200) / (145 / 400);
+  var QIDLE = new Image(); var qidleOk = false;
+  QIDLE.onload = function () { qidleOk = true; };
+  QIDLE.src = 'assets/queen/queen_idle_front_strip_v1.png';
+  function drawQueenFront(x, y, w, alpha, now) {
+    if (!qidleOk) { sprite(art.landing, 125, 12, x, y, w, alpha); return; }
+    var f = Q3.order[Math.floor(now / 1000 * Q3.fps) % Q3.order.length], s = w * Q3_BODY_MATCH / Q3.cellW;
+    ctx.save(); ctx.globalAlpha *= alpha;
+    ctx.drawImage(QIDLE, f * Q3.cellW, 0, Q3.cellW, Q3.cellH, x - Q3.ax * s, y - Q3.ay * s, Q3.cellW * s, Q3.cellH * s);
+    ctx.restore();
+  }
+  function drawQueen(now) {
+    if (QN.dig && QN.mode !== 'walk') { sprite(art.dig, Math.floor((QT - QN.dig.t0) * 8) % 6, 6, queen.x, queen.y, QUEEN_UNDER_W); return; }
+    if (QN.mode === 'walk') sprite(art.walk, Math.floor(QN.wf) % 16, 16, queen.x, queen.y, QUEEN_UNDER_W, 1, QN.flip);
+    else drawQueenFront(queen.x, queen.y, QUEEN_UNDER_W, 1, now);
+  }
+  // Called from drawUnderground (index.html) once per frame while she is free.
+  function queenFrame(now) {
+    var dt = qLastNow ? Math.min(0.1, (now - qLastNow) / 1000) : 0;
+    qLastNow = now;
+    QT += dt;
+    stepQueen(dt);
+    drawQueen(now);
+    if (QN.mode === 'walk') positionTarget();
+  }
+  window.BASE_QUEEN = {
+    get free() { return queenFree; },
+    draw: queenFrame
+  };
+
+  // ---- CHECKPOINT 2: the four item reactions (v1 queenScript, at placed positions) ----
+  // The 4 items ARE the 4 rooms without walls (bed = royal, fridge = kitchen,
+  // cooler = water, basket = nursery). Each reaction uses its PLACED position
+  // in the entrance hexagon, not a fixed room spot. No unlock chain (all 4 are
+  // already in the menu), no timers, no brain/coin system.
+  // v1's flyIcons fed the meter HUD, which checkpoint 2 does not have, so the
+  // eat/drink reactions are walk -> wait -> return home without flying icons.
+  // v1's doLay needs the whole egg/generation system, so the basket is walk ->
+  // wait (the lay wait) -> return home; no eggs appear yet.
+  function itemSpot(id, cx, floorY) {
+    // Bed: ON the bed (v1 royal: feet ~17.5% up from the bed's foot).
+    // Others: just in front of the item.
+    if (id === 'leafbed') {
+      var it = itemById(id);
+      var h = it ? itemH(it) : 0;
+      return { x: cx, y: floorY - h * 0.175 };
+    }
+    return { x: cx, y: floorY + 6 };
+  }
+  function runItemScript(id, cx, floorY) {
+    var spot = itemSpot(id, cx, floorY);
+    runningScriptId = id;
+    if (id === 'leafbed') {
+      // v1 queenScript royal: walks to the leaf bed by herself and settles.
+      QN.busy = true;
+      queenTo(spot.x, spot.y, function () {
+        QN.home = { x: spot.x, y: spot.y }; QN.settled = true;
+        queenWait(BED_WAIT_S, function () { QN.busy = false; runningScriptId = null; runPending(); });
+      });
+    } else if (id === 'fridge') {
+      // v1 queenScript kitchen: walks to the fridge and eats, then returns home.
+      QN.busy = true;
+      queenTo(spot.x, spot.y, function () {
+        queenWait(EAT_WAIT_S, function () { queenHome(function () { QN.busy = false; runningScriptId = null; runPending(); }); });
+      });
+    } else if (id === 'watercooler') {
+      // v1 queenScript water: walks to the cooler and drinks, then returns home.
+      QN.busy = true;
+      queenTo(spot.x, spot.y, function () {
+        queenWait(DRINK_WAIT_S, function () { queenHome(function () { QN.busy = false; runningScriptId = null; runPending(); }); });
+      });
+    } else if (id === 'eggbasket') {
+      // v1 queenScript nursery (doLay) minus the egg system: walks to the
+      // basket, waits the lay wait, then returns home. No eggs appear yet.
+      QN.busy = true;
+      queenTo(spot.x, spot.y, function () {
+        queenWait(LAY_WAIT_S, function () { queenHome(function () { QN.busy = false; runningScriptId = null; runPending(); }); });
+      });
+    }
+  }
+  function runPending() {
+    if (QN.busy) return;
+    var next = pendingScripts.shift();
+    if (next) runItemScript(next.id, next.cx, next.floorY);
+  }
+  function onItemPlaced(id, cx, floorY) {
+    queenFree = true; // the QN system takes over from here; checkpoint 1 is done
+    if (QN.busy) {
+      for (var i = 0; i < pendingScripts.length; i++) {
+        if (pendingScripts[i].id === id) { pendingScripts[i].cx = cx; pendingScripts[i].floorY = floorY; return; }
+      }
+      pendingScripts.push({ id: id, cx: cx, floorY: floorY });
+      return;
+    }
+    runItemScript(id, cx, floorY);
+  }
+  function onItemRemoved(id) {
+    for (var i = pendingScripts.length - 1; i >= 0; i--) if (pendingScripts[i].id === id) pendingScripts.splice(i, 1);
+    if (id === 'leafbed') { QN.home = null; QN.settled = false; }
+    if (runningScriptId === id) {
+      // She was mid-reaction to an item that no longer exists: stop, stand still.
+      runningScriptId = null;
+      QN.mode = 'idle'; QN.path = []; QN.cb = null; QN.busy = false;
+      runPending();
+    }
   }
 
   // ---- CHECKPOINT 2: the ONE entrance hexagon (visual, below the hole) ----
@@ -178,8 +324,10 @@
       var it = itemById(id);
       if (!it) return false;
       // CHECKPOINT 2: a placed position (from the ghost) wins; no position = the default spot (checkpoint 1).
-      placed.push({ id: it.id, cx: (typeof cx === 'number' ? cx : it.cx), floorY: (typeof floorY === 'number' ? floorY : it.floorY), w: it.w });
+      var pcx = (typeof cx === 'number' ? cx : it.cx), pfy = (typeof floorY === 'number' ? floorY : it.floorY);
+      placed.push({ id: it.id, cx: pcx, floorY: pfy, w: it.w });
       renderMenu();
+      onItemPlaced(it.id, pcx, pfy);
       return true;
     },
     removeAt: function (wx, wy) {
