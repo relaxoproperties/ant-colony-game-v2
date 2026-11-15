@@ -9,11 +9,14 @@
   var URLQ = new URLSearchParams(location.search);
 
   // ---- the four first build items (default spots in the entrance hex; Chris will place them) ----
+  // Spots sit in the middle of the cleared pocket, above the build menu, so a
+  // placed item is visible the moment you tap BUILD (Nov 15 fix: the low spots
+  // hid behind the menu).
   var ITEMS = [
-    { id: 'leafbed',    name: 'Leaf bed',    src: 'assets/items/leaf-bed.png',    cx: 2790, floorY: 5098, w: 50 },
-    { id: 'eggbasket',  name: 'Egg basket',  src: 'assets/items/egg-basket.png',  cx: 2862, floorY: 5094, w: 28 },
-    { id: 'fridge',     name: 'Fridge',      src: 'assets/items/fridge.png',      cx: 2762, floorY: 5050, w: 36 },
-    { id: 'watercooler',name: 'Water cooler',src: 'assets/items/water-cooler.png',cx: 2865, floorY: 5047, w: 33 }
+    { id: 'leafbed',    name: 'Leaf bed',    src: 'assets/items/leaf-bed.png',    cx: 2790, floorY: 5000, w: 50 },
+    { id: 'eggbasket',  name: 'Egg basket',  src: 'assets/items/egg-basket.png',  cx: 2862, floorY: 4995, w: 28 },
+    { id: 'fridge',     name: 'Fridge',      src: 'assets/items/fridge.png',      cx: 2762, floorY: 5010, w: 36 },
+    { id: 'watercooler',name: 'Water cooler',src: 'assets/items/water-cooler.png',cx: 2865, floorY: 5005, w: 33 }
   ];
   var IMGS = {};
   ITEMS.forEach(function (it) {
