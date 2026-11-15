@@ -10,8 +10,15 @@
 // the item appears as a white ghost; drag/tap anywhere inside the entrance hex
 // to place it (white = can place, red = outside the hex or overlapping another
 // item). Tap a placed item and a bubble appears: arrows to MOVE it inside the
-// hex, bulldozer to ERASE it (asks "are you sure?" first). No item functions
-// or timers in this build — placed items are drawn and marked Built, nothing more.
+// hex, bulldozer to ERASE it (asks "are you sure?" first).
+// CHECKPOINT 2 TIMERS (Nov 15, v1 values, reused not invented): every item has
+// a timer. Bed = the brain timer (120s resting on the bed -> brain bubble above
+// her head, tap = +1 brain, 2-3 coins tracked, no HUD, no idea minigame).
+// Fridge = kitchen room timer 5:00, cooler = water room timer 7:00: a countdown
+// over the item; at 00:00 a leaf/drop bubble appears, tap = she eats/drinks (3s)
+// and the timer restarts. Basket = the egg cycle: lay (2s) -> tends at +2/+4/+6
+// min -> hatch at +8 min (basket empties; the kid ants need v1's whole kid
+// system and are NOT ported). No unlock chain.
 // ?checkpoint=2 skips the opening for testing: straight underground, menu open.
 (function () {
   'use strict';
@@ -129,13 +136,375 @@
     qLastNow = now;
     QT += dt;
     stepQueen(dt);
+    // Brain timer (v1): runs only while she rests idle and settled on the bed.
+    // Pauses while placing; resets when she leaves the bed (brainReset calls).
+    var brainIdle = QN.mode === 'idle' && !QN.busy && mode !== 'carrying' &&
+      (typeof state === 'undefined' || state === 'underground' || state === 'menu') && atHome();
+    if (mode !== 'carrying' && brainIdle && !BR.ready) {
+      BR.t += dt;
+      if (BR.t >= BRAIN_EVERY) BR.ready = true;
+    }
+    stepRoomTimers();
+    stepEggs();
     drawQueen(now);
+    drawBrainBubble(now);
+    drawRoomTimerBubbles(now);
+    drawBasketBubbles(now);
     if (QN.mode === 'walk') positionTarget();
   }
   window.BASE_QUEEN = {
     get free() { return queenFree; },
     draw: queenFrame
   };
+
+  // ---- CHECKPOINT 2: the brain timer (v1 CHAMBER_BUB / BRAIN_BED_ONLY) ----
+  // v1: a 2-minute timer that runs ONLY while she rests idle and settled on her
+  // Royal grass bed. When it completes, a brain bubble appears above her head;
+  // tap = +1 brain, 2-3 coins (counted in BR.coins; checkpoint 2 has no money
+  // HUD and no idea minigame). The timer pauses while placing and resets
+  // whenever she leaves the bed (any build activity distracts her, v1 brainReset).
+  var BRAIN_EVERY = 120; // v1 CHAMBER_BUB.EVERY_S
+  var BRAIN_COINS = [2, 3]; // v1
+  var BR = { t: 0, ready: false, brains: 0, coins: 0 };
+  function brainReset() { BR.t = 0; }
+  function queenHeadW() { return { x: queen.x, y: queen.y - QUEEN_UNDER_W * 0.58 }; } // v1
+  function atHome() {
+    if (!QN.home) return false;
+    return Math.hypot(queen.x - QN.home.x, queen.y - QN.home.y) < 2; // v1 (<2 world units)
+  }
+  function bubbleR() {
+    var pxw = spp * view.s;
+    return Math.max(19, Math.min(30, HEX.w * pxw * 0.13)) / pxw; // v1
+  }
+  var IBRAIN = new Image(); IBRAIN.src = 'assets/menu-ant/iBrain.webp';
+  function brainBubble() {
+    if (!BR.ready || mode === 'carrying' || (typeof state !== 'undefined' && state === 'menu')) return null;
+    var h = queenHeadW(), r = bubbleR();
+    return { kind: 'brain', x: h.x, y: h.y - r - 4 / (spp * view.s), r: r }; // v1, hidden while placing
+  }
+  function drawBrainBubble(now) {
+    var b = brainBubble();
+    if (!b) return;
+    var k = 1 + .06 * Math.sin(now / 200), Rr = b.r * k, lw = 3 / (spp * view.s); // v1 pulse
+    ctx.save();
+    ctx.beginPath(); ctx.arc(b.x, b.y, Rr, 0, 7);
+    ctx.fillStyle = 'rgba(255,255,255,.92)'; ctx.fill();
+    ctx.lineWidth = lw; ctx.strokeStyle = '#f3cf82'; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(b.x - Rr * .28, b.y + Rr * .9);
+    ctx.lineTo(b.x, b.y + Rr * 1.32); ctx.lineTo(b.x + Rr * .28, b.y + Rr * .9);
+    ctx.closePath(); ctx.fillStyle = 'rgba(255,255,255,.92)'; ctx.fill();
+    if (IBRAIN.complete && IBRAIN.naturalWidth) {
+      var q = Rr * 1.5;
+      ctx.drawImage(IBRAIN, b.x - q / 2, b.y - q / 2, q, q);
+    }
+    ctx.restore();
+  }
+  // v1 floatTxt2 (DOM): a floating "+1" at screen coords, then it fades away.
+  function worldToScreen(x, y) {
+    var c = worldToCanvas(x, y);
+    var panY = (typeof pan !== 'undefined' ? pan : 0);
+    return { x: view.x + c.x * view.s, y: view.y + (c.y - panY) * view.s };
+  }
+  function floatTxt(t, wx, wy) {
+    var game = document.querySelector('#game');
+    if (!game) return;
+    var s = worldToScreen(wx, wy);
+    var d = document.createElement('div');
+    d.textContent = t;
+    d.style.cssText = "position:absolute;left:" + s.x + "px;top:" + s.y + "px;transform:translate(-50%,-50%);z-index:9460;pointer-events:none;color:#ffe38a;font:800 20px/1 'BM3 Sans','DejaVu Sans',sans-serif;text-shadow:0 2px 3px #000,0 0 6px #000a;transition:opacity .6s,margin-top .6s";
+    game.appendChild(d);
+    requestAnimationFrame(function () { d.style.opacity = '0'; d.style.marginTop = '-28px'; });
+    setTimeout(function () { if (d.parentNode) d.parentNode.removeChild(d); }, 700);
+  }
+  function tapBrainBubble(b) {
+    BR.ready = false; BR.t = 0; BR.brains += 1;
+    var n = BRAIN_COINS[0] + Math.floor(Math.random() * (BRAIN_COINS[1] - BRAIN_COINS[0] + 1));
+    BR.coins += n;
+    floatTxt('+1', b.x, b.y);
+    // (coins counted in BR.coins; no money HUD in checkpoint 2, no idea minigame)
+  }
+
+  // ---- CHECKPOINT 2: the fridge / water room timers (v1 R3-5 / ROOM_STALL_S) ----
+  // v1: the kitchen counts down 5:00 and the water room 7:00 (ROOM_STALL_S).
+  // The countdown is drawn over the item; at 00:00 it stops and a leaf (fridge)
+  // / water-drop (cooler) bubble pops over the item. Tap = she walks over and
+  // eats / drinks (3s, the existing reaction) and the timer restarts. The 3s
+  // eat/drink itself has no visible countdown in v1 — the room timer is the
+  // visible countdown. No meters in checkpoint 2, so the timer never starves.
+  var ROOM_STALL_S = { fridge: 300, watercooler: 420 }; // v1 kitchen 300, water 420
+  var roomTimers = {}; // id -> {start, ready} in queen-clock (QT) seconds
+  var ILEAF = new Image(); ILEAF.src = 'assets/icons/fi_leaf.webp';
+  var IDROP = new Image(); IDROP.src = 'assets/icons/icon_water_droplet.png';
+  function startRoomTimer(id) {
+    if (!ROOM_STALL_S[id]) return;
+    roomTimers[id] = { start: QT, ready: false };
+  }
+  function clearRoomTimer(id) { delete roomTimers[id]; }
+  function roomTimerLeft(id) {
+    var rt = roomTimers[id];
+    if (!rt) return null;
+    return Math.max(0, rt.start + ROOM_STALL_S[id] - QT);
+  }
+  function stepRoomTimers() {
+    for (var id in roomTimers) {
+      var rt = roomTimers[id];
+      if (!rt.ready && roomTimerLeft(id) <= 0) rt.ready = true; // 00:00: bubble appears
+    }
+  }
+  function roomTimerBubble(id) {
+    var rt = roomTimers[id];
+    if (!rt || !rt.ready || mode === 'carrying') return null;
+    var p = null;
+    for (var i = 0; i < placed.length; i++) if (placed[i].id === id) { p = placed[i]; break; }
+    if (!p) return null;
+    var r = bubbleR();
+    var im = IMGS[p.id];
+    var h = (im && im.naturalWidth) ? p.w * im.naturalHeight / im.naturalWidth : p.w * 0.8;
+    return { kind: id === 'fridge' ? 'eat' : 'drink', id: id, x: p.cx, y: p.floorY - h - r * 2.2, r: r };
+  }
+  function drawRoomTimerBubbles(now) {
+    var ids = ['fridge', 'watercooler'];
+    for (var i = 0; i < ids.length; i++) {
+      var id = ids[i];
+      var p = null;
+      for (var j = 0; j < placed.length; j++) if (placed[j].id === id) { p = placed[j]; break; }
+      if (!p) continue;
+      var im = IMGS[p.id];
+      var h = (im && im.naturalWidth) ? p.w * im.naturalHeight / im.naturalWidth : p.w * 0.8;
+      var left = roomTimerLeft(id);
+      // Countdown mm:ss over the item while the timer runs (v1's visible timer).
+      if (left !== null && left > 0) {
+        var mm = Math.floor(left / 60), ss = Math.floor(left % 60);
+        var txt = mm + ':' + (ss < 10 ? '0' : '') + ss;
+        ctx.save();
+        ctx.font = '700 8px sans-serif'; // world units (v1 draws timer text in world space)
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        var tx = p.cx, ty = p.floorY - h - 8;
+        ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(0,0,0,.7)';
+        ctx.strokeText(txt, tx, ty);
+        ctx.fillStyle = '#ffe38a';
+        ctx.fillText(txt, tx, ty);
+        ctx.restore();
+      }
+      // Leaf / drop bubble at 00:00 (v1's eat/drink bubble, same bubble style).
+      var b = roomTimerBubble(id);
+      if (b) {
+        var k = 1 + .06 * Math.sin(now / 200), Rr = b.r * k, lw = 3 / (spp * view.s);
+        var ic = (b.kind === 'eat') ? ILEAF : IDROP;
+        ctx.save();
+        ctx.beginPath(); ctx.arc(b.x, b.y, Rr, 0, 7);
+        ctx.fillStyle = 'rgba(255,255,255,.92)'; ctx.fill();
+        ctx.lineWidth = lw; ctx.strokeStyle = '#f3cf82'; ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(b.x - Rr * .28, b.y + Rr * .9);
+        ctx.lineTo(b.x, b.y + Rr * 1.32); ctx.lineTo(b.x + Rr * .28, b.y + Rr * .9);
+        ctx.closePath(); ctx.fillStyle = 'rgba(255,255,255,.92)'; ctx.fill();
+        if (ic.complete && ic.naturalWidth) {
+          var q = Rr * 1.36, a = ic.naturalWidth / ic.naturalHeight || 1;
+          var w = a >= 1 ? q : q * a, hh = a >= 1 ? q / a : q;
+          ctx.drawImage(ic, b.x - w / 2, b.y - hh / 2, w, hh);
+        }
+        ctx.restore();
+      }
+    }
+  }
+  function tapRoomTimerBubble(b) {
+    // v1 R3-5: tap = queue; when she is free she walks there and eats/drinks, timer restarts.
+    var id = b.id;
+    var p = null;
+    for (var j = 0; j < placed.length; j++) if (placed[j].id === id) { p = placed[j]; break; }
+    if (!p) return;
+    startRoomTimer(id); // restart the countdown now (v1 restarts it when she goes)
+    if (QN.busy) {
+      for (var i = 0; i < pendingScripts.length; i++) {
+        if (pendingScripts[i].id === id) { pendingScripts[i].cx = p.cx; pendingScripts[i].floorY = p.floorY; return; }
+      }
+      pendingScripts.push({ id: id, cx: p.cx, floorY: p.floorY });
+      return;
+    }
+    runItemScript(id, p.cx, p.floorY);
+  }
+
+  // ---- CHECKPOINT 2: the egg cycle (v1 EGG_CYCLE, doLay/doTend/doRemove, stepEggs) ----
+  // v1 values: lay 2s, tends at +2/+4/+6 min, hatch at +8 min, spoil window 120s.
+  // The basket is the ONE placed egg basket (not v1's 4 nursery baskets).
+  // Lay: she walks to the basket, waits 2s, two eggs appear, the cycle starts.
+  // Tend: at each tend time a bubble (egg cutout + heart) appears over the basket;
+  // tap = she walks over, tends 2s, the next tend is due (or the hatch is set).
+  // Spoil: a tend untapped for 120s spoils the basket; tap the fried-egg bubble
+  // and she removes the spoiled eggs (2s) and the basket is empty again.
+  // Hatch: at +8 min (all tends done) the eggs hatch and the basket empties.
+  // The hatch itself spawns kid ants in v1 (GENS/newKid/walkAnt + kid sprites) —
+  // that whole kid system is NOT ported, so no babies appear yet (see report).
+  var EGG_CYCLE = {
+    TEND_AT_S: [120, 240, 360],
+    TEND_COUNT: 3,
+    HATCH_AT_S: 480,
+    SPOIL_WINDOW_S: 120,
+    LAY_WAIT_S: 2, TEND_LOOK_S: 2, SPOIL_REMOVE_S: 2
+  };
+  var IEGG = new Image(); IEGG.src = 'assets/items/egg-cutout.png';
+  var IBASKET_EMPTY = new Image(); IBASKET_EMPTY.src = 'assets/items/egg-basket-empty.png';
+  var basketJob = null; // 'tend' | 'remove' while she is doing a basket job
+  var basketQueue = []; // kinds waiting while she is busy
+  function basketPlaced() {
+    for (var i = 0; i < placed.length; i++) if (placed[i].id === 'eggbasket') return placed[i];
+    return null;
+  }
+  function layEggs() {
+    var p = basketPlaced();
+    if (!p) return;
+    p.egg = {
+      state: 'two', laidAt: QT, tendsDone: 0, tapped: false,
+      tendDueAt: QT + EGG_CYCLE.TEND_AT_S[0], tendAppearedAt: null, spoilAt: null, hatchAt: null
+    };
+  }
+  function markTend(p) {
+    var e = p.egg;
+    if (!e) return;
+    e.tendsDone++;
+    e.tendAppearedAt = null; e.spoilAt = null; e.tapped = false;
+    if (e.tendsDone < EGG_CYCLE.TEND_COUNT) e.tendDueAt = e.laidAt + EGG_CYCLE.TEND_AT_S[e.tendsDone];
+    else { e.tendDueAt = null; e.hatchAt = Math.max(e.laidAt + EGG_CYCLE.HATCH_AT_S, QT); }
+  }
+  function basketTimer(p) {
+    var e = p.egg;
+    if (!e || e.state !== 'two') return null;
+    if (e.tendAppearedAt != null) return e.tapped ? null : e.spoilAt - QT;
+    if (e.tendsDone < EGG_CYCLE.TEND_COUNT) return e.tendDueAt - QT;
+    return e.hatchAt - QT;
+  }
+  function stepEggs() {
+    var p = basketPlaced();
+    if (!p || !p.egg) return;
+    var e = p.egg;
+    if (e.state !== 'two') return;
+    if (e.tendsDone < EGG_CYCLE.TEND_COUNT) {
+      if (e.tendAppearedAt == null && QT >= e.tendDueAt) { e.tendAppearedAt = QT; e.spoilAt = QT + EGG_CYCLE.SPOIL_WINDOW_S; }
+      else if (e.tendAppearedAt != null && !e.tapped && QT >= e.spoilAt) {
+        e.state = 'spoiled'; e.tendAppearedAt = null; e.spoilAt = null; e.hatchAt = null;
+      }
+    } else if (QT >= e.hatchAt && !QN.busy) {
+      // Hatch: v1 spawns kid ants here (GENS/newKid) — NOT ported. The basket empties.
+      p.egg = null;
+    }
+  }
+  function runBasketJob(kind) {
+    var p = basketPlaced();
+    if (!p || !p.egg) return;
+    if (QN.busy) { if (basketQueue.indexOf(kind) < 0) basketQueue.push(kind); return; }
+    basketJob = kind;
+    runningScriptId = 'eggbasket';
+    var spot = itemSpot('eggbasket', p.cx, p.floorY);
+    QN.busy = true;
+    queenTo(spot.x, spot.y, function () {
+      if (kind === 'tend') {
+        queenWait(EGG_CYCLE.TEND_LOOK_S, function () {
+          var pp = basketPlaced();
+          if (pp && pp.egg && pp.egg.state === 'two' && pp.egg.tendAppearedAt != null) {
+            markTend(pp);
+            floatTxt('\u2665', pp.cx, pp.floorY - 10); // v1 doTend heart
+          }
+          basketJob = null; runningScriptId = null;
+          queenHome(function () { QN.busy = false; runBasketPending(); });
+        });
+      } else { // remove
+        queenWait(EGG_CYCLE.SPOIL_REMOVE_S, function () {
+          var pp = basketPlaced();
+          if (pp && pp.egg && pp.egg.state === 'spoiled') pp.egg = null;
+          basketJob = null; runningScriptId = null;
+          queenHome(function () { QN.busy = false; runBasketPending(); });
+        });
+      }
+    });
+  }
+  function runBasketPending() {
+    if (QN.busy) return;
+    var kind = basketQueue.shift();
+    if (kind) runBasketJob(kind);
+    else runPending();
+  }
+  function basketBubbles() {
+    var p = basketPlaced();
+    if (!p || !p.egg || mode === 'carrying') return [];
+    var e = p.egg, out = [], r = bubbleR();
+    var im = IMGS[p.id];
+    var h = (im && im.naturalWidth) ? p.w * im.naturalHeight / im.naturalWidth : p.w * 0.8;
+    var bx = p.cx, by = p.floorY - h - r;
+    if (e.state === 'two' && e.tendAppearedAt != null && !e.tapped) {
+      out.push({ kind: 'tend', x: bx, y: by, r: r });
+    }
+    if (e.state === 'spoiled') {
+      out.push({ kind: 'spoil', x: bx, y: by, r: r });
+    }
+    return out;
+  }
+  function drawBasketBubbles(now) {
+    var list = basketBubbles();
+    for (var i = 0; i < list.length; i++) {
+      var b = list[i];
+      var k = 1 + .06 * Math.sin(now / 200), Rr = b.r * k, lw = 3 / (spp * view.s);
+      ctx.save();
+      ctx.beginPath(); ctx.arc(b.x, b.y, Rr, 0, 7);
+      ctx.fillStyle = 'rgba(255,255,255,.92)'; ctx.fill();
+      ctx.lineWidth = lw; ctx.strokeStyle = '#f3cf82'; ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(b.x - Rr * .28, b.y + Rr * .9);
+      ctx.lineTo(b.x, b.y + Rr * 1.32); ctx.lineTo(b.x + Rr * .28, b.y + Rr * .9);
+      ctx.closePath(); ctx.fillStyle = 'rgba(255,255,255,.92)'; ctx.fill();
+      if (b.kind === 'tend') {
+        // v1 tend bubble: the egg cutout clipped in the circle + a small heart.
+        if (IEGG.complete && IEGG.naturalWidth) {
+          ctx.save();
+          ctx.beginPath(); ctx.arc(b.x, b.y, Rr * .86, 0, 7); ctx.clip();
+          var q = Rr * 3.2;
+          ctx.drawImage(IEGG, b.x - q * .63, b.y - q * .37, q, q * 133 / 113);
+          ctx.restore();
+        }
+        ctx.save();
+        ctx.font = '800 ' + (Rr * .62).toFixed(3) + "px 'BM3 Sans','DejaVu Sans',sans-serif";
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.shadowColor = '#000'; ctx.shadowOffsetY = 2; ctx.shadowBlur = 3;
+        ctx.fillStyle = '#ffe38a';
+        ctx.fillText('\u2665', b.x + Rr * .30, b.y - Rr * .26);
+        ctx.restore();
+      } else if (b.kind === 'spoil') {
+        // v1 spoil bubble: fried-egg glyph.
+        ctx.font = '900 ' + (Rr * 1.25).toFixed(3) + "px 'Apple Color Emoji','Noto Color Emoji','Segoe UI Emoji',sans-serif";
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#000';
+        ctx.fillText('\uD83C\uDF73', b.x, b.y + Rr * .08);
+      }
+      ctx.restore();
+    }
+    // Countdown over the basket (v1 basketTimer, seconds left).
+    var p = basketPlaced();
+    if (p && p.egg && p.egg.state === 'two') {
+      var left = basketTimer(p);
+      if (left !== null && left > 0) {
+        var mm = Math.floor(left / 60), ss = Math.floor(left % 60);
+        var txt = mm + ':' + (ss < 10 ? '0' : '') + ss;
+        var im2 = IMGS[p.id];
+        var h2 = (im2 && im2.naturalWidth) ? p.w * im2.naturalHeight / im2.naturalWidth : p.w * 0.8;
+        ctx.save();
+        ctx.font = '700 8px sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(0,0,0,.7)';
+        ctx.strokeText(txt, p.cx, p.floorY - h2 - 8);
+        ctx.fillStyle = '#ffe38a';
+        ctx.fillText(txt, p.cx, p.floorY - h2 - 8);
+        ctx.restore();
+      }
+    }
+  }
+  function tapBasketBubble(b) {
+    var p = basketPlaced();
+    if (!p || !p.egg) return;
+    if (b.kind === 'tend') {
+      p.egg.tapped = true; // v1: the tap counts as the tend in time (spoil clock stops)
+      runBasketJob('tend');
+    } else if (b.kind === 'spoil') {
+      runBasketJob('remove');
+    }
+  }
 
   // ---- CHECKPOINT 2: the four item reactions (v1 queenScript, at placed positions) ----
   // The 4 items ARE the 4 rooms without walls (bed = royal, fridge = kitchen,
@@ -180,10 +549,14 @@
       });
     } else if (id === 'eggbasket') {
       // v1 queenScript nursery (doLay) minus the egg system: walks to the
-      // basket, waits the lay wait, then returns home. No eggs appear yet.
+      // basket, waits the lay wait, the two eggs appear and the cycle starts,
+      // then returns home. No eggs appear yet in the old build — now they do.
       QN.busy = true;
       queenTo(spot.x, spot.y, function () {
-        queenWait(LAY_WAIT_S, function () { queenHome(function () { QN.busy = false; runningScriptId = null; runPending(); }); });
+        queenWait(LAY_WAIT_S, function () {
+          layEggs();
+          queenHome(function () { QN.busy = false; runningScriptId = null; runPending(); });
+        });
       });
     }
   }
@@ -194,6 +567,8 @@
   }
   function onItemPlaced(id, cx, floorY) {
     queenFree = true; // the QN system takes over from here; checkpoint 1 is done
+    brainReset(); // v1: any build activity distracts the queen
+    if (id === 'fridge' || id === 'watercooler') startRoomTimer(id); // v1: the room timer starts at reveal
     if (QN.busy) {
       for (var i = 0; i < pendingScripts.length; i++) {
         if (pendingScripts[i].id === id) { pendingScripts[i].cx = cx; pendingScripts[i].floorY = floorY; return; }
@@ -205,6 +580,10 @@
   }
   function onItemRemoved(id) {
     for (var i = pendingScripts.length - 1; i >= 0; i--) if (pendingScripts[i].id === id) pendingScripts.splice(i, 1);
+    for (var j = basketQueue.length - 1; j >= 0; j--) basketQueue.splice(j, 1);
+    if (id === 'fridge' || id === 'watercooler') clearRoomTimer(id);
+    if (id === 'eggbasket') basketJob = null;
+    brainReset(); // v1: any build activity distracts the queen
     if (id === 'leafbed') { QN.home = null; QN.settled = false; }
     if (runningScriptId === id) {
       // She was mid-reaction to an item that no longer exists: stop, stand still.
@@ -269,6 +648,7 @@
     var p = placed[idx];
     moveFrom = { id: p.id, cx: p.cx, floorY: p.floorY };
     placed.splice(idx, 1);
+    brainReset(); // v1: any build activity distracts the queen
     hideBubble();
     mode = 'carrying'; carryId = id;
     ghost = { cx: p.cx, floorY: p.floorY };
@@ -296,6 +676,8 @@
       }
       placed.forEach(function (p) {
         var im = IMGS[p.id];
+        // The basket shows the empty basket until she lays, then two eggs.
+        if (p.id === 'eggbasket' && !p.egg) im = IBASKET_EMPTY;
         if (!im || !im.complete || !im.naturalWidth) return;
         var h = p.w * im.naturalHeight / im.naturalWidth;
         ctx.drawImage(im, p.cx - p.w / 2, p.floorY - h, p.w, h);
@@ -343,6 +725,31 @@
     get placing() { return mode === 'carrying'; },
     get placed() { return placed.slice(); },
     get entrance() { return { x: ENTRANCE.x, y: ENTRANCE.y, w: HEXW }; }
+  };
+
+  // Test/debug handle for the checkpoint 2 timers (read-only state).
+  window.BASE_TIMERS = {
+    get brain() { return { t: BR.t, ready: BR.ready, brains: BR.brains, coins: BR.coins }; },
+    get room() {
+      var out = {};
+      for (var id in roomTimers) out[id] = { left: roomTimerLeft(id), ready: roomTimers[id].ready };
+      return out;
+    },
+    get basket() {
+      var p = basketPlaced();
+      return p && p.egg ? { state: p.egg.state, tendsDone: p.egg.tendsDone, left: basketTimer(p) } : null;
+    },
+    get queen() { return { x: queen.x, y: queen.y, mode: QN.mode, busy: QN.busy, settled: QN.settled, home: QN.home }; }
+  };
+  // Test handle for the timer bubbles (tap entry points, same as the canvas tap).
+  window.BASE_TEST = {
+    brainBubble: brainBubble,
+    roomTimerBubble: roomTimerBubble,
+    basketBubbles: basketBubbles,
+    tapBrainBubble: tapBrainBubble,
+    tapRoomTimerBubble: tapRoomTimerBubble,
+    tapBasketBubble: tapBasketBubble,
+    get placed() { return placed.slice(); }
   };
 
   // ---- the build menu (always on, just the four items + the bulldozer) ----
@@ -496,6 +903,26 @@
     if (bubbleEl) bubbleEl.style.display = 'none';
   }
 
+  // CHECKPOINT 2 TIMERS: the brain / eat / drink / tend / spoil bubbles are
+  // canvas bubbles (v1 hitBubble: nearest bubble within r*1.35 wins). They are
+  // checked before the placed-item bubble, so a tap on the brain bubble above
+  // her head does not open the bed's move/erase bubble.
+  function hitTimerBubble(w) {
+    var list = [];
+    var bb = brainBubble();
+    if (bb) list.push(bb);
+    var eb = roomTimerBubble('fridge'); if (eb) list.push(eb);
+    var db = roomTimerBubble('watercooler'); if (db) list.push(db);
+    var tb = basketBubbles();
+    for (var i = 0; i < tb.length; i++) list.push(tb[i]);
+    var best = null, bd = 1e18;
+    for (var j = 0; j < list.length; j++) {
+      var b = list[j], d = Math.hypot(w.x - b.x, w.y - b.y);
+      if (d <= b.r * 1.35 && d < bd) { bd = d; best = b; }
+    }
+    return best;
+  }
+
   // CHECKPOINT 2: tap BUILD and the ghost is carried straight into the one
   // entrance hexagon; drag to move the ghost, tap to set it down. A drag only
   // moves the ghost — only a tap (down and up in one spot) places it.
@@ -544,6 +971,13 @@
       }
       if (mode === 'idle') {
         var w = toWorld(e);
+        var tb = hitTimerBubble(w);
+        if (tb) {
+          if (tb.kind === 'brain') tapBrainBubble(tb);
+          else if (tb.kind === 'eat' || tb.kind === 'drink') tapRoomTimerBubble(tb);
+          else if (tb.kind === 'tend' || tb.kind === 'spoil') tapBasketBubble(tb);
+          return;
+        }
         var hit = placedItemAt(w.x, w.y);
         if (hit) showBubble(hit.id);
         else hideBubble();
