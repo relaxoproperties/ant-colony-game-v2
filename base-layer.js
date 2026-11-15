@@ -137,8 +137,7 @@
       // does this in the real flow; the hook skips it, so without this the
       // camera stays at the start view and placed items sit off-screen.
       if (window.openingDemo) {
-        var E = window.openingDemo.downEnd();
-        window.openingDemo.setView({ spp: E.spp, lookX: BC.SPIRAL_W.x, lookY: E.lookY });
+        window.openingDemo.setView({ lookX: BC.SPIRAL_W.x, lookY: BC.SPIRAL_W.y });
       }
     };
     go();
