@@ -59,7 +59,7 @@ const BC=(()=>{const q=new URLSearchParams(location.search),IMG={w:7198,h:4043,H
  const toW=(ix,iy)=>({x:RECT.x+ix*K,y:RECT.y+iy*K});
  const QK=q.get('qunder')==='1'?1:1.25;   // Chris Nov 11 4:00 AM: queen 1.25x underground vs outside; ?qunder=1 = the locked 1x
  return {IMG,K,SPIRAL,HOLE,SPIRAL_W,RECT,toW,QK,GRID:q.get('grid')==='1',HOLE_W:toW(HOLE.x,HOLE.y),STAND_DY:92,EMERGE_SECONDS:1.1}})();
-const DIG_SECONDS=10;let floorFrom=null,emergeT0=0,pan=0,floorPanStart=0,floorLookYStart=0,floorDipWorld=0,lastDownDipWorld=0;
+const DIG_SECONDS=10;let floorFrom=null,emergeT0=0,emerged=false,pan=0,floorPanStart=0,floorLookYStart=0,floorDipWorld=0,lastDownDipWorld=0;
 // Close-up mound-plain.webp lined up on the last bird-video frame (the far/out view).
 const FAR={ox:145.8,oy:293.8,s:0.62};
 const WORLD={w:5625,h:10000},START_SPP=720/168,MAP_RECT={x:2728,y:4850.2,w:168,h:1280/START_SPP};
@@ -136,10 +136,10 @@ function begin(next){
     // BC: the drop ends centred on the spiral hex at START_SPP (a straight move down from the locked start view).
     floorFrom={spp,lookX};if(next==='descending'){const E=downEnd();floorFrom.toSpp=E.spp;floorDipWorld=E.lookY-lookY;lastDownDipWorld=floorDipWorld}
     if(next==='descending')lastDownDipWorld=floorDipWorld;
-    pan=0;queenTarget.style.display='none';menu.classList.remove('open');if(next==='descending'&&!(window.BV&&BV.started))emergeT0=0;
+    pan=0;queenTarget.style.display='none';menu.classList.remove('open');if(next==='descending'&&!emerged)emergeT0=0;
     pointers.clear();gesture=null;tapCandidate=null;
   }
-  if(next==='underground'){if(!emergeT0)emergeT0=performance.now();pan=0;if(!(window.BV&&BV.started)){queen.x=APPEAR.x;queen.y=APPEAR.y}queenTarget.style.width='72px';queenTarget.style.height='72px';queenTarget.style.display='block';positionTarget();queenTarget.click()}   // BASE: the build menu opens by itself when she gets downstairs, and stays on
+  if(next==='underground'){if(!emergeT0){emergeT0=performance.now();emerged=true}pan=0;if(!(window.BV&&BV.started)){queen.x=APPEAR.x;queen.y=APPEAR.y}queenTarget.style.width='72px';queenTarget.style.height='72px';queenTarget.style.display='block';positionTarget();queenTarget.click()}   // BASE: the build menu opens by itself when she gets downstairs, and stays on
   if(next==='entered'){pan=0;queenTarget.style.display='none';menu.classList.remove('open')}
   syncFloors();
 }
