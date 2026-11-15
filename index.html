@@ -320,6 +320,7 @@ const canNavigate=()=>onSurface()||state==='underground'||state==='menu';
 function zoomAt(next,anchor,target=anchor){const p=canvasToWorld(anchor.x,anchor.y);spp=clamp(next,MIN_SPP,MAX_SPP);lookX=p.x-(target.x-360)/spp;lookY=p.y-(target.y-640)/spp;cameraBounds();positionTarget()}
 canvas.addEventListener('pointerdown',e=>{
  if(!canNavigate())return;
+ if(window.BASE_PLACING)return;   // CHECKPOINT 2: while carrying an item, the drag moves the ghost, not the camera.
  canvas.setPointerCapture?.(e.pointerId);
  const p=eventCanvas(e);pointers.set(e.pointerId,p);
  if(pointers.size===1){tapCandidate={id:e.pointerId,x:p.x,y:p.y,moved:false};gesture=null}
@@ -327,6 +328,7 @@ canvas.addEventListener('pointerdown',e=>{
 });
 canvas.addEventListener('pointermove',e=>{
  if(!canNavigate()||!pointers.has(e.pointerId))return;
+ if(window.BASE_PLACING)return;   // CHECKPOINT 2: while carrying an item, the drag moves the ghost, not the camera.
  const old=pointers.get(e.pointerId),p=eventCanvas(e);pointers.set(e.pointerId,p);
  if(tapCandidate&&Math.hypot(p.x-tapCandidate.x,p.y-tapCandidate.y)>8)tapCandidate.moved=true;
  if(pointers.size===2&&gesture){const [a,b]=[...pointers.values()],mid={x:(a.x+b.x)/2,y:(a.y+b.y)/2},dist=Math.hypot(a.x-b.x,a.y-b.y);if(gesture.dist>8)zoomAt(spp*dist/gesture.dist,gesture.mid,mid);gesture={dist,mid}}
