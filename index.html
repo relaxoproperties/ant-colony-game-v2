@@ -139,7 +139,7 @@ function begin(next){
     pan=0;queenTarget.style.display='none';menu.classList.remove('open');if(next==='descending'&&!emerged)emergeT0=0;
     pointers.clear();gesture=null;tapCandidate=null;
   }
-  if(next==='underground'){if(!emergeT0){emergeT0=performance.now();emerged=true}pan=0;if(!(window.BV&&BV.started)){queen.x=APPEAR.x;queen.y=APPEAR.y}queenTarget.style.width='72px';queenTarget.style.height='72px';queenTarget.style.display='block';positionTarget();queenTarget.click()}   // BASE: the build menu opens by itself when she gets downstairs, and stays on
+  if(next==='underground'){if(!emergeT0){emergeT0=performance.now();emerged=true}pan=0;if(!(window.BV&&BV.started)&&!(window.BASE_QUEEN&&BASE_QUEEN.free)){queen.x=APPEAR.x;queen.y=APPEAR.y}queenTarget.style.width='72px';queenTarget.style.height='72px';queenTarget.style.display='block';positionTarget();queenTarget.click()}   // BASE: the build menu opens by itself when she gets downstairs, and stays on
   if(next==='entered'){pan=0;queenTarget.style.display='none';menu.classList.remove('open')}
   syncFloors();
 }
@@ -277,7 +277,7 @@ if(window.BASE_ITEMS)BASE_ITEMS.draw();
 // (landing frame 125 + breathe), drawn at QUEEN_UNDER_W (1.25x; ?qunder=1 = 1x). Locked art scaled at draw time only.
 const e=emergeT0?clamp((now-emergeT0)/1000/BC.EMERGE_SECONDS):0,k=ease(e),H=BC.HOLE_W;
 const breathe=e>=1?Math.sin(now/650):0;
-queen.x=H.x+(APPEAR.x-H.x)*k;queen.y=H.y+(APPEAR.y-H.y)*k;if(emergeT0)sprite(art.landing,125,12,queen.x,queen.y+breathe*QUEEN_DOWN_BOB*BC.QK,QUEEN_UNDER_W,clamp(e/.35));ctx.restore()
+if(window.BASE_QUEEN&&BASE_QUEEN.free&&e>=1)BASE_QUEEN.draw(now);else{queen.x=H.x+(APPEAR.x-H.x)*k;queen.y=H.y+(APPEAR.y-H.y)*k;if(emergeT0)sprite(art.landing,125,12,queen.x,queen.y+breathe*QUEEN_DOWN_BOB*BC.QK,QUEEN_UNDER_W,clamp(e/.35))}ctx.restore()
 }
 // BV3 (Tester I4): where the drop ends. Phone: unchanged (spiral hex centre at START_SPP). When the visible screen band is too
 // short (wide desktop crop), zoom out just enough and centre so the spiral hex AND the standing queen are both fully on screen.
