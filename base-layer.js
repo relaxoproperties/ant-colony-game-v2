@@ -22,7 +22,10 @@
 // over the item; at 00:00 a leaf/drop bubble appears, tap = she eats/drinks (3s)
 // and the timer restarts. Basket = the egg cycle: lay (2s) -> tends at +2/+4/+6
 // min -> hatch at +8 min (basket empties; the kid ants need v1's whole kid
-// system and are NOT ported). No unlock chain.
+// system and are NOT ported). Unlock chain (v1): only the bed is buildable at
+// first; the fridge unlocks after she settles on the bed, the cooler after she
+// eats at the fridge, the basket after she drinks at the cooler. The basket is
+// last (no playground in checkpoint 2). Checkpoint 2 stops at 8 brains.
 // ?checkpoint=2 skips the opening for testing: straight underground, menu open.
 (function () {
   'use strict';
@@ -50,6 +53,31 @@
   });
   function itemById(id) { var found = null; ITEMS.forEach(function (x) { if (x.id === id) found = x; }); return found; }
   function itemH(it) { var im = IMGS[it.id]; return (im && im.naturalWidth) ? it.w * im.naturalHeight / im.naturalWidth : it.w * 0.8; }
+
+  // ---- CHECKPOINT 2: the unlock chain (v1 index.html ~469-472, 497-503) ----
+  // v1: only one room is available to build at a time; the next unlocks when the
+  // current one's first script finishes. Bed -> fridge -> cooler -> basket.
+  // `unlocked` grows as her first reaction to each item completes. The menu
+  // offers only the earliest unplaced unlocked item (currentAvail), so the
+  // order holds even after an erase or a move — v1 has no erase/move, so this
+  // is the chain adapted to checkpoint 2, not a new rule. The basket is last;
+  // nothing unlocks after it (no playground in checkpoint 2).
+  var CHAIN = ['leafbed', 'fridge', 'watercooler', 'eggbasket'];
+  var CHAIN_NEXT = { leafbed: 'fridge', fridge: 'watercooler', watercooler: 'eggbasket', eggbasket: null };
+  var unlocked = { leafbed: true };
+  var builtOnce = {}; // items placed at least once (a move re-place is not a first build)
+  function currentAvail() {
+    for (var i = 0; i < CHAIN.length; i++) {
+      var id = CHAIN[i];
+      if (unlocked[id] && !window.BASE_ITEMS.isPlaced(id)) return id;
+    }
+    return null;
+  }
+  function unlock(id) {
+    if (!id || unlocked[id] || window.BASE_ITEMS.isPlaced(id)) return;
+    unlocked[id] = true;
+    renderMenu();
+  }
 
   // ---- placed items (drawn in world space by drawUnderground) ----
   var placed = []; // {id, cx, floorY, w, h}
@@ -543,8 +571,10 @@
   // ---- CHECKPOINT 2: the four item reactions (v1 queenScript, at placed positions) ----
   // The 4 items ARE the 4 rooms without walls (bed = royal, fridge = kitchen,
   // cooler = water, basket = nursery). Each reaction uses its PLACED position
-  // in the entrance hexagon, not a fixed room spot. No unlock chain (all 4 are
-  // already in the menu), no timers, no brain/coin system.
+  // in the entrance hexagon, not a fixed room spot. The unlock chain (v1) fires
+  // when each item's FIRST reaction completes: bed settle -> fridge, fridge
+  // eat -> cooler, cooler drink -> basket. unlock() is idempotent, so a
+  // re-run (move, bubble-tap re-eat/drink) is a no-op.
   // v1's flyIcons fed the meter HUD, which checkpoint 2 does not have, so the
   // eat/drink reactions are walk -> wait -> return home without flying icons.
   // v1's doLay needs the whole egg/generation system, so the basket is walk ->
@@ -559,6 +589,43 @@
     }
     return { x: cx, y: floorY + 6 };
   }
+  // ---- CHECKPOINT 2: flying eat/drink icons (v1 flyIcons, index.html ~973-978) ----
+  // v1: 5 leaves fly from the fridge/counter to her while she eats (3s), 5
+  // droplets fly from the cooler/tank while she drinks (3s). Same icons, same
+  // count (5), same stagger (175ms) and flight (750ms) as v1, same keyframes
+  // (up-arc then to the target). No meter HUD in checkpoint 2, so the target
+  // is the queen herself, not the meter row. Runs on every eat/drink — the
+  // first one and every later one from the room-timer bubble — because it lives
+  // in runItemScript, the one entry point for both.
+  var FLY = { food: { n: 5, ic: 'assets/icons/fi_leaf.webp' }, water: { n: 5, ic: 'assets/icons/icon_water_droplet.png' } };
+  var FLY_MS = 750, FLY_STAGGER_MS = 175; // v1 COIN.FLY_MS / COIN.STAGGER_MS
+  function flyIcons(kind, srcX, srcY) {
+    var cfg = FLY[kind];
+    if (!cfg) return;
+    var gameEl = document.querySelector('#game');
+    if (!gameEl || typeof scr !== 'function') return;
+    var s = scr(srcX, srcY);
+    for (var i = 0; i < cfg.n; i++) {
+      (function (k) {
+        setTimeout(function () {
+          var t = scr(queen.x, queen.y);
+          var c = document.createElement('img');
+          c.className = 'bvFly'; c.alt = ''; c.src = cfg.ic;
+          c.style.left = s.x + 'px'; c.style.top = s.y + 'px';
+          gameEl.appendChild(c);
+          var done = function () { if (c.parentNode) c.parentNode.removeChild(c); };
+          if (c.animate) {
+            var a = c.animate([
+              { transform: 'translate(0,0) scale(.6)', opacity: 1 },
+              { transform: 'translate(0,-26px) scale(1.15)', opacity: 1, offset: .22 },
+              { transform: 'translate(' + (t.x - s.x) + 'px,' + (t.y - s.y) + 'px) scale(.8)', opacity: .95 }
+            ], { duration: FLY_MS, easing: 'ease-in' });
+            a.onfinish = done;
+          } else setTimeout(done, FLY_MS);
+        }, k * FLY_STAGGER_MS);
+      })(i);
+    }
+  }
   function runItemScript(id, cx, floorY) {
     var spot = itemSpot(id, cx, floorY);
     runningScriptId = id;
@@ -567,19 +634,21 @@
       QN.busy = true;
       queenTo(spot.x, spot.y, function () {
         QN.home = { x: spot.x, y: spot.y }; QN.settled = true;
-        queenWait(BED_WAIT_S, function () { QN.busy = false; runningScriptId = null; runPending(); });
+        queenWait(BED_WAIT_S, function () { QN.busy = false; runningScriptId = null; unlock('fridge'); runPending(); });
       });
     } else if (id === 'fridge') {
       // v1 queenScript kitchen: walks to the fridge and eats, then returns home.
       QN.busy = true;
       queenTo(spot.x, spot.y, function () {
-        queenWait(EAT_WAIT_S, function () { queenHome(function () { QN.busy = false; runningScriptId = null; runPending(); }); });
+        flyIcons('food', cx, floorY - itemH(itemById('fridge')) / 2); // v1: leaves fly from the fridge to her while she eats
+        queenWait(EAT_WAIT_S, function () { queenHome(function () { QN.busy = false; runningScriptId = null; unlock('watercooler'); runPending(); }); });
       });
     } else if (id === 'watercooler') {
       // v1 queenScript water: walks to the cooler and drinks, then returns home.
       QN.busy = true;
       queenTo(spot.x, spot.y, function () {
-        queenWait(DRINK_WAIT_S, function () { queenHome(function () { QN.busy = false; runningScriptId = null; runPending(); }); });
+        flyIcons('water', cx, floorY - itemH(itemById('watercooler')) / 2); // v1: droplets fly from the cooler to her while she drinks
+        queenWait(DRINK_WAIT_S, function () { queenHome(function () { QN.busy = false; runningScriptId = null; unlock('eggbasket'); runPending(); }); });
       });
     } else if (id === 'eggbasket') {
       // v1 queenScript nursery (doLay) minus the egg system: walks to the
@@ -661,6 +730,33 @@
     return true;
   }
 
+  // ---- CHECKPOINT 2: the miniature dust cloud on placing an item ----
+  // v1's dustAt (index.html ~1060, NP5 build cloud): 25 dust puffs, ellipses,
+  // colours #bc9869 / #c9ac7e / #9b784c, fading in/out — copied verbatim, only
+  // the scale is smaller. v1's room cloud uses DUST_K_BV=4.893; an item is a
+  // fraction of a room, so k is sized to the item (cloud about as wide as the
+  // item, puffs a few world units). It puffs briefly as the item lands (1.2s),
+  // then fades. QT is the game clock (same clock the timers use).
+  var dusts = []; // {x, y, t0, dur, k}
+  function dustAt(t, wx, wy, dur, k) {
+    var fade = Math.min(1, t / .3, (dur - t) / .45);
+    if (fade <= 0) return;
+    ctx.save(); ctx.translate(wx, wy); ctx.scale(k, k);
+    for (var i = 0; i < 25; i++) {
+      var p = ((t * .65 + i * .137) % 1), a = i * 2.399;
+      var x = Math.cos(a) * p * 120, y = -Math.sin(p * Math.PI) * 80 + (i % 4) * 7;
+      var r = (20 + p * 22) * (1 - p * .3);
+      ctx.globalAlpha = clamp(fade) * (.16 + .18 * (1 - p));
+      ctx.fillStyle = ['#bc9869', '#c9ac7e', '#9b784c'][i % 3];
+      ctx.beginPath(); ctx.ellipse(x, y, r, r * .75, 0, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.restore();
+  }
+  function spawnDust(cx, floorY, w, h) {
+    var k = Math.max(w, 14) / 200;
+    dusts.push({ x: cx, y: floorY - h * 0.45, t0: QT, dur: 1.2, k: k });
+  }
+
   // ---- CHECKPOINT 2: placement state ----
   // mode: 'idle' | 'carrying' (ghost follows the finger; a new placement or a move)
   var mode = 'idle', carryId = null, ghost = null, moveFrom = null; // moveFrom = {id, cx, floorY} while moving an existing item
@@ -682,6 +778,7 @@
   }
   function startSelect(id) {
     if (window.BASE_ITEMS.isPlaced(id)) return;
+    if (id !== currentAvail()) return; // the unlock chain: only the available item can be built
     if (typeof state !== 'undefined' && state !== 'underground' && state !== 'menu') return; // only downstairs
     hideBubble();
     // No hexagon picker any more: the item is carried straight into the one entrance hexagon.
@@ -748,15 +845,25 @@
           ctx.restore();
         }
       }
+      // CHECKPOINT 2: the miniature dust clouds — puff briefly where an item
+      // was just placed, then fade (v1 dustAt, 1.2s).
+      for (var di = dusts.length - 1; di >= 0; di--) {
+        var dc = dusts[di], dt = QT - dc.t0;
+        if (dt > dc.dur) { dusts.splice(di, 1); continue; }
+        dustAt(dt, dc.x, dc.y, dc.dur, dc.k);
+      }
     },
     isPlaced: function (id) { return placed.some(function (p) { return p.id === id; }); },
     place: function (id, cx, floorY) {
+      if (id !== currentAvail() && !builtOnce[id]) return false; // the unlock chain: only the available item can be built (a move re-place is always allowed)
       if (this.isPlaced(id)) return false;
       var it = itemById(id);
       if (!it) return false;
       // CHECKPOINT 2: a placed position (from the ghost) wins; no position = the default spot (checkpoint 1).
       var pcx = (typeof cx === 'number' ? cx : it.cx), pfy = (typeof floorY === 'number' ? floorY : it.floorY);
       placed.push({ id: it.id, cx: pcx, floorY: pfy, w: it.w });
+      builtOnce[it.id] = true;
+      spawnDust(pcx, pfy, it.w, itemH(it)); // v1's build dust, miniature, where the item lands
       renderMenu();
       onItemPlaced(it.id, pcx, pfy);
       return true;
@@ -779,6 +886,8 @@
   // Test/debug handle for the checkpoint 2 timers (read-only state).
   window.BASE_TIMERS = {
     get brain() { return { t: BR.t, ready: BR.ready, brains: BR.brains, coins: BR.coins }; },
+    get chain() { return { avail: currentAvail(), unlocked: Object.keys(unlocked).filter(function (k) { return unlocked[k]; }) }; },
+    get dust() { return dusts.length; },
     get room() {
       var out = {};
       for (var id in roomTimers) out[id] = { left: roomTimerLeft(id), ready: roomTimers[id].ready };
@@ -816,6 +925,13 @@
     '.bl-build:disabled{background:#5a5148;cursor:default}' +
     '.bl-cancel{background:linear-gradient(180deg,#a93226,#7e241b)}' +
     '.bl-placed{position:absolute;top:6px;right:6px;border-radius:9px;background:#5a5148;color:#e8dcc8;font-size:12px;font-weight:700;padding:5px 8px}' +
+    '.bl-locked{position:absolute;top:6px;right:6px;border-radius:9px;background:#3a2f26;color:#9a8a76;font-size:12px;font-weight:700;padding:5px 8px}' +
+    '.bl-dim{opacity:.55}' +
+    '.bl-tabs{display:flex;gap:8px;padding:0 6px 8px}' +
+    '.bl-tab{border:2px solid #82562f;border-bottom:0;border-radius:10px 10px 0 0;background:rgba(255,244,220,.08);padding:4px 10px;cursor:pointer;line-height:0}' +
+    '.bl-tab img{height:30px;width:auto;display:block}' +
+    '.bl-tab.on{background:linear-gradient(#2b1c11,#1e130d)}' +
+    '.bvFly{position:absolute;z-index:9461;width:28px;height:auto;margin:-14px 0 0 -14px;pointer-events:none}' +
     // CHECKPOINT 2: the item bubble (tap a placed item).
     '.bl-bubble{position:absolute;z-index:6;display:none;min-width:190px;max-width:260px;background:linear-gradient(#2b1c11,#1e130d);border:2px solid #82562f;border-radius:14px;padding:10px 12px;box-shadow:0 4px 18px #00000080;text-align:center}' +
     '.bl-bname{color:#f3e6c8;font-size:15px;font-weight:700;margin-bottom:8px}' +
@@ -828,23 +944,42 @@
     '.bl-bno{background:#5a5148;color:#e8dcc8}';
   document.head.appendChild(style);
 
+  // ---- CHECKPOINT 2: the Build menu tabs ----
+  // The menu will hold many kinds of things to build later, so it has tabs.
+  // The first (and for now only) tab is the queen tab: the four queen items
+  // (leaf bed, egg basket, fridge, water cooler). Its icon is v1's crown,
+  // assets/menu-ant/hat-crown-lowered.webp, copied unchanged (md5 46a84515).
+  // The tab structure is ready for more tabs later; only the crown tab exists now.
+  var CROWN_SRC = 'assets/menu-ant/hat-crown-lowered.webp';
+  var TABS = [{ id: 'queen', icon: CROWN_SRC, items: ITEMS }];
+  var activeTab = 'queen';
+  function tabOf(id) { for (var i = 0; i < TABS.length; i++) if (TABS[i].id === id) return TABS[i]; return TABS[0]; }
+
   var tray = document.querySelector('#emptyTray');
 
   function renderMenu() {
     if (!tray) return;
     var html = '<div class="bl-head"><div class="bl-title">Build</div>' +
       '<button type="button" class="bl-dozer" id="blDozer" aria-label="Bulldozer: remove a placed item">\uD83D\uDE9C</button></div>' +
+      '<div class="bl-tabs">' +
+      TABS.map(function (t) {
+        return '<button type="button" class="bl-tab' + (t.id === activeTab ? ' on' : '') + '" data-tab="' + t.id + '" aria-label="' + t.id + '"><img alt="" draggable="false" src="' + t.icon + '"></button>';
+      }).join('') +
+      '</div>' +
       '<div class="bl-cards">';
-    ITEMS.forEach(function (it) {
+    tabOf(activeTab).items.forEach(function (it) {
       var done = window.BASE_ITEMS.isPlaced(it.id);
       var active = (mode !== 'idle' && carryId === it.id);
-      html += '<div class="bl-card"><div class="bl-thumb" style="background-image:url(' + it.src + ')"></div>' +
+      var locked = !done && !active && it.id !== currentAvail(); // the unlock chain: only the available item can be built
+      html += '<div class="bl-card' + (locked ? ' bl-dim' : '') + '"><div class="bl-thumb" style="background-image:url(' + it.src + ')"></div>' +
         '<div class="bl-name">' + it.name + '</div>' +
         (done
           ? '<span class="bl-placed">\u2713 Built</span>'
           : active
             ? '<button type="button" class="bl-build bl-cancel" data-cancel="' + it.id + '">\u2715 Cancel</button>'
-            : '<button type="button" class="bl-build" data-build="' + it.id + '">BUILD</button>') +
+            : locked
+              ? '<span class="bl-locked">\uD83D\uDD12 Locked</span>'
+              : '<button type="button" class="bl-build" data-build="' + it.id + '">BUILD</button>') +
         '</div>';
     });
     html += '</div>';
@@ -864,6 +999,13 @@
       b.addEventListener('click', function (e) {
         e.stopPropagation();
         window.BASE_ITEMS.cancel();
+      });
+    });
+    tray.querySelectorAll('[data-tab]').forEach(function (b) {
+      b.addEventListener('click', function (e) {
+        e.stopPropagation();
+        activeTab = b.getAttribute('data-tab');
+        renderMenu();
       });
     });
   }
