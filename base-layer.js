@@ -1583,9 +1583,21 @@
   // The mask is the source of truth (0 = clear dirt, 255 = fog); the canvas
   // is only the display of the mask. No full-res offscreen canvas: the fog
   // layer is 1/8 scale (704x1250, ~3.5 MB), never 5625x10000 (~225 MB).
+  // ---- v38: the fog looks like ROCK, not solid brown (Chris, Nov 16) ----
+  // v37's fog was one flat RGB [87,61,34] for every cell — it read as solid
+  // brown, not fog. Chris wants rock. The rock is generated PROCEDURALLY in
+  // code as a single continuous noise field over the fog layer — never tiled
+  // from a small image (the old rock images failed because he could see the
+  // pattern when zoomed out) and never copied/pasted from an image file (he
+  // forbade pasting image parts). A single continuous field has no tile
+  // seams and no repetition, so there is nothing to spot at any zoom. It is
+  // generated ONCE at init (not per frame), at fog resolution (704x1250),
+  // and the mask stays the source of truth (0 = clear dirt, 255 = fog).
+  // The noise is deterministic (fixed seed) so the rock is the same every
+  // load. The hash is non-periodic: it mixes the absolute integer grid
+  // coordinates, never wraps them, so the field cannot repeat.
   var FOG_FC = 8;
   var FOG_FW = Math.ceil(WORLD.w / FOG_FC), FOG_FH = Math.ceil(WORLD.h / FOG_FC);
-  var FOG_RGB = [87, 61, 34]; // the brown fog's flat dark brown
   var FOG_RED = 120; // fog-map pixels with red below this are fog (fog ~87, clear ~153)
   var FOG_FEATHER = 20; // world units of soft edge when a hexagon is cleared
   var fogMask = new Uint8Array(FOG_FW * FOG_FH); // 0 = clear, 255 = fog
@@ -1631,13 +1643,147 @@
       }
     }
   }
-  // Write the fog mask into the display canvas (guarded: the harness fake
-  // canvas has no putImageData, and the game must never crash on it).
+  // ---- v38 rock texture (procedural, single continuous field, no tiling) ----
+  // A deterministic seeded value-noise fBm. The hash mixes absolute integer
+  // grid coordinates (never wrapped), so the field is one continuous random
+  // field with no period and no repeating motif — nothing to spot zoomed out.
+  var ROCK_SEED = 20261116;
+  var rockRGB = null; // Uint8Array, 3 bytes per fog cell (the rock texture)
+  function rockHash(gx, gy, salt) {
+    var h = (gx * 374761393 + gy * 668265263 + salt * 974634) | 0;
+    h = Math.imul(h ^ (h >>> 13), 1274126177);
+    h = (h ^ (h >>> 16)) >>> 0;
+    return h / 4294967296;
+  }
+  // One octave's grid values, precomputed (small: a few thousand values).
+  function rockGrid(cols, rows, salt) {
+    var g = new Float32Array((cols + 1) * (rows + 1)), i, j;
+    for (j = 0; j <= rows; j++) for (i = 0; i <= cols; i++) g[j * (cols + 1) + i] = rockHash(i, j, salt);
+    return { g: g, cols: cols, rows: rows };
+  }
+  // One fBm field's octave grids, precomputed once (not per cell).
+  // Each octave carries sx/sy (grid cycles per fog cell) so the hot path
+  // multiplies instead of dividing.
+  function rockFbmGrids(cycles, salt, octaves) {
+    var grids = [], amp = 1, norm = 0, o, cols, rows;
+    for (o = 0; o < octaves; o++) {
+      cols = cycles * (1 << o);
+      rows = Math.max(1, Math.round(cols * FOG_FH / FOG_FW));
+      grids.push({ grid: rockGrid(cols, rows, salt + o * 101), cols: cols, rows: rows, amp: amp, sx: cols / FOG_FW, sy: rows / FOG_FH });
+      norm += amp; amp *= 0.5;
+    }
+    return { grids: grids, norm: norm };
+  }
+  // fBm for one cell from a precomputed grid set. The octave interpolation
+  // is INLINED here (no per-octave function call) and uses precomputed
+  // scales (sx/sy, a multiply instead of a divide) and |0 instead of
+  // Math.floor, so the per-cell cost stays low even in unoptimised contexts
+  // (a vm/interpreter runs the nested-call version ~20x slower; the phone's
+  // JIT is fast either way, but the game must not freeze for seconds on
+  // first load). gx/gy are always >= 0 and < cols/rows, so |0 == floor.
+  function rockFbmCell(f, i, j) {
+    var sum = 0, o, gr, grid, w, gx, gy, ix, iy, u, v, su, sv, a, b, c, d;
+    for (o = 0; o < f.grids.length; o++) {
+      gr = f.grids[o];
+      grid = gr.grid;
+      gx = i * gr.sx;
+      gy = j * gr.sy;
+      w = grid.cols + 1;
+      ix = gx | 0; iy = gy | 0;
+      if (ix > grid.cols - 1) ix = grid.cols - 1;
+      if (iy > grid.rows - 1) iy = grid.rows - 1;
+      u = gx - ix; v = gy - iy;
+      su = u * u * (3 - 2 * u); sv = v * v * (3 - 2 * v);
+      a = grid.g[iy * w + ix]; b = grid.g[iy * w + ix + 1];
+      c = grid.g[(iy + 1) * w + ix]; d = grid.g[(iy + 1) * w + ix + 1];
+      sum += gr.amp * (a + (b - a) * su + (c - a) * sv + (a - b - c + d) * su * sv);
+    }
+    return sum / f.norm;
+  }
+  // Rocky browns/tans, as flat channel arrays (no per-cell array
+  // allocation). The mean lands near the old flat fog colour, so the fog
+  // still obscures the same amount overall — but now with real rock
+  // variation: dark patches, tan highlights, cracks, speckles.
+  var ROCK_R = [46, 74, 98, 130, 166];
+  var ROCK_G = [30, 50, 69, 95, 128];
+  var ROCK_B = [16, 28, 38, 55, 80];
+  // Generate the rock texture once (deterministic — same rock every load).
+  // Pure JS, no DOM/canvas: safe to run in the harness. ~880k cells.
+  // The fBm grids are precomputed once and shared by the field build and by
+  // the single-cell computation (so the harness can verify one cell from
+  // scratch and prove the stored field matches the pure function).
+  var rockGrids = null;
+  function ensureRockGrids() {
+    if (rockGrids) return rockGrids;
+    rockGrids = {
+      base: rockFbmGrids(4, 11, 3),    // large irregular rock shapes
+      detail: rockFbmGrids(7, 23, 3),  // medium variation (different base freq)
+      crack: rockFbmGrids(12, 37, 2)   // ridged cracks
+    };
+    return rockGrids;
+  }
+  // The rock RGB for one fog cell, computed from scratch (pure, no cache).
+  // Palette lookup is inlined (no array allocation); rounding uses
+  // (x+0.5)|0 and no clamp is needed (palette 46..166 x dk<=1 x s<=1.10
+  // stays inside 0..255).
+  function rockCellRGB(i, j) {
+    var g = ensureRockGrids(), t, r, c, dk, s, x, si, f, R, G, B;
+    t = 0.62 * rockFbmCell(g.base, i, j) + 0.38 * rockFbmCell(g.detail, i, j);
+    if (t < 0) t = 0; else if (t > 1) t = 1;
+    x = t * 4;
+    si = x >= 4 ? 3 : (x | 0);
+    f = x - si;
+    R = ROCK_R[si] + (ROCK_R[si + 1] - ROCK_R[si]) * f;
+    G = ROCK_G[si] + (ROCK_G[si + 1] - ROCK_G[si]) * f;
+    B = ROCK_B[si] + (ROCK_B[si + 1] - ROCK_B[si]) * f;
+    // Cracks: ridged noise, darkens along thin ridge crests.
+    r = rockFbmCell(g.crack, i, j);
+    c = 1 - Math.abs(2 * r - 1);
+    dk = 1 - 0.35 * c * c * c;
+    // Speckle: per-cell hash jitter, subtle grain.
+    s = 0.90 + 0.20 * rockHash(i, j, 53);
+    return [(R * dk * s + 0.5) | 0, (G * dk * s + 0.5) | 0, (B * dk * s + 0.5) | 0];
+  }
+  function genRock() {
+    if (rockRGB) return rockRGB;
+    var n = FOG_FW * FOG_FH, out = new Uint8Array(n * 3);
+    var i, j, k, c;
+    for (j = 0; j < FOG_FH; j++) {
+      for (i = 0; i < FOG_FW; i++) {
+        k = j * FOG_FW + i;
+        c = rockCellRGB(i, j);
+        out[k * 3] = c[0]; out[k * 3 + 1] = c[1]; out[k * 3 + 2] = c[2];
+      }
+    }
+    rockRGB = out;
+    return out;
+  }
+  // The rock RGB for one fog cell (pure; generates the field on first use).
+  function rockAt(i, j) {
+    if (!rockRGB) genRock();
+    var k = j * FOG_FW + i;
+    if (k < 0 || k >= fogMask.length) return null;
+    return [rockRGB[k * 3], rockRGB[k * 3 + 1], rockRGB[k * 3 + 2]];
+  }
+  // The RGBA a cell paints as: rock colour with the mask as alpha.
+  function rockRGBA(k) {
+    if (!rockRGB) genRock();
+    if (k < 0 || k >= fogMask.length) return [0, 0, 0, 0];
+    return [rockRGB[k * 3], rockRGB[k * 3 + 1], rockRGB[k * 3 + 2], fogMask[k]];
+  }
+  // Write the fog mask into the display canvas: ROCK texture per cell (not
+  // one flat brown) with the mask as alpha. Guarded: the harness fake
+  // canvas has no putImageData, and the game must never crash on it.
   function fogMaskToCanvas() {
     if (!fogX || !fogImg) return false;
     try {
-      var d = fogImg.data, k, n = fogMask.length;
-      for (k = 0; k < n; k++) { d[k * 4] = FOG_RGB[0]; d[k * 4 + 1] = FOG_RGB[1]; d[k * 4 + 2] = FOG_RGB[2]; d[k * 4 + 3] = fogMask[k]; }
+      if (!rockRGB) genRock();
+      var d = fogImg.data, k, n = fogMask.length, o;
+      for (k = 0; k < n; k++) {
+        o = k * 3;
+        d[k * 4] = rockRGB[o]; d[k * 4 + 1] = rockRGB[o + 1]; d[k * 4 + 2] = rockRGB[o + 2];
+        d[k * 4 + 3] = fogMask[k];
+      }
       fogX.putImageData(fogImg, 0, 0);
       return true;
     } catch (e) { return false; }
@@ -1691,10 +1837,15 @@
     get cell() { return FOG_FC; },
     get size() { return { w: FOG_FW, h: FOG_FH }; },
     get mask() { return fogMask; },
+    get rock() { return rockRGB; },
     // Test hooks (pure logic, no canvas needed).
     _hexDist: hexDist,
     _threshold: fogThreshold,
-    _clearMask: clearFogHexMask
+    _clearMask: clearFogHexMask,
+    _genRock: genRock,
+    _rockAt: rockAt,
+    _rockRGBA: rockRGBA,
+    _rockCell: rockCellRGB
   };
   // The item box only needs to TOUCH the entrance hexagon (Chris): any part of
   // the box overlapping or intersecting the hexagon counts — it may hang over
