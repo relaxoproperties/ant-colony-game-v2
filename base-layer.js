@@ -929,7 +929,7 @@
     '.bl-dim{opacity:.55}' +
     '.bl-tabs{display:flex;gap:8px;padding:0 6px 8px}' +
     '.bl-tab{border:2px solid #82562f;border-bottom:0;border-radius:10px 10px 0 0;background:rgba(255,244,220,.08);padding:4px 10px;cursor:pointer;line-height:0}' +
-    '.bl-tab img{height:30px;width:auto;display:block}' +
+    '.bl-tab img{height:30px;width:auto;display:block;clip-path:inset(0 33.2% 0 33%)}' +
     '.bl-tab.on{background:linear-gradient(#2b1c11,#1e130d)}' +
     '.bvFly{position:absolute;z-index:9461;width:28px;height:auto;margin:-14px 0 0 -14px;pointer-events:none}' +
     // CHECKPOINT 2: the item bubble (tap a placed item).
