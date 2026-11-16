@@ -1064,20 +1064,18 @@
     '.bl-card{flex:1;position:relative;background:linear-gradient(#2b1c11,#1e130d);border:1px solid #1d100a;border-radius:14px;padding:8px 6px 8px;display:flex;flex-direction:column;align-items:center;gap:5px;box-shadow:inset 0 3px 12px #08040299}' +
     '.bl-thumb{width:100%;height:104px;background-size:contain;background-repeat:no-repeat;background-position:center bottom}' +
     '.bl-name{color:#f3e6c8;font-size:14px}' +
-    '.bl-price{color:#e8c87a;font-size:13px;font-weight:700}' +
-    '.bl-free{color:#8fce7a}' +
-    '.bl-count{position:absolute;top:6px;left:6px;border-radius:9px;background:#3a2f26;color:#e8dcc8;font-size:12px;font-weight:700;padding:5px 8px}' +
     '.bl-build{position:absolute;top:6px;right:6px;border:0;border-radius:9px;background:linear-gradient(180deg,#7fb069,#4c8a3f);color:#fff;font-size:13px;font-weight:700;padding:5px 9px;cursor:pointer}' +
     '.bl-build:disabled{background:#5a5148;cursor:default}' +
     '.bl-cancel{background:linear-gradient(180deg,#a93226,#7e241b)}' +
     '.bl-tabs{display:flex;gap:8px;padding:0 6px;align-items:flex-end}' +
     // folder tab: a real file-folder tab, not a button. Raised flat top with
-    // sloped shoulders (clip-path), warm paper with a lighter top, a darker
-    // bottom edge for thickness, and a cast shadow under the active tab.
-    // The tab's flat bottom meets the menu body below with no gap.
-    '.bl-tab{border:0;padding:7px 20px 5px;margin-bottom:-1px;cursor:pointer;line-height:0;background:linear-gradient(180deg,#c8ab72,#b8945f 60%,#a37f4c);clip-path:polygon(0 100%,0 34%,15% 0,85% 0,100% 34%,100% 100%);box-shadow:inset 0 1px 0 rgba(255,244,214,.45),inset 0 -4px 0 rgba(110,78,34,.45)}' +
+    // sloped shoulders (clip-path), in the menu's own dark brown (no paper
+    // colour), a lighter top for depth, a darker bottom edge for thickness,
+    // and a cast shadow under the active tab. The tab's flat bottom meets
+    // the menu body below with no gap, so it reads as part of the folder.
+    '.bl-tab{border:0;padding:7px 20px 5px;margin-bottom:-1px;cursor:pointer;line-height:0;background:linear-gradient(180deg,#3d2c1d,#2a1c11 60%,#20140c);clip-path:polygon(0 100%,0 34%,15% 0,85% 0,100% 34%,100% 100%);box-shadow:inset 0 1px 0 rgba(255,214,160,.18),inset 0 -4px 0 rgba(0,0,0,.35)}' +
     '.bl-tab img{height:30px;width:auto;display:block;clip-path:inset(0 33.2% 0 33%)}' +
-    '.bl-tab.on{background:linear-gradient(180deg,#f4e4b8,#e2c992 55%,#d3ae71);box-shadow:inset 0 1px 0 rgba(255,250,224,.85),inset 0 -4px 0 rgba(122,88,40,.5);filter:drop-shadow(0 3px 3px rgba(0,0,0,.45))}' +
+    '.bl-tab.on{background:linear-gradient(180deg,#5a4128,#38271c 55%,#2e1d12);box-shadow:inset 0 1px 0 rgba(255,220,170,.35),inset 0 -4px 0 rgba(0,0,0,.4);filter:drop-shadow(0 3px 3px rgba(0,0,0,.45))}' +
     '.bvFly{position:absolute;z-index:9461;width:28px;height:auto;margin:-14px 0 0 -14px;pointer-events:none}' +
     // v1's food/water meters (index.html #bvMeters / .bm3-meter): the little
     // meters at the top of the screen, crown on top, food + water rows. They
@@ -1174,13 +1172,11 @@
       var price = n * 10; // the NEXT copy: FREE first, then 10, 20, 30... seed money (per type)
       var active = (mode !== 'idle' && carryId === it.id);
       html += '<div class="bl-card">' +
-        (n > 0 ? '<span class="bl-count">\u00d7' + n + '</span>' : '') +
         '<div class="bl-thumb" style="background-image:url(' + it.src + ')"></div>' +
         '<div class="bl-name">' + it.name + '</div>' +
-        '<div class="bl-price' + (price === 0 ? ' bl-free' : '') + '">' + (price === 0 ? 'FREE' : '\uD83C\uDF31 ' + price) + '</div>' +
         (active
           ? '<button type="button" class="bl-build bl-cancel" data-cancel="' + it.id + '">\u2715 Cancel</button>'
-          : '<button type="button" class="bl-build" data-build="' + it.id + '">BUILD</button>') +
+          : '<button type="button" class="bl-build" data-build="' + it.id + '">' + (price === 0 ? 'BUILD' : 'BUILD \uD83C\uDF31 ' + price) + '</button>') +
         '</div>';
     });
     html += '</div>';
