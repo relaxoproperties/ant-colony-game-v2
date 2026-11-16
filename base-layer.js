@@ -385,6 +385,21 @@
       tendDueAt: QT + EGG_CYCLE.TEND_AT_S[0], tendAppearedAt: null, spoilAt: null, hatchAt: null
     };
   }
+  // v1 first-play fast hatch (index.html armFirstPlayHatch, FIRST_PLAY_HATCH_S=30):
+  // the FIRST basket lay hatches in 30 s with no tends and no spoil, so the
+  // player sees a hatch fast the first time. Only ever runs once per session.
+  var firstPlayHatch = false;
+  var FIRST_PLAY_HATCH_S = 30;
+  function armFirstPlayHatch() {
+    if (firstPlayHatch) return;
+    var p = basketPlaced();
+    if (!p || !p.egg) return; // no eggs laid (basket erased mid-walk) — flag stays for the next lay
+    firstPlayHatch = true;
+    var e = p.egg;
+    e.tendsDone = EGG_CYCLE.TEND_COUNT;
+    e.tendDueAt = null; e.tendAppearedAt = null; e.spoilAt = null; e.tapped = false;
+    e.hatchAt = QT + FIRST_PLAY_HATCH_S;
+  }
   function markTend(p) {
     var e = p.egg;
     if (!e) return;
@@ -574,7 +589,7 @@
       queenTo(spot.x, spot.y, function () {
         queenWait(LAY_WAIT_S, function () {
           layEggs();
-          queenHome(function () { QN.busy = false; runningScriptId = null; runPending(); });
+          queenHome(function () { QN.busy = false; runningScriptId = null; armFirstPlayHatch(); runPending(); });
         });
       });
     }
