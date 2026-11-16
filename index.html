@@ -139,7 +139,7 @@ function begin(next){
     pan=0;queenTarget.style.display='none';menu.classList.remove('open');if(next==='descending'&&!emerged)emergeT0=0;
     pointers.clear();gesture=null;tapCandidate=null;
   }
-  if(next==='underground'){if(!emergeT0){emergeT0=performance.now();emerged=true}pan=0;if(!(window.BV&&BV.started)&&!(window.BASE_QUEEN&&BASE_QUEEN.free)){queen.x=APPEAR.x;queen.y=APPEAR.y}queenTarget.style.width='72px';queenTarget.style.height='72px';queenTarget.style.display='block';positionTarget();queenTarget.click()}   // BASE: the build menu opens by itself when she gets downstairs, and stays on
+  if(next==='underground'){if(!emergeT0)emergeT0=performance.now();emerged=true;pan=0;if(!(window.BV&&BV.started)&&!(window.BASE_QUEEN&&BASE_QUEEN.free)){queen.x=APPEAR.x;queen.y=APPEAR.y}queenTarget.style.width='72px';queenTarget.style.height='72px';queenTarget.style.display='block';positionTarget();queenTarget.click()}   // BASE: the build menu opens by itself when she gets downstairs, and stays on
   if(next==='entered'){pan=0;queenTarget.style.display='none';menu.classList.remove('open')}
   syncFloors();
 }
