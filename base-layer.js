@@ -54,33 +54,40 @@
   function itemById(id) { var found = null; ITEMS.forEach(function (x) { if (x.id === id) found = x; }); return found; }
   function itemH(it) { var im = IMGS[it.id]; return (im && im.naturalWidth) ? it.w * im.naturalHeight / im.naturalWidth : it.w * 0.8; }
 
-  // ---- CHECKPOINT 2: the unlock chain (v1 index.html ~469-472, 497-503) ----
-  // v1: only one room is available to build at a time; the next unlocks when the
-  // current one's first script finishes. Bed -> fridge -> cooler -> basket.
-  // `unlocked` grows as her first reaction to each item completes. The menu
-  // offers only the earliest unplaced unlocked item (currentAvail), so the
-  // order holds even after an erase or a move — v1 has no erase/move, so this
-  // is the chain adapted to checkpoint 2, not a new rule. The basket is last;
-  // nothing unlocks after it (no playground in checkpoint 2).
-  var CHAIN = ['leafbed', 'fridge', 'watercooler', 'eggbasket'];
-  var CHAIN_NEXT = { leafbed: 'fridge', fridge: 'watercooler', watercooler: 'eggbasket', eggbasket: null };
-  var unlocked = { leafbed: true };
+  // ---- CHECKPOINT 2: the unlock rule (Chris, Nov 15 — replaces v1's chain) ----
+  // The bed is the only gate. At the start the menu shows ONLY the bed; the
+  // fridge, water cooler, and egg basket are HIDDEN, not "Locked". Once she
+  // settles on the bed, all three appear and are buildable in ANY order —
+  // there is no forced sequence. Erasing the bed closes the gate again (the
+  // three hide until the bed is rebuilt); moving an item changes nothing.
+  // An item is either visible and buildable, or hidden. No "Locked" cards.
+  var bedGate = false; // opens when she settles on the bed
   var builtOnce = {}; // items placed at least once (a move re-place is not a first build)
-  function currentAvail() {
-    for (var i = 0; i < CHAIN.length; i++) {
-      var id = CHAIN[i];
-      if (unlocked[id] && !window.BASE_ITEMS.isPlaced(id)) return id;
-    }
-    return null;
+  function isVisible(id) {
+    if (id === 'leafbed') return true;
+    return bedGate;
   }
-  function unlock(id) {
-    if (!id || unlocked[id] || window.BASE_ITEMS.isPlaced(id)) return;
-    unlocked[id] = true;
+  function openBedGate() {
+    if (bedGate) return;
+    bedGate = true;
+    renderMenu();
+  }
+  function closeBedGate() {
+    if (!bedGate) return;
+    bedGate = false;
     renderMenu();
   }
 
   // ---- placed items (drawn in world space by drawUnderground) ----
-  var placed = []; // {id, cx, floorY, w, h}
+  var placed = []; // {uid, id, cx, floorY, w, h, building, t0, cost}
+  var nextUid = 1; // each placed copy gets its own id, so multiples of one type never get mixed up
+  function placedCount(id) { var n = 0; for (var i = 0; i < placed.length; i++) if (placed[i].id === id) n++; return n; }
+  // Seed-money price of the NEXT copy of a type (Chris, Nov 15): the 1st is
+  // FREE, then 10, 20, 30... — each next copy costs 10 more than the last,
+  // counted PER TYPE. No seed-money balance or wallet exists yet (Chris will
+  // explain seed money later), so this is the price structure and display
+  // only — building is never blocked for cost.
+  function nextPrice(id) { return placedCount(id) * 10; } // 0 = FREE for the first copy
   function rectOf(cx, floorY, w, h) { return { x0: cx - w / 2, x1: cx + w / 2, y0: floorY - h, y1: floorY }; }
   function rectsOverlap(a, b) { return a.x0 < b.x1 && a.x1 > b.x0 && a.y0 < b.y1 && a.y1 > b.y0; }
   function overlapsPlaced(cx, floorY, w, h) {
@@ -100,9 +107,9 @@
     }
     return null;
   }
-  function removeItem(id) {
+  function removeItem(uid) {
     for (var i = placed.length - 1; i >= 0; i--) {
-      if (placed[i].id === id) { placed.splice(i, 1); renderMenu(); onItemRemoved(id); return true; }
+      if (placed[i].uid === uid) { var p = placed.splice(i, 1)[0]; renderMenu(); onItemRemoved(p); return true; }
     }
     return false;
   }
@@ -224,8 +231,9 @@
   // baseline bottom, at queen.y - QUEEN_UNDER_W*0.62. Same condition as v1:
   // only while she rests idle and settled on the bed, not ready, not busy.
   // v1 draws it in underground AND menu states, with no placing check (the
-  // timer itself pauses while placing). No meters in checkpoint 2, so the
-  // starve-red flash does not apply (always white).
+  // timer itself pauses while placing). The meters exist now (food/water at
+  // the top), but there is no drain, so the starve-red flash does not apply
+  // (always white).
   function brainMmss(sec) {
     sec = Math.max(0, Math.ceil(sec - 1e-6));
     return String(Math.floor(sec / 60)).padStart(2, '0') + ':' + String(sec % 60).padStart(2, '0');
@@ -294,7 +302,10 @@
   // / water-drop (cooler) bubble pops over the item. Tap = she walks over and
   // eats / drinks (3s, the existing reaction) and the timer restarts. The 3s
   // eat/drink itself has no visible countdown in v1 — the room timer is the
-  // visible countdown. No meters in checkpoint 2, so the timer never starves.
+  // visible countdown. The timer starts only after the item is built (the
+  // cloud is gone), never while the cloud is still going. The meters exist
+  // now (food/water at the top), but there is no drain, so the timer never
+  // starves.
   var ROOM_STALL_S = { fridge: 300, watercooler: 420 }; // v1 kitchen 300, water 420
   var roomTimers = {}; // id -> {start, ready} in queen-clock (QT) seconds
   var ILEAF = new Image(); ILEAF.src = 'assets/icons/fi_leaf.webp';
@@ -371,12 +382,12 @@
     startRoomTimer(id); // restart the countdown now (v1 restarts it when she goes)
     if (QN.busy) {
       for (var i = 0; i < pendingScripts.length; i++) {
-        if (pendingScripts[i].id === id) { pendingScripts[i].cx = p.cx; pendingScripts[i].floorY = p.floorY; return; }
+        if (pendingScripts[i].id === id) { pendingScripts[i].uid = p.uid; pendingScripts[i].cx = p.cx; pendingScripts[i].floorY = p.floorY; return; }
       }
-      pendingScripts.push({ id: id, cx: p.cx, floorY: p.floorY });
+      pendingScripts.push({ uid: p.uid, id: id, cx: p.cx, floorY: p.floorY });
       return;
     }
-    runItemScript(id, p.cx, p.floorY);
+    runItemScript(id, p.cx, p.floorY, p.uid);
   }
 
   // ---- CHECKPOINT 2: the egg cycle (v1 EGG_CYCLE, doLay/doTend/doRemove, stepEggs) ----
@@ -463,7 +474,7 @@
     if (!p || !p.egg) return;
     if (QN.busy) { if (basketQueue.indexOf(kind) < 0) basketQueue.push(kind); return; }
     basketJob = kind;
-    runningScriptId = 'eggbasket';
+    runningScriptId = p.uid; // the basket she is working on (for multiples)
     var spot = itemSpot('eggbasket', p.cx, p.floorY);
     QN.busy = true;
     queenTo(spot.x, spot.y, function () {
@@ -571,12 +582,12 @@
   // ---- CHECKPOINT 2: the four item reactions (v1 queenScript, at placed positions) ----
   // The 4 items ARE the 4 rooms without walls (bed = royal, fridge = kitchen,
   // cooler = water, basket = nursery). Each reaction uses its PLACED position
-  // in the entrance hexagon, not a fixed room spot. The unlock chain (v1) fires
-  // when each item's FIRST reaction completes: bed settle -> fridge, fridge
-  // eat -> cooler, cooler drink -> basket. unlock() is idempotent, so a
-  // re-run (move, bubble-tap re-eat/drink) is a no-op.
-  // v1's flyIcons fed the meter HUD, which checkpoint 2 does not have, so the
-  // eat/drink reactions are walk -> wait -> return home without flying icons.
+  // in the entrance hexagon, not a fixed room spot. The bed gate opens when
+  // she settles on the bed (openBedGate); the other reactions unlock nothing —
+  // after the bed, the three are buildable in any order. The reactions run only
+  // after the item is built (the cloud is gone); the build sequence calls
+  // them. While she eats, leaves fly from the fridge to the FOOD meter; while
+  // she drinks, droplets fly from the cooler to the WATER meter (v1 flyIcons).
   // v1's doLay needs the whole egg/generation system, so the basket is walk ->
   // wait (the lay wait) -> return home; no eggs appear yet.
   function itemSpot(id, cx, floorY) {
@@ -590,35 +601,58 @@
     return { x: cx, y: floorY + 6 };
   }
   // ---- CHECKPOINT 2: flying eat/drink icons (v1 flyIcons, index.html ~973-978) ----
-  // v1: 5 leaves fly from the fridge/counter to her while she eats (3s), 5
-  // droplets fly from the cooler/tank while she drinks (3s). Same icons, same
-  // count (5), same stagger (175ms) and flight (750ms) as v1, same keyframes
-  // (up-arc then to the target). No meter HUD in checkpoint 2, so the target
-  // is the queen herself, not the meter row. Runs on every eat/drink — the
-  // first one and every later one from the room-timer bubble — because it lives
-  // in runItemScript, the one entry point for both.
+  // v1: 5 leaves fly from the fridge/counter to the FOOD meter while she eats
+  // (3s), 5 droplets fly from the cooler/tank to the WATER meter while she
+  // drinks (3s). Same icons, same count (5), same stagger (175ms) and flight
+  // (750ms) as v1, same keyframes (up-arc then to the target). The target is
+  // the meter row's icon at the top of the screen — the leaves fly UP TO THE
+  // RIGHT into the food meter, the droplets into the water meter — and each
+  // landing steps that meter up (v1: the meter steps up as each lands). Runs
+  // on every eat/drink — the first one and every later one from the
+  // room-timer bubble — because it lives in runItemScript, the one entry
+  // point for both. (v1's scr is worldToScreen here; the old code called a
+  // global scr that does not exist in this build, so nothing flew.)
   var FLY = { food: { n: 5, ic: 'assets/icons/fi_leaf.webp' }, water: { n: 5, ic: 'assets/icons/icon_water_droplet.png' } };
   var FLY_MS = 750, FLY_STAGGER_MS = 175; // v1 COIN.FLY_MS / COIN.STAGGER_MS
+  // v1's food/water meters (index.html METERS/MV): cap 100, start 70, a full
+  // eat/drink cycle fills 35 (food) / 40 (water), split across the 5 icons.
+  // No drain in checkpoint 2 (v1's drainPerMin not ported).
+  var METERS = { food: { cap: 100, start: 70, fillPerCycle: 35 }, water: { cap: 100, start: 70, fillPerCycle: 40 } };
+  var MV = { food: METERS.food.start, water: METERS.water.start };
   function flyIcons(kind, srcX, srcY) {
     var cfg = FLY[kind];
     if (!cfg) return;
     var gameEl = document.querySelector('#game');
-    if (!gameEl || typeof scr !== 'function') return;
-    var s = scr(srcX, srcY);
+    if (!gameEl) return;
+    var step = METERS[kind].fillPerCycle / cfg.n;
+    flashMeters(); // the meters show while the icons fly to them
     for (var i = 0; i < cfg.n; i++) {
       (function (k) {
         setTimeout(function () {
-          var t = scr(queen.x, queen.y);
+          // v1: the source and the meter target are read at flight time.
+          var s = worldToScreen(srcX, srcY);
+          var tx = s.x, ty = s.y;
+          var row = metersEl ? metersEl.querySelector('[data-m="' + kind + '"] i') : null;
+          if (row) {
+            var gr = gameEl.getBoundingClientRect(), hr = row.getBoundingClientRect();
+            tx = hr.left - gr.left + hr.width / 2;
+            ty = hr.top - gr.top + hr.height / 2;
+          }
           var c = document.createElement('img');
           c.className = 'bvFly'; c.alt = ''; c.src = cfg.ic;
           c.style.left = s.x + 'px'; c.style.top = s.y + 'px';
           gameEl.appendChild(c);
-          var done = function () { if (c.parentNode) c.parentNode.removeChild(c); };
+          var done = function () {
+            if (c.parentNode) c.parentNode.removeChild(c);
+            MV[kind] = Math.min(METERS[kind].cap, MV[kind] + step); // v1: the meter steps up as each lands
+            hudMeters();
+            flashMeters();
+          };
           if (c.animate) {
             var a = c.animate([
               { transform: 'translate(0,0) scale(.6)', opacity: 1 },
               { transform: 'translate(0,-26px) scale(1.15)', opacity: 1, offset: .22 },
-              { transform: 'translate(' + (t.x - s.x) + 'px,' + (t.y - s.y) + 'px) scale(.8)', opacity: .95 }
+              { transform: 'translate(' + (tx - s.x) + 'px,' + (ty - s.y) + 'px) scale(.8)', opacity: .95 }
             ], { duration: FLY_MS, easing: 'ease-in' });
             a.onfinish = done;
           } else setTimeout(done, FLY_MS);
@@ -626,29 +660,30 @@
       })(i);
     }
   }
-  function runItemScript(id, cx, floorY) {
+  function runItemScript(id, cx, floorY, uid) {
     var spot = itemSpot(id, cx, floorY);
-    runningScriptId = id;
+    runningScriptId = (uid != null ? uid : id);
     if (id === 'leafbed') {
       // v1 queenScript royal: walks to the leaf bed by herself and settles.
       QN.busy = true;
       queenTo(spot.x, spot.y, function () {
         QN.home = { x: spot.x, y: spot.y }; QN.settled = true;
-        queenWait(BED_WAIT_S, function () { QN.busy = false; runningScriptId = null; unlock('fridge'); runPending(); });
+        if (uid != null) QN.homeUid = uid; // the bed she settled on (for multiples: erasing another bed keeps her home)
+        queenWait(BED_WAIT_S, function () { QN.busy = false; runningScriptId = null; openBedGate(); runPending(); });
       });
     } else if (id === 'fridge') {
       // v1 queenScript kitchen: walks to the fridge and eats, then returns home.
       QN.busy = true;
       queenTo(spot.x, spot.y, function () {
         flyIcons('food', cx, floorY - itemH(itemById('fridge')) / 2); // v1: leaves fly from the fridge to her while she eats
-        queenWait(EAT_WAIT_S, function () { queenHome(function () { QN.busy = false; runningScriptId = null; unlock('watercooler'); runPending(); }); });
+        queenWait(EAT_WAIT_S, function () { queenHome(function () { QN.busy = false; runningScriptId = null; runPending(); }); });
       });
     } else if (id === 'watercooler') {
       // v1 queenScript water: walks to the cooler and drinks, then returns home.
       QN.busy = true;
       queenTo(spot.x, spot.y, function () {
         flyIcons('water', cx, floorY - itemH(itemById('watercooler')) / 2); // v1: droplets fly from the cooler to her while she drinks
-        queenWait(DRINK_WAIT_S, function () { queenHome(function () { QN.busy = false; runningScriptId = null; unlock('eggbasket'); runPending(); }); });
+        queenWait(DRINK_WAIT_S, function () { queenHome(function () { QN.busy = false; runningScriptId = null; runPending(); }); });
       });
     } else if (id === 'eggbasket') {
       // v1 queenScript nursery (doLay) minus the egg system: walks to the
@@ -665,32 +700,94 @@
   }
   function runPending() {
     if (QN.busy) return;
+    // A build waiting for the queen goes first, then a queued reaction.
+    if (activeBuild) return; // activeBuild implies busy; a stale one must not stall the queue
+    var b = buildQueue.shift();
+    if (b) { beginBuild(b); return; }
     var next = pendingScripts.shift();
-    if (next) runItemScript(next.id, next.cx, next.floorY);
+    if (next) runItemScript(next.id, next.cx, next.floorY, next.uid);
   }
-  function onItemPlaced(id, cx, floorY) {
-    queenFree = true; // the QN system takes over from here; checkpoint 1 is done
-    brainReset(); // v1: any build activity distracts the queen
-    if (id === 'fridge' || id === 'watercooler') startRoomTimer(id); // v1: the room timer starts at reveal
-    if (QN.busy) {
-      for (var i = 0; i < pendingScripts.length; i++) {
-        if (pendingScripts[i].id === id) { pendingScripts[i].cx = cx; pendingScripts[i].floorY = floorY; return; }
-      }
-      pendingScripts.push({ id: id, cx: cx, floorY: floorY });
-      return;
+  // ---- CHECKPOINT 2: the build sequence (v1 index.html build() / stepAuto / drawBuildCloud) ----
+  // v1: the player picks a spot; the queen WALKS to the spot first; ONLY when
+  // she arrives does the cloud begin (she digs, the cloud covers the spot for
+  // BUILD_SECONDS); when the cloud clears the item is revealed underneath; the
+  // timer starts only after the item is built; then she does the item's
+  // reaction. The item is added to placed[] at pick time with t0 = DIG_PEND
+  // (not dug yet — no cloud, invisible, v1 build() / notes1 #5); t0 is set to
+  // the queen clock when she arrives and starts digging.
+  var BUILD_SECONDS = 5; // v1
+  var BUILD_FX = { REVEAL_S: 1.7, GROW_S: 0.45, COLS: ['188,152,105', '201,172,126', '155,120,76'] }; // v1
+  var DIG_PEND = 1e9; // v1: room not dug yet (no cloud, invisible)
+  var buildQueue = []; // {uid, id, cx, floorY} waiting for the queen
+  var activeBuild = null; // {uid, id, cx, floorY} while she walks / the cloud runs
+  function buildCover(tt) { // v1 buildCover: cover grows in, then fades as the room reveals
+    var out = ease(clamp((tt - (BUILD_SECONDS - BUILD_FX.REVEAL_S)) / BUILD_FX.REVEAL_S));
+    return { cover: ease(clamp(tt / BUILD_FX.GROW_S)) * (1 - out), room: out };
+  }
+  function startBuild(uid, id, cx, floorY) {
+    if (QN.busy || activeBuild) { buildQueue.push({ uid: uid, id: id, cx: cx, floorY: floorY }); return; }
+    beginBuild({ uid: uid, id: id, cx: cx, floorY: floorY });
+  }
+  function beginBuild(job) {
+    activeBuild = job;
+    QN.busy = true;
+    var spot = itemSpot(job.id, job.cx, job.floorY);
+    queenTo(spot.x, spot.y, function () {
+      // She arrived: the cloud begins NOW (v1: r.t0 = T when she digs).
+      var p = null;
+      for (var i = 0; i < placed.length; i++) if (placed[i].uid === job.uid) { p = placed[i]; break; }
+      if (!p) { activeBuild = null; QN.busy = false; runPending(); return; } // erased while she walked
+      p.t0 = QT;
+      QN.dig = { t0: QT }; // v1: she digs at the spot, under the dust puff
+      queenWait(BUILD_SECONDS, function () {
+        // The cloud cleared: the item is built. Guard the erase-during-cloud case.
+        var pp = null;
+        for (var j = 0; j < placed.length; j++) if (placed[j].uid === job.uid) { pp = placed[j]; break; }
+        QN.dig = null;
+        activeBuild = null;
+        if (!pp) { QN.busy = false; runPending(); return; }
+        pp.building = false;
+        // The timer starts ONLY after the item is built (cloud gone), never
+        // while the cloud is still going.
+        if (job.id === 'fridge' || job.id === 'watercooler') startRoomTimer(job.id);
+        runItemScript(job.id, job.cx, job.floorY, job.uid); // her reaction, then the unlock chain
+      });
+    });
+  }
+  function cancelBuild(uid) {
+    for (var i = buildQueue.length - 1; i >= 0; i--) if (buildQueue[i].uid === uid) buildQueue.splice(i, 1);
+    if (activeBuild && activeBuild.uid === uid) {
+      activeBuild = null;
+      QN.dig = null;
+      QN.mode = 'idle'; QN.path = []; QN.cb = null; QN.busy = false;
+      runPending();
     }
-    runItemScript(id, cx, floorY);
   }
-  function onItemRemoved(id) {
-    for (var i = pendingScripts.length - 1; i >= 0; i--) if (pendingScripts[i].id === id) pendingScripts.splice(i, 1);
+  function onItemRemoved(p) {
+    var id = p.id;
+    cancelBuild(p.uid); // a build in progress for THIS copy stops with it, not the other copies
+    // A copy of this type still on the floor keeps the type alive: pending
+    // reactions re-point to it; only when the LAST copy goes do they drop.
+    var remaining = null;
+    for (var i = 0; i < placed.length; i++) if (placed[i].id === id) { remaining = placed[i]; break; }
+    for (var i = pendingScripts.length - 1; i >= 0; i--) {
+      if (pendingScripts[i].id !== id) continue;
+      if (remaining) { pendingScripts[i].uid = remaining.uid; pendingScripts[i].cx = remaining.cx; pendingScripts[i].floorY = remaining.floorY; }
+      else pendingScripts.splice(i, 1);
+    }
     for (var j = basketQueue.length - 1; j >= 0; j--) basketQueue.splice(j, 1);
-    if (id === 'fridge' || id === 'watercooler') clearRoomTimer(id);
-    if (id === 'eggbasket') basketJob = null;
+    if ((id === 'fridge' || id === 'watercooler') && !remaining) clearRoomTimer(id);
+    if (id === 'eggbasket' && !remaining) basketJob = null;
     brainReset(); // v1: any build activity distracts the queen
-    if (id === 'leafbed') { QN.home = null; QN.settled = false; }
-    if (runningScriptId === id) {
-      // She was mid-reaction to an item that no longer exists: stop, stand still.
+    if (id === 'leafbed') {
+      // Her home is the bed she settled on; erasing a different bed leaves it.
+      if (QN.homeUid === p.uid) { QN.home = null; QN.settled = false; QN.homeUid = null; }
+      if (!remaining) closeBedGate(); // the bed is the gate: the last bed going hides the three again
+    }
+    if (runningScriptId === p.uid) {
+      // She was mid-reaction to the copy that no longer exists: stop, stand still.
       runningScriptId = null;
+      basketJob = null;
       QN.mode = 'idle'; QN.path = []; QN.cb = null; QN.busy = false;
       runPending();
     }
@@ -730,14 +827,14 @@
     return true;
   }
 
-  // ---- CHECKPOINT 2: the miniature dust cloud on placing an item ----
-  // v1's dustAt (index.html ~1060, NP5 build cloud): 25 dust puffs, ellipses,
-  // colours #bc9869 / #c9ac7e / #9b784c, fading in/out — copied verbatim, only
-  // the scale is smaller. v1's room cloud uses DUST_K_BV=4.893; an item is a
-  // fraction of a room, so k is sized to the item (cloud about as wide as the
-  // item, puffs a few world units). It puffs briefly as the item lands (1.2s),
-  // then fades. QT is the game clock (same clock the timers use).
-  var dusts = []; // {x, y, t0, dur, k}
+  // ---- CHECKPOINT 2: the build cloud (v1 drawBuildCloud, index.html ~1061-1065) ----
+  // v1's build cloud: a cover of radial-gradient blobs (BUILD_FX.COLS) that
+  // grows in (GROW_S) then fades as the room reveals (REVEAL_S), plus dustAt
+  // puffs at the bottom — copied verbatim, only the area is smaller. The
+  // cloud COVERS the spot where the item is about to appear; the item is
+  // hidden underneath and fades in (buildCover().room) as the cloud clears.
+  // It runs for BUILD_SECONDS from the moment she arrives (p.t0), never
+  // before. QT is the game clock (same clock the timers use).
   function dustAt(t, wx, wy, dur, k) {
     var fade = Math.min(1, t / .3, (dur - t) / .45);
     if (fade <= 0) return;
@@ -752,9 +849,32 @@
     }
     ctx.restore();
   }
-  function spawnDust(cx, floorY, w, h) {
-    var k = Math.max(w, 14) / 200;
-    dusts.push({ x: cx, y: floorY - h * 0.45, t0: QT, dur: 1.2, k: k });
+  function drawBuildCloud(p) { // p = a building placed item (building, t0 set on her arrival)
+    var tt = QT - p.t0;
+    if (tt < 0 || tt > BUILD_SECONDS) return;
+    var c = buildCover(tt);
+    var it = itemById(p.id);
+    var h = it ? itemH(it) : p.w * 0.8;
+    var cx = p.cx, cy = p.floorY - h / 2; // the item's centre
+    var hw = p.w / 2 + 6, hh = h / 2 + 6; // the cloud covers the item box + a margin
+    if (c.cover > 0.002) {
+      ctx.save();
+      for (var j = 0; j < 5; j++) for (var i = 0; i < 4; i++) {
+        var n = j * 4 + i, ph = tt * 1.3 + n * 1.7;
+        var x = cx + (-1 + 2 * (i + .5) / 4) * hw * .82 + Math.sin(ph) * 4;
+        var y = cy + (-1 + 2 * (j + .5) / 5) * hh * .86 + Math.cos(ph * .8) * 4;
+        var R0 = Math.max(hw, hh) * (.62 + .06 * Math.sin(ph * 1.1));
+        var g = ctx.createRadialGradient(x, y, 0, x, y, R0), col = BUILD_FX.COLS[n % 3], a = c.cover;
+        g.addColorStop(0, 'rgba(' + col + ',' + (.96 * a).toFixed(3) + ')');
+        g.addColorStop(.55, 'rgba(' + col + ',' + (.82 * a).toFixed(3) + ')');
+        g.addColorStop(1, 'rgba(' + col + ',0)');
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(x, y, R0, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.restore();
+    }
+    // v1's dust puffs at the item's bottom (miniature: k sized to the item).
+    dustAt(tt, cx, p.floorY - h * 0.45, BUILD_SECONDS, Math.max(p.w, 14) / 200);
   }
 
   // ---- CHECKPOINT 2: placement state ----
@@ -777,8 +897,8 @@
     window.BASE_PLACING = (mode === 'carrying');
   }
   function startSelect(id) {
-    if (window.BASE_ITEMS.isPlaced(id)) return;
-    if (id !== currentAvail()) return; // the unlock chain: only the available item can be built
+    // Multiples: an already-placed type can be selected again for another copy.
+    if (!isVisible(id)) return; // the bed gate: hidden items cannot be built
     if (typeof state !== 'undefined' && state !== 'underground' && state !== 'menu') return; // only downstairs
     hideBubble();
     // No hexagon picker any more: the item is carried straight into the one entrance hexagon.
@@ -786,24 +906,27 @@
     ghost = { cx: ENTRANCE.x, floorY: ENTRANCE.y };
     setPlacingUI(); renderMenu();
   }
-  function startMove(id) {
-    // Take the placed item off the floor and carry it; cancelling puts it back where it was.
+  function startMove(uid) {
+    // Take the placed copy off the floor and carry it; cancelling puts it back where it was.
     var idx = -1;
-    for (var i = 0; i < placed.length; i++) if (placed[i].id === id) { idx = i; break; }
+    for (var i = 0; i < placed.length; i++) if (placed[i].uid === uid) { idx = i; break; }
     if (idx < 0) return;
     var p = placed[idx];
-    moveFrom = { id: p.id, cx: p.cx, floorY: p.floorY };
+    cancelBuild(p.uid); // a build in progress for THIS copy stops with it
+    moveFrom = p; // keep the whole placed object, not just its spot (a moved basket keeps its eggs)
     placed.splice(idx, 1);
     brainReset(); // v1: any build activity distracts the queen
     hideBubble();
-    mode = 'carrying'; carryId = id;
+    mode = 'carrying'; carryId = p.id; // the TYPE being carried (multiples: the copy itself is in moveFrom)
     ghost = { cx: p.cx, floorY: p.floorY };
     setPlacingUI(); renderMenu();
   }
   function cancelPlacing() {
     if (moveFrom) {
-      var it = itemById(moveFrom.id);
-      placed.push({ id: moveFrom.id, cx: moveFrom.cx, floorY: moveFrom.floorY, w: it ? it.w : 0 });
+      // Put the whole item back as it was (eggs and all); a cancelled move is
+      // not a rebuild, so it is fully revealed, never building.
+      moveFrom.building = false;
+      placed.push(moveFrom);
     }
     mode = 'idle'; carryId = null; ghost = null; moveFrom = null;
     setPlacingUI(); renderMenu();
@@ -826,7 +949,18 @@
         if (p.id === 'eggbasket' && !p.egg) im = IBASKET_EMPTY;
         if (!im || !im.complete || !im.naturalWidth) return;
         var h = p.w * im.naturalHeight / im.naturalWidth;
+        // v1: a building item is invisible until she arrives (t0 = DIG_PEND),
+        // then fades in as the cloud clears (buildCover().room, the last 1.7s).
+        var alpha = 1;
+        if (p.building) {
+          var tt = QT - p.t0;
+          if (tt < 0) return;
+          alpha = buildCover(tt).room;
+          if (alpha <= 0) return;
+        }
+        ctx.save(); ctx.globalAlpha = alpha;
         ctx.drawImage(im, p.cx - p.w / 2, p.floorY - h, p.w, h);
+        ctx.restore();
       });
       // CHECKPOINT 2: the carried ghost — white while it can be set down, red when it cannot.
       if (mode === 'carrying' && ghost && carryId) {
@@ -845,39 +979,46 @@
           ctx.restore();
         }
       }
-      // CHECKPOINT 2: the miniature dust clouds — puff briefly where an item
-      // was just placed, then fade (v1 dustAt, 1.2s).
-      for (var di = dusts.length - 1; di >= 0; di--) {
-        var dc = dusts[di], dt = QT - dc.t0;
-        if (dt > dc.dur) { dusts.splice(di, 1); continue; }
-        dustAt(dt, dc.x, dc.y, dc.dur, dc.k);
-      }
+      // CHECKPOINT 2: the build clouds — one per building item, covering the
+      // spot while it builds (v1 drawBuildCloud, after the items so the cloud
+      // covers the item being revealed underneath it).
+      placed.forEach(function (p) { if (p.building) drawBuildCloud(p); });
     },
     isPlaced: function (id) { return placed.some(function (p) { return p.id === id; }); },
-    place: function (id, cx, floorY) {
-      if (id !== currentAvail() && !builtOnce[id]) return false; // the unlock chain: only the available item can be built (a move re-place is always allowed)
-      if (this.isPlaced(id)) return false;
+    place: function (id, cx, floorY, moved) {
+      if (!isVisible(id) && !builtOnce[id]) return false; // the bed gate: a first build needs the item visible (a move re-place is always allowed)
       var it = itemById(id);
       if (!it) return false;
       // CHECKPOINT 2: a placed position (from the ghost) wins; no position = the default spot (checkpoint 1).
       var pcx = (typeof cx === 'number' ? cx : it.cx), pfy = (typeof floorY === 'number' ? floorY : it.floorY);
-      placed.push({ id: it.id, cx: pcx, floorY: pfy, w: it.w });
+      // Multiples (Chris, Nov 15): any number of copies of one type. The 1st
+      // is FREE, then 10, 20, 30... seed money per type. A moved copy keeps
+      // the uid and the cost it was built for — moving is not a new purchase.
+      var cost = moved ? moved.cost : nextPrice(id);
+      var uid = moved ? moved.uid : nextUid++;
+      if (moved) moveFrom = null; // the move is committed; a later cancel must not restore it again
+      // v1: the item is added with t0 = DIG_PEND (not dug yet — no cloud,
+      // invisible). The queen walks to the spot first; the cloud starts only
+      // when she arrives; the timer starts only after the item is built.
+      placed.push({ uid: uid, id: it.id, cx: pcx, floorY: pfy, w: it.w, building: true, t0: DIG_PEND, cost: cost });
       builtOnce[it.id] = true;
-      spawnDust(pcx, pfy, it.w, itemH(it)); // v1's build dust, miniature, where the item lands
+      queenFree = true; // the QN system takes over from here; checkpoint 1 is done
+      brainReset(); // v1: any build activity distracts the queen
       renderMenu();
-      onItemPlaced(it.id, pcx, pfy);
+      startBuild(uid, it.id, pcx, pfy);
       return true;
     },
     removeAt: function (wx, wy) {
       var p = placedItemAt(wx, wy);
       if (!p) return false;
-      return removeItem(p.id);
+      return removeItem(p.uid);
     },
     removeItem: removeItem,
     startSelect: startSelect,
     startMove: startMove,
     cancel: cancelPlacing,
     get mode() { return mode; },
+    get moving() { return moveFrom; }, // the copy being moved (null for a fresh build) — read-only, for tests
     get placing() { return mode === 'carrying'; },
     get placed() { return placed.slice(); },
     get entrance() { return { x: ENTRANCE.x, y: ENTRANCE.y, w: HEXW }; }
@@ -886,8 +1027,10 @@
   // Test/debug handle for the checkpoint 2 timers (read-only state).
   window.BASE_TIMERS = {
     get brain() { return { t: BR.t, ready: BR.ready, brains: BR.brains, coins: BR.coins }; },
-    get chain() { return { avail: currentAvail(), unlocked: Object.keys(unlocked).filter(function (k) { return unlocked[k]; }) }; },
-    get dust() { return dusts.length; },
+    get chain() { return { gateOpen: bedGate, visible: ITEMS.filter(function (it) { return isVisible(it.id); }).map(function (it) { return it.id; }) }; },
+    get prices() { var out = {}; ITEMS.forEach(function (it) { out[it.id] = { count: placedCount(it.id), next: nextPrice(it.id) }; }); return out; },
+    get dust() { return placed.filter(function (p) { return p.building; }).length; },
+    get build() { return { active: activeBuild ? { id: activeBuild.id, cx: activeBuild.cx, floorY: activeBuild.floorY } : null, queued: buildQueue.length, meters: { food: MV.food, water: MV.water } }; },
     get room() {
       var out = {};
       for (var id in roomTimers) out[id] = { left: roomTimerLeft(id), ready: roomTimers[id].ready };
@@ -913,7 +1056,7 @@
   // ---- the build menu (always on, just the four items + the bulldozer) ----
   var style = document.createElement('style');
   style.textContent =
-    '.bl-head{display:flex;justify-content:space-between;align-items:center;padding:2px 6px 8px}' +
+    '.bl-head{display:flex;justify-content:flex-end;align-items:center;padding:2px 6px 8px}' +
     '.bl-title{color:#f3e6c8;font-size:17px;font-weight:700;letter-spacing:.5px}' +
     '.bl-dozer{border:2px solid #82562f;border-radius:12px;background:rgba(255,244,220,.14);color:#f3e6c8;font-size:22px;line-height:1;padding:6px 12px;cursor:pointer}' +
     '.bl-dozer.on{background:#a93226;border-color:#e74c3c}' +
@@ -921,17 +1064,32 @@
     '.bl-card{flex:1;position:relative;background:linear-gradient(#2b1c11,#1e130d);border:1px solid #1d100a;border-radius:14px;padding:8px 6px 8px;display:flex;flex-direction:column;align-items:center;gap:5px;box-shadow:inset 0 3px 12px #08040299}' +
     '.bl-thumb{width:100%;height:104px;background-size:contain;background-repeat:no-repeat;background-position:center bottom}' +
     '.bl-name{color:#f3e6c8;font-size:14px}' +
+    '.bl-price{color:#e8c87a;font-size:13px;font-weight:700}' +
+    '.bl-free{color:#8fce7a}' +
+    '.bl-count{position:absolute;top:6px;left:6px;border-radius:9px;background:#3a2f26;color:#e8dcc8;font-size:12px;font-weight:700;padding:5px 8px}' +
     '.bl-build{position:absolute;top:6px;right:6px;border:0;border-radius:9px;background:linear-gradient(180deg,#7fb069,#4c8a3f);color:#fff;font-size:13px;font-weight:700;padding:5px 9px;cursor:pointer}' +
     '.bl-build:disabled{background:#5a5148;cursor:default}' +
     '.bl-cancel{background:linear-gradient(180deg,#a93226,#7e241b)}' +
-    '.bl-placed{position:absolute;top:6px;right:6px;border-radius:9px;background:#5a5148;color:#e8dcc8;font-size:12px;font-weight:700;padding:5px 8px}' +
-    '.bl-locked{position:absolute;top:6px;right:6px;border-radius:9px;background:#3a2f26;color:#9a8a76;font-size:12px;font-weight:700;padding:5px 8px}' +
-    '.bl-dim{opacity:.55}' +
-    '.bl-tabs{display:flex;gap:8px;padding:0 6px 8px}' +
-    '.bl-tab{border:2px solid #82562f;border-bottom:0;border-radius:10px 10px 0 0;background:rgba(255,244,220,.08);padding:4px 10px;cursor:pointer;line-height:0}' +
+    '.bl-tabs{display:flex;gap:8px;padding:0 6px;align-items:flex-end}' +
+    // folder tab: a real file-folder tab, not a button. Raised flat top with
+    // sloped shoulders (clip-path), warm paper with a lighter top, a darker
+    // bottom edge for thickness, and a cast shadow under the active tab.
+    // The tab's flat bottom meets the menu body below with no gap.
+    '.bl-tab{border:0;padding:7px 20px 5px;margin-bottom:-1px;cursor:pointer;line-height:0;background:linear-gradient(180deg,#c8ab72,#b8945f 60%,#a37f4c);clip-path:polygon(0 100%,0 34%,15% 0,85% 0,100% 34%,100% 100%);box-shadow:inset 0 1px 0 rgba(255,244,214,.45),inset 0 -4px 0 rgba(110,78,34,.45)}' +
     '.bl-tab img{height:30px;width:auto;display:block;clip-path:inset(0 33.2% 0 33%)}' +
-    '.bl-tab.on{background:linear-gradient(#2b1c11,#1e130d)}' +
+    '.bl-tab.on{background:linear-gradient(180deg,#f4e4b8,#e2c992 55%,#d3ae71);box-shadow:inset 0 1px 0 rgba(255,250,224,.85),inset 0 -4px 0 rgba(122,88,40,.5);filter:drop-shadow(0 3px 3px rgba(0,0,0,.45))}' +
     '.bvFly{position:absolute;z-index:9461;width:28px;height:auto;margin:-14px 0 0 -14px;pointer-events:none}' +
+    // v1's food/water meters (index.html #bvMeters / .bm3-meter): the little
+    // meters at the top of the screen, crown on top, food + water rows. They
+    // flash on while the leaves/droplets fly to them, then fade (2.5s).
+    '#bvMeters{--u:0.86px;position:absolute;z-index:6;top:calc(60px + env(safe-area-inset-top,0px));right:calc(84px + env(safe-area-inset-right,0px));display:flex;flex-direction:column;align-items:center;gap:4px;padding:4px 8px 6px;border-radius:12px;background:rgba(40,30,20,.62);pointer-events:none;opacity:0;transition:opacity .6s}' +
+    '#bvMeters.on{opacity:1;transition:opacity .15s}' +
+    '#bvMeters .crown{display:block;width:calc(34*var(--u));height:auto;clip-path:inset(0 33.2% 0 33%);margin-bottom:-2px}' +
+    '.bm3-meter{width:calc(128*var(--u));height:calc(22*var(--u));display:flex;align-items:center;gap:calc(5*var(--u))}' +
+    '.bm3-meter i{flex:none;width:calc(20*var(--u));height:calc(20*var(--u));background:center/contain no-repeat}' +
+    '.bm3-meter .bar{flex:1;height:calc(10*var(--u));border-radius:calc(6*var(--u));background:rgba(0,0,0,.45);border:1px solid #f3cf82;overflow:hidden}' +
+    '.bm3-meter .bar b{display:block;height:100%;width:0;transition:width .3s}' +
+    '.bm3-meter em{flex:none;min-width:34px;text-align:right;font:800 calc(13*var(--u))/1 \'BM3 Sans\',\'DejaVu Sans\',sans-serif;color:#fff;font-style:normal;text-shadow:0 1px 2px #000}' +
     // CHECKPOINT 2: the item bubble (tap a placed item).
     '.bl-bubble{position:absolute;z-index:6;display:none;min-width:190px;max-width:260px;background:linear-gradient(#2b1c11,#1e130d);border:2px solid #82562f;border-radius:14px;padding:10px 12px;box-shadow:0 4px 18px #00000080;text-align:center}' +
     '.bl-bname{color:#f3e6c8;font-size:15px;font-weight:700;margin-bottom:8px}' +
@@ -955,6 +1113,49 @@
   var activeTab = 'queen';
   function tabOf(id) { for (var i = 0; i < TABS.length; i++) if (TABS[i].id === id) return TABS[i]; return TABS[0]; }
 
+  // ---- CHECKPOINT 2: the food/water meters (v1 #bvMeters / .bm3-meter) ----
+  // v1's little meters at the top of the screen (crown on top, food + water
+  // rows). The leaves fly up to the right into the food meter and the
+  // droplets into the water meter; each landing steps that meter up (v1
+  // flyIcons / hud). They flash on while the icons fly, then fade (v1
+  // flashMeters, HUD_FLASH_MS 2.5s). Only food + water here — the brain has
+  // its own counter above the queen's head, and there is no money HUD.
+  var metersEl = null, metT = 0;
+  var HUD_FLASH_MS = 2500; // v1
+  function setMeter(k, v, cap, label) {
+    if (!metersEl) return;
+    var rows = metersEl.querySelectorAll('.bm3-meter[data-m="' + k + '"]');
+    for (var i = 0; i < rows.length; i++) {
+      var r = rows[i], b = r.querySelector('b');
+      if (b) b.style.width = (100 * v / cap).toFixed(1) + '%';
+      var em = r.querySelector('em');
+      if (em && em.textContent !== label) em.textContent = label;
+    }
+  }
+  function hudMeters() {
+    setMeter('food', MV.food, METERS.food.cap, String(Math.round(MV.food)));
+    setMeter('water', MV.water, METERS.water.cap, String(Math.round(MV.water)));
+  }
+  function flashMeters() {
+    if (!metersEl) return;
+    metersEl.classList.add('on');
+    clearTimeout(metT);
+    metT = setTimeout(function () { metersEl.classList.remove('on'); }, HUD_FLASH_MS);
+  }
+  function createMeters() {
+    var game = document.querySelector('#game');
+    if (!game || metersEl) return;
+    metersEl = document.createElement('div');
+    metersEl.id = 'bvMeters';
+    metersEl.setAttribute('aria-label', 'Queen meters');
+    metersEl.innerHTML = '<img class="crown" alt="" draggable="false" src="' + CROWN_SRC + '">' +
+      '<div class="bm3-meter" data-m="food"><i style="background-image:url(assets/icons/fi_leaf.webp)"></i><span class="bar"><b style="background:linear-gradient(90deg,#ffd27a,#e89a2c)"></b></span><em></em></div>' +
+      '<div class="bm3-meter" data-m="water"><i style="background-image:url(assets/icons/icon_water_droplet.png)"></i><span class="bar"><b style="background:linear-gradient(90deg,#9fd6ff,#3f8fd8)"></b></span><em></em></div>';
+    game.appendChild(metersEl);
+    hudMeters();
+  }
+  createMeters();
+
   var tray = document.querySelector('#emptyTray');
 
   function renderMenu() {
@@ -968,18 +1169,18 @@
       '</div>' +
       '<div class="bl-cards">';
     tabOf(activeTab).items.forEach(function (it) {
-      var done = window.BASE_ITEMS.isPlaced(it.id);
+      if (!isVisible(it.id)) return; // the bed gate: hidden items are not shown at all, never "Locked"
+      var n = placedCount(it.id); // copies of this type on the floor
+      var price = n * 10; // the NEXT copy: FREE first, then 10, 20, 30... seed money (per type)
       var active = (mode !== 'idle' && carryId === it.id);
-      var locked = !done && !active && it.id !== currentAvail(); // the unlock chain: only the available item can be built
-      html += '<div class="bl-card' + (locked ? ' bl-dim' : '') + '"><div class="bl-thumb" style="background-image:url(' + it.src + ')"></div>' +
+      html += '<div class="bl-card">' +
+        (n > 0 ? '<span class="bl-count">\u00d7' + n + '</span>' : '') +
+        '<div class="bl-thumb" style="background-image:url(' + it.src + ')"></div>' +
         '<div class="bl-name">' + it.name + '</div>' +
-        (done
-          ? '<span class="bl-placed">\u2713 Built</span>'
-          : active
-            ? '<button type="button" class="bl-build bl-cancel" data-cancel="' + it.id + '">\u2715 Cancel</button>'
-            : locked
-              ? '<span class="bl-locked">\uD83D\uDD12 Locked</span>'
-              : '<button type="button" class="bl-build" data-build="' + it.id + '">BUILD</button>') +
+        '<div class="bl-price' + (price === 0 ? ' bl-free' : '') + '">' + (price === 0 ? 'FREE' : '\uD83C\uDF31 ' + price) + '</div>' +
+        (active
+          ? '<button type="button" class="bl-build bl-cancel" data-cancel="' + it.id + '">\u2715 Cancel</button>'
+          : '<button type="button" class="bl-build" data-build="' + it.id + '">BUILD</button>') +
         '</div>';
     });
     html += '</div>';
@@ -1013,7 +1214,7 @@
   // ---- CHECKPOINT 2: the item bubble ----
   // Tap a placed item: a bubble with arrows to MOVE it inside the hexagon and a
   // bulldozer to ERASE it. The bulldozer asks "are you sure?" first.
-  var bubbleEl = null, bubbleItemId = null, bubbleMode = 'actions', bubbleRAF = null;
+  var bubbleEl = null, bubbleUid = null, bubbleMode = 'actions', bubbleRAF = null;
   function ensureBubble() {
     if (bubbleEl) return bubbleEl;
     var game = document.querySelector('#game');
@@ -1025,8 +1226,11 @@
   }
   function renderBubble() {
     var el = ensureBubble();
-    if (!bubbleItemId) return;
-    var it = itemById(bubbleItemId);
+    if (!bubbleUid) return;
+    var bp = null;
+    for (var i = 0; i < placed.length; i++) if (placed[i].uid === bubbleUid) { bp = placed[i]; break; }
+    if (!bp) { hideBubble(); return; }
+    var it = itemById(bp.id);
     var name = it ? it.name : 'Item';
     if (bubbleMode === 'confirm') {
       el.innerHTML = '<div class="bl-bq">Are you sure you want to erase it?</div>' +
@@ -1041,18 +1245,18 @@
       b.addEventListener('click', function (e) {
         e.stopPropagation();
         var act = b.getAttribute('data-act');
-        if (act === 'move') startMove(bubbleItemId);
+        if (act === 'move') startMove(bubbleUid);
         else if (act === 'erase') { bubbleMode = 'confirm'; renderBubble(); }
-        else if (act === 'yes') { var id = bubbleItemId; hideBubble(); removeItem(id); }
+        else if (act === 'yes') { var uid = bubbleUid; hideBubble(); removeItem(uid); }
         else if (act === 'no') { bubbleMode = 'actions'; renderBubble(); }
       });
     });
   }
   function positionBubble() {
     var el = bubbleEl;
-    if (!el || !bubbleItemId) return;
+    if (!el || !bubbleUid) return;
     var p = null;
-    for (var i = 0; i < placed.length; i++) if (placed[i].id === bubbleItemId) { p = placed[i]; break; }
+    for (var i = 0; i < placed.length; i++) if (placed[i].uid === bubbleUid) { p = placed[i]; break; }
     if (!p) { hideBubble(); return; }
     var im = IMGS[p.id];
     var h = (im && im.naturalWidth) ? p.w * im.naturalHeight / im.naturalWidth : p.w * 0.8;
@@ -1073,8 +1277,8 @@
     el.style.left = left + 'px';
     el.style.top = top + 'px';
   }
-  function showBubble(id) {
-    bubbleItemId = id; bubbleMode = 'actions';
+  function showBubble(uid) {
+    bubbleUid = uid; bubbleMode = 'actions';
     var el = ensureBubble();
     renderBubble();
     el.style.display = 'block';
@@ -1089,7 +1293,7 @@
     }
   }
   function hideBubble() {
-    bubbleItemId = null; bubbleMode = 'actions';
+    bubbleUid = null; bubbleMode = 'actions';
     if (bubbleRAF) { cancelAnimationFrame(bubbleRAF); bubbleRAF = null; }
     if (bubbleEl) bubbleEl.style.display = 'none';
   }
@@ -1153,8 +1357,9 @@
       if (mode === 'carrying') {
         if (ghostOK()) {
           var id = carryId, g = ghost;
+          var moved = moveFrom; // the copy being moved (null for a fresh build) — it keeps its uid and cost
           moveFrom = null; // placed now; cancelling must not restore it
-          window.BASE_ITEMS.place(id, g.cx, g.floorY);
+          window.BASE_ITEMS.place(id, g.cx, g.floorY, moved);
           cancelPlacing();
         }
         // Red ghost: the tap does nothing, the item stays carried.
@@ -1170,7 +1375,7 @@
           return;
         }
         var hit = placedItemAt(w.x, w.y);
-        if (hit) showBubble(hit.id);
+        if (hit) showBubble(hit.uid);
         else hideBubble();
       }
     };
