@@ -88,6 +88,14 @@
   // explain seed money later), so this is the price structure and display
   // only — building is never blocked for cost.
   function nextPrice(id) { return placedCount(id) * 10; } // 0 = FREE for the first copy
+  // Seed-money balance: no balance, wallet, or earning system exists yet
+  // (Chris will explain seed money later), so there is nothing to check
+  // against and the player can always build. canAfford() is the real gate
+  // for the BUILD button colour: RED only when a balance exists and the
+  // price is above it. Until then it always passes and building is never
+  // blocked for cost.
+  function seedBalance() { return null; } // null = no balance system yet
+  function canAfford(price) { var b = seedBalance(); return b === null || price <= b; }
   function rectOf(cx, floorY, w, h) { return { x0: cx - w / 2, x1: cx + w / 2, y0: floorY - h, y1: floorY }; }
   function rectsOverlap(a, b) { return a.x0 < b.x1 && a.x1 > b.x0 && a.y0 < b.y1 && a.y1 > b.y0; }
   function overlapsPlaced(cx, floorY, w, h) {
@@ -1065,7 +1073,8 @@
     '.bl-thumb{width:100%;height:104px;background-size:contain;background-repeat:no-repeat;background-position:center bottom}' +
     '.bl-name{color:#f3e6c8;font-size:14px}' +
     '.bl-price{color:#fff;font-weight:700}' +
-    '.bl-build{position:absolute;top:6px;right:6px;border:0;border-radius:9px;background:linear-gradient(180deg,#e74c3c,#c0392b);color:#fff;font-size:13px;font-weight:700;padding:5px 9px;cursor:pointer}' +
+    '.bl-build{position:absolute;top:6px;right:6px;border:0;border-radius:9px;background:linear-gradient(180deg,#7fb069,#4c8a3f);color:#fff;font-size:13px;font-weight:700;padding:5px 9px;cursor:pointer}' +
+    '.bl-build.bl-cant{background:linear-gradient(180deg,#e74c3c,#c0392b);cursor:not-allowed}' +
     '.bl-build:disabled{background:#5a5148;cursor:default}' +
     '.bl-cancel{background:linear-gradient(180deg,#a93226,#7e241b)}' +
     '.bl-tabs{display:flex;gap:8px;padding:0;align-items:flex-end}' +
@@ -1171,13 +1180,14 @@
       if (!isVisible(it.id)) return; // the bed gate: hidden items are not shown at all, never "Locked"
       var n = placedCount(it.id); // copies of this type on the floor
       var price = n * 10; // the NEXT copy: FREE first, then 10, 20, 30... seed money (per type)
+      var afford = canAfford(price); // green when he can build, red only when he cannot afford it
       var active = (mode !== 'idle' && carryId === it.id);
       html += '<div class="bl-card">' +
         '<div class="bl-thumb" style="background-image:url(' + it.src + ')"></div>' +
         '<div class="bl-name">' + it.name + (price === 0 ? '' : ' <span class="bl-price">$' + price + '</span>') + '</div>' +
         (active
           ? '<button type="button" class="bl-build bl-cancel" data-cancel="' + it.id + '">\u2715 Cancel</button>'
-          : '<button type="button" class="bl-build" data-build="' + it.id + '">BUILD</button>') +
+          : '<button type="button" class="bl-build' + (afford ? '' : ' bl-cant') + '" data-build="' + it.id + '">BUILD</button>') +
         '</div>';
     });
     html += '</div>';
@@ -1190,7 +1200,9 @@
     tray.querySelectorAll('[data-build]').forEach(function (b) {
       b.addEventListener('click', function (e) {
         e.stopPropagation();
-        window.BASE_ITEMS.startSelect(b.getAttribute('data-build'));
+        var id = b.getAttribute('data-build');
+        if (!canAfford(nextPrice(id))) return; // red button: not enough seed money, cannot build
+        window.BASE_ITEMS.startSelect(id);
       });
     });
     tray.querySelectorAll('[data-cancel]').forEach(function (b) {
