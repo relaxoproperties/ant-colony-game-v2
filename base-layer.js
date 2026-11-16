@@ -959,7 +959,7 @@
 
   function renderMenu() {
     if (!tray) return;
-    var html = '<div class="bl-head"><div class="bl-title">Build</div>' +
+    var html = '<div class="bl-head">' +
       '<button type="button" class="bl-dozer" id="blDozer" aria-label="Bulldozer: remove a placed item">\uD83D\uDE9C</button></div>' +
       '<div class="bl-tabs">' +
       TABS.map(function (t) {
