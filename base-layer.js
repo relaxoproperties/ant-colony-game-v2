@@ -39,9 +39,9 @@
   // Default spots are inside the entrance hex (fallbacks only; the player places them).
   var ITEMS = [
     { id: 'leafbed',    name: 'Leaf bed',    src: 'assets/items/leaf-bed.png',    cx: 2790, floorY: 5050, w: 27.34 },
-    { id: 'eggbasket',  name: 'Egg basket',  src: 'assets/items/egg-basket.png',  cx: 2835, floorY: 5045, w: 9.69 },
-    { id: 'fridge',     name: 'Fridge',      src: 'assets/items/fridge.png',      cx: 2770, floorY: 5060, w: 18.0 },
-    { id: 'watercooler',name: 'Water cooler',src: 'assets/items/water-cooler.png',cx: 2855, floorY: 5055, w: 19.5 }
+    { id: 'eggbasket',  name: 'Egg basket',  src: 'assets/items/egg-basket.png',  cx: 2835, floorY: 5045, w: 9.69, thumb: 'background-size:78% auto;' },
+    { id: 'fridge',     name: 'Fridge',      src: 'assets/items/fridge.png?v=26', cx: 2770, floorY: 5060, w: 18.0, thumb: 'background-position:center 13px;' },
+    { id: 'watercooler',name: 'Water cooler',src: 'assets/items/water-cooler.png',cx: 2855, floorY: 5055, w: 19.5, thumb: 'background-position:center 19px;' }
   ];
   var IMGS = {};
   ITEMS.forEach(function (it) {
@@ -84,18 +84,18 @@
   function placedCount(id) { var n = 0; for (var i = 0; i < placed.length; i++) if (placed[i].id === id) n++; return n; }
   // Seed-money price of the NEXT copy of a type (Chris, Nov 15): the 1st is
   // FREE, then 10, 20, 30... — each next copy costs 10 more than the last,
-  // counted PER TYPE. No seed-money balance or wallet exists yet (Chris will
-  // explain seed money later), so this is the price structure and display
-  // only — building is never blocked for cost.
+  // counted PER TYPE. The player starts with ZERO seed money (Chris,
+  // Nov 16), so a priced copy is unaffordable until he explains how seed
+  // money is earned. No earning method or wallet exists yet.
   function nextPrice(id) { return placedCount(id) * 10; } // 0 = FREE for the first copy
-  // Seed-money balance: no balance, wallet, or earning system exists yet
-  // (Chris will explain seed money later), so there is nothing to check
-  // against and the player can always build. canAfford() is the real gate
-  // for the BUILD button colour: RED only when a balance exists and the
-  // price is above it. Until then it always passes and building is never
-  // blocked for cost.
-  function seedBalance() { return null; } // null = no balance system yet
-  function canAfford(price) { var b = seedBalance(); return b === null || price <= b; }
+  // Seed-money balance: the player starts with ZERO (Chris, Nov 16).
+  // No earning method or wallet exists yet — he will explain how seed
+  // money is earned at a future checkpoint, when it matters. canAfford()
+  // is the gate for the BUILD button colour: GREEN when the balance covers
+  // the price (a FREE copy is always affordable), RED only when the price
+  // is above the balance, and a red button cannot be tapped to build.
+  function seedBalance() { return 0; } // starting balance: zero seed money
+  function canAfford(price) { return price <= seedBalance(); }
   function rectOf(cx, floorY, w, h) { return { x0: cx - w / 2, x1: cx + w / 2, y0: floorY - h, y1: floorY }; }
   function rectsOverlap(a, b) { return a.x0 < b.x1 && a.x1 > b.x0 && a.y0 < b.y1 && a.y1 > b.y0; }
   function overlapsPlaced(cx, floorY, w, h) {
@@ -549,7 +549,7 @@
           ctx.restore();
         }
         ctx.save();
-        ctx.font = '800 ' + (Rr * .62).toFixed(3) + "px 'BM3 Sans','DejaVu Sans',sans-serif";
+        ctx.font = '800 ' + (Rr * .434).toFixed(3) + "px 'BM3 Sans','DejaVu Sans',sans-serif"; // tend-bubble heart, 30% smaller (70% of v25 size)
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
         ctx.shadowColor = '#000'; ctx.shadowOffsetY = 2; ctx.shadowBlur = 3;
         ctx.fillStyle = '#ffe38a';
@@ -1072,7 +1072,7 @@
     '.bl-card{flex:0 0 calc((100% - 30px)/4);position:relative;background:linear-gradient(#2b1c11,#1e130d);border:1px solid #1d100a;border-radius:14px;padding:8px 6px 8px;display:flex;flex-direction:column;align-items:center;gap:5px;box-shadow:inset 0 3px 12px #08040299}' +
     '.bl-thumb{width:100%;height:104px;background-size:contain;background-repeat:no-repeat;background-position:center bottom}' +
     '.bl-name{color:#f3e6c8;font-size:14px}' +
-    '.bl-price{color:#fff;font-weight:700}' +
+    '.bl-price{position:absolute;top:36px;right:6px;color:#fff;font-weight:700;font-size:13px;text-shadow:0 1px 3px rgba(0,0,0,.85)}' +
     '.bl-build{position:absolute;top:6px;right:6px;border:0;border-radius:9px;background:linear-gradient(180deg,#7fb069,#4c8a3f);color:#fff;font-size:13px;font-weight:700;padding:5px 9px;cursor:pointer}' +
     '.bl-build.bl-cant{background:linear-gradient(180deg,#e74c3c,#c0392b);cursor:not-allowed}' +
     '.bl-build:disabled{background:#5a5148;cursor:default}' +
@@ -1086,7 +1086,7 @@
     // border-top), so the outline flows continuously from the tab into the
     // menu's top edge as one folder outline. The tab's flat bottom meets
     // the menu body below with no gap, so it reads as part of the folder.
-    '.bl-tab{border:0;padding:5px 20px 4px;margin-bottom:-1px;cursor:pointer;line-height:0;background:linear-gradient(180deg,#3d2c1d,#2a1c11 60%,#20140c);clip-path:polygon(0 100%,0 0,60% 0,80% 100%,100% 100%);box-shadow:inset 0 1px 0 rgba(255,214,160,.18),inset 0 -4px 0 rgba(0,0,0,.35)}' +
+    '.bl-tab{border:0;padding:5px 20px 4px;margin-bottom:-1px;cursor:pointer;line-height:0;display:flex;justify-content:center;align-items:center;background:linear-gradient(180deg,#3d2c1d,#2a1c11 60%,#20140c);clip-path:polygon(0 100%,0 0,60% 0,80% 100%,100% 100%);box-shadow:inset 0 1px 0 rgba(255,214,160,.18),inset 0 -4px 0 rgba(0,0,0,.35)}' +
     '.bl-tab img{height:25px;width:auto;display:block;clip-path:inset(0 33.2% 0 33%)}' +
     '.bl-tab.on{background:linear-gradient(180deg,#5a4128,#38271c 55%,#2e1d12);box-shadow:inset 0 1px 0 rgba(255,220,170,.35),inset 0 -4px 0 rgba(0,0,0,.4);filter:drop-shadow(0 3px 3px rgba(0,0,0,.45))}' +
     '.bvFly{position:absolute;z-index:9461;width:28px;height:auto;margin:-14px 0 0 -14px;pointer-events:none}' +
@@ -1186,8 +1186,9 @@
       var afford = canAfford(price); // green when he can build, red only when he cannot afford it
       var active = (mode !== 'idle' && carryId === it.id);
       html += '<div class="bl-card">' +
-        '<div class="bl-thumb" style="background-image:url(' + it.src + ')"></div>' +
-        '<div class="bl-name">' + it.name + (price === 0 ? '' : ' <span class="bl-price">$' + price + '</span>') + '</div>' +
+        '<div class="bl-thumb" style="background-image:url(' + it.src + ');' + (it.thumb || '') + '"></div>' +
+        '<div class="bl-name">' + it.name + '</div>' +
+        (price === 0 ? '' : '<div class="bl-price">$' + price + '</div>') +
         (active
           ? '<button type="button" class="bl-build bl-cancel" data-cancel="' + it.id + '">\u2715 Cancel</button>'
           : '<button type="button" class="bl-build' + (afford ? '' : ' bl-cant') + '" data-build="' + it.id + '">BUILD</button>') +
