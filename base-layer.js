@@ -1068,7 +1068,7 @@
     '.bl-title{color:#f3e6c8;font-size:17px;font-weight:700;letter-spacing:.5px}' +
     '.bl-dozer{border:2px solid #82562f;border-radius:12px;background:rgba(255,244,220,.14);color:#f3e6c8;font-size:22px;line-height:1;padding:6px 12px;cursor:pointer}' +
     '.bl-dozer.on{background:#a93226;border-color:#e74c3c}' +
-    '.bl-cards{display:flex;gap:10px;justify-content:flex-start}' +
+    '.bl-cards{display:flex;gap:10px;justify-content:flex-start;border-top:2px solid #82562f}' +
     '.bl-card{flex:0 0 calc((100% - 30px)/4);position:relative;background:linear-gradient(#2b1c11,#1e130d);border:1px solid #1d100a;border-radius:14px;padding:8px 6px 8px;display:flex;flex-direction:column;align-items:center;gap:5px;box-shadow:inset 0 3px 12px #08040299}' +
     '.bl-thumb{width:100%;height:104px;background-size:contain;background-repeat:no-repeat;background-position:center bottom}' +
     '.bl-name{color:#f3e6c8;font-size:14px}' +
@@ -1079,12 +1079,15 @@
     '.bl-cancel{background:linear-gradient(180deg,#a93226,#7e241b)}' +
     '.bl-tabs{display:flex;gap:8px;padding:0;align-items:flex-end}' +
     // folder tab: a real file-folder tab, not a button. Raised flat top with
-    // sloped shoulders (clip-path), in the menu's own dark brown (no paper
+    // a sloped right side (clip-path), in the menu's own dark brown (no paper
     // colour), a lighter top for depth, a darker bottom edge for thickness,
-    // and a cast shadow under the active tab. The tab's flat bottom meets
+    // and a cast shadow under the active tab. The tab's right slope runs all
+    // the way down to the menu's top edge (the folder line, .bl-cards
+    // border-top), so the outline flows continuously from the tab into the
+    // menu's top edge as one folder outline. The tab's flat bottom meets
     // the menu body below with no gap, so it reads as part of the folder.
-    '.bl-tab{border:0;padding:4px 20px 3px;margin-bottom:-1px;cursor:pointer;line-height:0;background:linear-gradient(180deg,#3d2c1d,#2a1c11 60%,#20140c);clip-path:polygon(0 100%,0 0,60% 0,80% 35%,100% 35%,100% 100%);box-shadow:inset 0 1px 0 rgba(255,214,160,.18),inset 0 -4px 0 rgba(0,0,0,.35)}' +
-    '.bl-tab img{height:20px;width:auto;display:block;clip-path:inset(0 33.2% 0 33%)}' +
+    '.bl-tab{border:0;padding:5px 20px 4px;margin-bottom:-1px;cursor:pointer;line-height:0;background:linear-gradient(180deg,#3d2c1d,#2a1c11 60%,#20140c);clip-path:polygon(0 100%,0 0,60% 0,80% 100%,100% 100%);box-shadow:inset 0 1px 0 rgba(255,214,160,.18),inset 0 -4px 0 rgba(0,0,0,.35)}' +
+    '.bl-tab img{height:25px;width:auto;display:block;clip-path:inset(0 33.2% 0 33%)}' +
     '.bl-tab.on{background:linear-gradient(180deg,#5a4128,#38271c 55%,#2e1d12);box-shadow:inset 0 1px 0 rgba(255,220,170,.35),inset 0 -4px 0 rgba(0,0,0,.4);filter:drop-shadow(0 3px 3px rgba(0,0,0,.45))}' +
     '.bvFly{position:absolute;z-index:9461;width:28px;height:auto;margin:-14px 0 0 -14px;pointer-events:none}' +
     // v1's food/water meters (index.html #bvMeters / .bm3-meter): the little
