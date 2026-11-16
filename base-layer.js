@@ -7,10 +7,11 @@
 // Checkpoint 2 (placement, REDESIGNED Nov 15 18:02 — replaces the 6-hexagon flow):
 // ONLY the one entrance hexagon (the VISUAL one below the hole, centre world
 // (2812,5039), w 136.86 — NOT the grid's (0,0) at (2812,4999.5)). Tap BUILD and
-// the item appears as a white ghost; drag/tap anywhere inside the entrance hex
-// to place it (white = can place, red = outside the hex or overlapping another
-// item). Tap a placed item and a bubble appears: arrows to MOVE it inside the
-// hex, bulldozer to ERASE it (asks "are you sure?" first).
+// the item appears as a white ghost; drag/tap so the box TOUCHES the entrance
+// hex to place it (it may hang over the edge; white = can place, red = not
+// touching the hex at all or overlapping another item). Tap a placed item and
+// a bubble appears: arrows to MOVE it inside the hex, bulldozer to ERASE it
+// (asks "are you sure?" first).
 // CHECKPOINT 2 TIMERS (Nov 15, v1 values, reused not invented): every item has
 // a timer. Bed = the brain timer: v1's counter above her head in the royal
 // chamber counts down 120s while she rests on the bed (NP5 drawTag, "02:00");
@@ -307,19 +308,10 @@
       var im = IMGS[p.id];
       var h = (im && im.naturalWidth) ? p.w * im.naturalHeight / im.naturalWidth : p.w * 0.8;
       var left = roomTimerLeft(id);
-      // Countdown mm:ss over the item while the timer runs (v1's visible timer).
+      // Countdown over the item while the timer runs: v1's drawTag (NP5),
+      // zero-padded mmss, white with a dark outline — same as the brain counter.
       if (left !== null && left > 0) {
-        var mm = Math.floor(left / 60), ss = Math.floor(left % 60);
-        var txt = mm + ':' + (ss < 10 ? '0' : '') + ss;
-        ctx.save();
-        ctx.font = '700 8px sans-serif'; // world units (v1 draws timer text in world space)
-        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        var tx = p.cx, ty = p.floorY - h - 8;
-        ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(0,0,0,.7)';
-        ctx.strokeText(txt, tx, ty);
-        ctx.fillStyle = '#ffe38a';
-        ctx.fillText(txt, tx, ty);
-        ctx.restore();
+        drawTag(p.cx, p.floorY - h - 8, brainMmss(left), 1, 0);
       }
       // Leaf / drop bubble at 00:00 (v1's eat/drink bubble, same bubble style).
       var b = roomTimerBubble(id);
@@ -510,23 +502,15 @@
       }
       ctx.restore();
     }
-    // Countdown over the basket (v1 basketTimer, seconds left).
+    // Countdown over the basket (v1 basketTimer, seconds left): v1's drawTag
+    // (NP5), zero-padded mmss, white with a dark outline — same as the brain counter.
     var p = basketPlaced();
     if (p && p.egg && p.egg.state === 'two') {
       var left = basketTimer(p);
       if (left !== null && left > 0) {
-        var mm = Math.floor(left / 60), ss = Math.floor(left % 60);
-        var txt = mm + ':' + (ss < 10 ? '0' : '') + ss;
         var im2 = IMGS[p.id];
         var h2 = (im2 && im2.naturalWidth) ? p.w * im2.naturalHeight / im2.naturalWidth : p.w * 0.8;
-        ctx.save();
-        ctx.font = '700 8px sans-serif';
-        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(0,0,0,.7)';
-        ctx.strokeText(txt, p.cx, p.floorY - h2 - 8);
-        ctx.fillStyle = '#ffe38a';
-        ctx.fillText(txt, p.cx, p.floorY - h2 - 8);
-        ctx.restore();
+        drawTag(p.cx, p.floorY - h2 - 8, brainMmss(left), 1, 0);
       }
     }
   }
@@ -634,16 +618,31 @@
   // This is NOT the placement grid's (0,0) at HEX (2812,4999.5) — the visual
   // entrance hex sits ~40 world units lower, near SPIRAL_W. Only this one hex
   // is the play area; the full hexagon pattern is NOT built.
-  var HEXW = HEX.w, HEXHH = HEX.w * Math.sqrt(3) / 2;
+  var HEXW = HEX.w;
   var ENTRANCE = { x: 2812, y: 5039 };
-  function inHexPt(p, cx, cy) { var dx = Math.abs(p.x - cx), dy = Math.abs(p.y - cy); return dy <= HEXHH / 2 && dx <= HEXW / 2 - dy / Math.sqrt(3); } // v1 inHex
-  // The whole item rect must sit inside the entrance hexagon.
-  function rectInEntranceHex(cx, floorY, w, h) {
-    var corners = [
-      { x: cx - w / 2, y: floorY - h }, { x: cx + w / 2, y: floorY - h },
-      { x: cx - w / 2, y: floorY },     { x: cx + w / 2, y: floorY }
-    ];
-    for (var i = 0; i < corners.length; i++) if (!inHexPt(corners[i], ENTRANCE.x, ENTRANCE.y)) return false;
+  // The item box only needs to TOUCH the entrance hexagon (Chris): any part of
+  // the box overlapping or intersecting the hexagon counts — it may hang over
+  // the edge. Only a box that does not touch the hexagon at all is rejected.
+  // Separating-axis test: rect vs the convex hexagon (pointy left/right, flat
+  // top/bottom, vertices at v1 hexVertex angles i*PI/3). Axes: the rect's x/y
+  // axes plus the hexagon's edge normals. Touching exactly on an edge counts.
+  function rectTouchesEntranceHex(cx, floorY, w, h) {
+    var x0 = cx - w / 2, x1 = cx + w / 2, y0 = floorY - h, y1 = floorY;
+    var rx = ENTRANCE.x, ry = ENTRANCE.y, r = HEXW / 2;
+    var vx = [], vy = [], i, a;
+    for (i = 0; i < 6; i++) { a = i * Math.PI / 3; vx.push(rx + r * Math.cos(a)); vy.push(ry + r * Math.sin(a)); }
+    function separated(ax, ay) {
+      var minR = Infinity, maxR = -Infinity, minH = Infinity, maxH = -Infinity, k, p;
+      var corners = [[x0, y0], [x1, y0], [x0, y1], [x1, y1]];
+      for (k = 0; k < 4; k++) { p = corners[k][0] * ax + corners[k][1] * ay; if (p < minR) minR = p; if (p > maxR) maxR = p; }
+      for (k = 0; k < 6; k++) { p = vx[k] * ax + vy[k] * ay; if (p < minH) minH = p; if (p > maxH) maxH = p; }
+      return maxR < minH || maxH < minR;
+    }
+    var s3 = Math.sqrt(3) / 2;
+    if (separated(1, 0)) return false;
+    if (separated(0, 1)) return false;
+    if (separated(s3, 0.5)) return false;
+    if (separated(-s3, 0.5)) return false;
     return true;
   }
 
@@ -656,7 +655,7 @@
     var it = itemById(carryId);
     if (!it) return false;
     var h = itemH(it);
-    return rectInEntranceHex(ghost.cx, ghost.floorY, it.w, h) && !overlapsPlaced(ghost.cx, ghost.floorY, it.w, h);
+    return rectTouchesEntranceHex(ghost.cx, ghost.floorY, it.w, h) && !overlapsPlaced(ghost.cx, ghost.floorY, it.w, h);
   }
   function setPlacingUI() {
     // While carrying, taps on the queen and the floor arrows must reach the room, not the buttons.
