@@ -1716,7 +1716,7 @@
     '.bl-brow button{border:0;border-radius:10px;padding:8px 12px;font-size:14px;font-weight:700;cursor:pointer}' +
     '.bl-bmove{background:linear-gradient(180deg,#7fb069,#4c8a3f);color:#fff}' +
     '.bl-berase{background:linear-gradient(180deg,#a93226,#7e241b);color:#fff}' +
-    '.bl-berase img{height:16px;width:auto;vertical-align:-2px;margin-right:2px}' + // v31: the bulldozer picture next to "Erase", same cut-out as the menu button
+    '.bl-berase img{height:16px;width:auto;vertical-align:-2px;margin-right:2px}' + // v33: the bulldozer picture next to "Destroy", same cut-out as the menu button
     '.bl-byes{background:linear-gradient(180deg,#7fb069,#4c8a3f);color:#fff}' +
     '.bl-bno{background:#5a5148;color:#e8dcc8}';
   document.head.appendChild(style);
@@ -1786,7 +1786,7 @@
   // The menu bulldozer (top right) is NOT a no-op any more. Pressing it arms
   // erase mode: the bulldozer turns red (.bl-dozer.on) so he can tell it is
   // on. While it is on, tapping a placed item opens the SAME confirmation
-  // the bubble's own bulldozer uses — "Are you sure you want to erase it?"
+  // the bubble's own bulldozer uses — "Are you sure you want to destroy it?"
   // — and only a Yes erases it (removeItem, the bubble erase's own path).
   // Pressing the bulldozer again, or tapping empty space, turns erase mode
   // off. When it is off, tapping a placed item behaves exactly as before
@@ -1831,7 +1831,7 @@
       e.stopPropagation();
       // v28: the menu bulldozer arms erase mode (it is no longer a no-op).
       // Red = armed: tapping a placed item asks "Are you sure you want to
-      // erase it?" first. Pressing it again turns erase mode off.
+      // destroy it?" first. Pressing it again turns erase mode off.
       eraseMode = !eraseMode;
       if (eraseMode) hideBubble();
       renderMenu();
@@ -1881,13 +1881,13 @@
     var it = itemById(bp.id);
     var name = it ? it.name : 'Item';
     if (bubbleMode === 'confirm') {
-      el.innerHTML = '<div class="bl-bq">Are you sure you want to erase it?</div>' +
+      el.innerHTML = '<div class="bl-bq">Are you sure you want to destroy it?</div>' +
         '<div class="bl-brow"><button type="button" class="bl-byes" data-act="yes">Yes</button>' +
         '<button type="button" class="bl-bno" data-act="no">No</button></div>';
     } else {
       el.innerHTML = '<div class="bl-bname">' + name + '</div>' +
         '<div class="bl-brow"><button type="button" class="bl-bmove" data-act="move">\u2194\uFE0F Move</button>' +
-        '<button type="button" class="bl-berase" data-act="erase"><img alt="" draggable="false" src="' + BULLDOZER_SRC + '"> Erase</button></div>';
+        '<button type="button" class="bl-berase" data-act="erase"><img alt="" draggable="false" src="' + BULLDOZER_SRC + '"> Destroy</button></div>';
     }
     el.querySelectorAll('[data-act]').forEach(function (b) {
       b.addEventListener('click', function (e) {
@@ -2033,7 +2033,7 @@
         var hit = placedItemAt(w.x, w.y);
         if (hit) {
           // v28: erase mode armed — the tap asks "Are you sure you want to
-          // erase it?" (the bubble's own confirmation) instead of opening
+          // destroy it?" (the bubble's own confirmation) instead of opening
           // the move/erase bubble; nothing is erased without a Yes.
           if (eraseMode) showBubbleConfirm(hit.uid);
           else showBubble(hit.uid);
