@@ -40,7 +40,7 @@
   var ITEMS = [
     { id: 'leafbed',    name: 'Leaf bed',    src: 'assets/items/leaf-bed.png',    cx: 2790, floorY: 5050, w: 27.34 },
     { id: 'eggbasket',  name: 'Egg basket',  src: 'assets/items/egg-basket.png',  cx: 2835, floorY: 5045, w: 9.69, thumb: 'background-size:78% auto;' },
-    { id: 'fridge',     name: 'Fridge',      src: 'assets/items/fridge.png?v=26', cx: 2770, floorY: 5060, w: 18.0, thumb: 'background-position:center 13px;' },
+    { id: 'fridge',     name: 'Fridge',      src: 'assets/items/fridge.png?v=27', cx: 2770, floorY: 5060, w: 18.0, thumb: 'background-position:center 13px;' },
     { id: 'watercooler',name: 'Water cooler',src: 'assets/items/water-cooler.png',cx: 2855, floorY: 5055, w: 19.5, thumb: 'background-position:center 19px;' }
   ];
   var IMGS = {};
@@ -54,17 +54,22 @@
   function itemById(id) { var found = null; ITEMS.forEach(function (x) { if (x.id === id) found = x; }); return found; }
   function itemH(it) { var im = IMGS[it.id]; return (im && im.naturalWidth) ? it.w * im.naturalHeight / im.naturalWidth : it.w * 0.8; }
 
-  // ---- CHECKPOINT 2: the unlock rule (Chris, Nov 15 — replaces v1's chain) ----
-  // The bed is the only gate. At the start the menu shows ONLY the bed; the
+  // ---- CHECKPOINT 2: the unlock rule (Chris, Nov 15, basket gated Nov 16) ----
+  // The bed is the first gate. At the start the menu shows ONLY the bed; the
   // fridge, water cooler, and egg basket are HIDDEN, not "Locked". Once she
-  // settles on the bed, all three appear and are buildable in ANY order —
-  // there is no forced sequence. Erasing the bed closes the gate again (the
-  // three hide until the bed is rebuilt); moving an item changes nothing.
+  // settles on the bed, the fridge and the water cooler appear and are
+  // buildable in EITHER order — there is no forced sequence between them.
+  // The egg basket is gated behind BOTH of them: it only appears once the
+  // fridge AND the water cooler are BUILT (cloud cleared, on the floor).
+  // Erasing the bed closes the gate again (all three hide until the bed is
+  // rebuilt); erasing the fridge or the cooler hides the basket again until
+  // both are rebuilt — but an already-built basket stays placed, only the
+  // menu availability is gated. Moving an item changes nothing.
   // An item is either visible and buildable, or hidden. No "Locked" cards.
   var bedGate = false; // opens when she settles on the bed
-  var builtOnce = {}; // items placed at least once (a move re-place is not a first build)
   function isVisible(id) {
     if (id === 'leafbed') return true;
+    if (id === 'eggbasket') return bedGate && isBuilt('fridge') && isBuilt('watercooler');
     return bedGate;
   }
   function openBedGate() {
@@ -82,6 +87,11 @@
   var placed = []; // {uid, id, cx, floorY, w, h, building, t0, cost}
   var nextUid = 1; // each placed copy gets its own id, so multiples of one type never get mixed up
   function placedCount(id) { var n = 0; for (var i = 0; i < placed.length; i++) if (placed[i].id === id) n++; return n; }
+  // A type counts as BUILT once a copy of it is on the floor and its build
+  // cloud has cleared (building === false). A copy she is still walking to
+  // or digging does not count yet — the basket only unlocks once the fridge
+  // and the cooler are both actually built.
+  function isBuilt(id) { for (var i = 0; i < placed.length; i++) if (placed[i].id === id && !placed[i].building) return true; return false; }
   // Seed-money price of the NEXT copy of a type (Chris, Nov 15): the 1st is
   // FREE, then 10, 20, 30... — each next copy costs 10 more than the last,
   // counted PER TYPE. The player starts with ZERO seed money (Chris,
@@ -755,6 +765,9 @@
         activeBuild = null;
         if (!pp) { QN.busy = false; runPending(); return; }
         pp.building = false;
+        // The basket unlocks when BOTH the fridge and the cooler are built:
+        // re-render the menu so it appears the moment the second one is revealed.
+        if (job.id === 'fridge' || job.id === 'watercooler') renderMenu();
         // The timer starts ONLY after the item is built (cloud gone), never
         // while the cloud is still going.
         if (job.id === 'fridge' || job.id === 'watercooler') startRoomTimer(job.id);
@@ -994,7 +1007,7 @@
     },
     isPlaced: function (id) { return placed.some(function (p) { return p.id === id; }); },
     place: function (id, cx, floorY, moved) {
-      if (!isVisible(id) && !builtOnce[id]) return false; // the bed gate: a first build needs the item visible (a move re-place is always allowed)
+      if (!isVisible(id) && !moved) return false; // the gate: a FRESH build needs the item visible in the menu (a move re-place is always allowed). A type built once is NOT enough — the basket hides again when the fridge/cooler is erased, and a 2nd basket must not be placeable while it is hidden.
       var it = itemById(id);
       if (!it) return false;
       // CHECKPOINT 2: a placed position (from the ghost) wins; no position = the default spot (checkpoint 1).
@@ -1009,7 +1022,6 @@
       // invisible). The queen walks to the spot first; the cloud starts only
       // when she arrives; the timer starts only after the item is built.
       placed.push({ uid: uid, id: it.id, cx: pcx, floorY: pfy, w: it.w, building: true, t0: DIG_PEND, cost: cost });
-      builtOnce[it.id] = true;
       queenFree = true; // the QN system takes over from here; checkpoint 1 is done
       brainReset(); // v1: any build activity distracts the queen
       renderMenu();
@@ -1087,7 +1099,7 @@
     // menu's top edge as one folder outline. The tab's flat bottom meets
     // the menu body below with no gap, so it reads as part of the folder.
     '.bl-tab{border:0;padding:5px 20px 4px;margin-bottom:-1px;cursor:pointer;line-height:0;display:flex;justify-content:center;align-items:center;background:linear-gradient(180deg,#3d2c1d,#2a1c11 60%,#20140c);clip-path:polygon(0 100%,0 0,60% 0,80% 100%,100% 100%);box-shadow:inset 0 1px 0 rgba(255,214,160,.18),inset 0 -4px 0 rgba(0,0,0,.35)}' +
-    '.bl-tab img{height:25px;width:auto;display:block;clip-path:inset(0 33.2% 0 33%)}' +
+    '.bl-tab img{height:25px;width:auto;display:block;clip-path:inset(0 33.2% 0 33%);transform:translateX(-14px)}' +
     '.bl-tab.on{background:linear-gradient(180deg,#5a4128,#38271c 55%,#2e1d12);box-shadow:inset 0 1px 0 rgba(255,220,170,.35),inset 0 -4px 0 rgba(0,0,0,.4);filter:drop-shadow(0 3px 3px rgba(0,0,0,.45))}' +
     '.bvFly{position:absolute;z-index:9461;width:28px;height:auto;margin:-14px 0 0 -14px;pointer-events:none}' +
     // v1's food/water meters (index.html #bvMeters / .bm3-meter): the little
