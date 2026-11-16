@@ -1070,6 +1070,7 @@
     tapBrainBubble: tapBrainBubble,
     tapRoomTimerBubble: tapRoomTimerBubble,
     tapBasketBubble: tapBasketBubble,
+    get eraseMode() { return eraseMode; }, // v28: menu-bulldozer erase mode, armed or not
     get placed() { return placed.slice(); }
   };
 
@@ -1181,6 +1182,20 @@
 
   var tray = document.querySelector('#emptyTray');
 
+  // ---- CHECKPOINT 2: the menu bulldozer arms erase mode (v28) ----
+  // The menu bulldozer (top right) is NOT a no-op any more. Pressing it arms
+  // erase mode: the bulldozer turns red (.bl-dozer.on) so he can tell it is
+  // on. While it is on, tapping a placed item opens the SAME confirmation
+  // the bubble's own bulldozer uses — "Are you sure you want to erase it?"
+  // — and only a Yes erases it (removeItem, the bubble erase's own path).
+  // Pressing the bulldozer again, or tapping empty space, turns erase mode
+  // off. When it is off, tapping a placed item behaves exactly as before
+  // (the move/erase bubble). The bulldozer never erases anything by itself;
+  // it only arms the mode. (v1's bulldozer is per-room MOVE — the room
+  // panel's "Move room (bulldozer)" — there is no menu-level erase mode in
+  // v1, so this reuses checkpoint 2's own bubble erase flow instead.)
+  var eraseMode = false;
+
   function renderMenu() {
     if (!tray) return;
     var html = '<div class="bl-head">' +
@@ -1189,7 +1204,7 @@
         return '<button type="button" class="bl-tab' + (t.id === activeTab ? ' on' : '') + '" data-tab="' + t.id + '" aria-label="' + t.id + '"><img alt="" draggable="false" src="' + t.icon + '"></button>';
       }).join('') +
       '</div>' +
-      '<button type="button" class="bl-dozer" id="blDozer" aria-label="Bulldozer: remove a placed item">\uD83D\uDE9C</button></div>' +
+      '<button type="button" class="bl-dozer' + (eraseMode ? ' on' : '') + '" id="blDozer" aria-label="Bulldozer: remove a placed item">\uD83D\uDE9C</button></div>' +
       '<div class="bl-cards">';
     tabOf(activeTab).items.forEach(function (it) {
       if (!isVisible(it.id)) return; // the bed gate: hidden items are not shown at all, never "Locked"
@@ -1211,7 +1226,12 @@
     var dz = document.getElementById('blDozer');
     if (dz) dz.addEventListener('click', function (e) {
       e.stopPropagation();
-      // CHECKPOINT 2: the bulldozer stays a no-op in the menu (erase lives in the item bubble).
+      // v28: the menu bulldozer arms erase mode (it is no longer a no-op).
+      // Red = armed: tapping a placed item asks "Are you sure you want to
+      // erase it?" first. Pressing it again turns erase mode off.
+      eraseMode = !eraseMode;
+      if (eraseMode) hideBubble();
+      renderMenu();
     });
     tray.querySelectorAll('[data-build]').forEach(function (b) {
       b.addEventListener('click', function (e) {
@@ -1317,6 +1337,14 @@
       bubbleRAF = requestAnimationFrame(loop);
     }
   }
+  // v28: erase mode — open the bubble straight on the confirmation the
+  // bubble's own bulldozer uses. Yes erases it (removeItem, the bubble
+  // erase's own path); No goes back to the move/erase actions.
+  function showBubbleConfirm(uid) {
+    showBubble(uid);
+    bubbleMode = 'confirm';
+    renderBubble();
+  }
   function hideBubble() {
     bubbleUid = null; bubbleMode = 'actions';
     if (bubbleRAF) { cancelAnimationFrame(bubbleRAF); bubbleRAF = null; }
@@ -1400,8 +1428,17 @@
           return;
         }
         var hit = placedItemAt(w.x, w.y);
-        if (hit) showBubble(hit.uid);
-        else hideBubble();
+        if (hit) {
+          // v28: erase mode armed — the tap asks "Are you sure you want to
+          // erase it?" (the bubble's own confirmation) instead of opening
+          // the move/erase bubble; nothing is erased without a Yes.
+          if (eraseMode) showBubbleConfirm(hit.uid);
+          else showBubble(hit.uid);
+        } else {
+          // v28: tapping empty space turns erase mode off again.
+          if (eraseMode) { eraseMode = false; renderMenu(); }
+          hideBubble();
+        }
       }
     };
     cv.addEventListener('pointerup', endPlacePtr);
