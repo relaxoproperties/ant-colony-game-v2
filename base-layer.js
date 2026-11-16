@@ -1570,6 +1570,132 @@
   // is the play area; the full hexagon pattern is NOT built.
   var HEXW = HEX.w;
   var ENTRANCE = { x: 2812, y: 5039 };
+  // ---- v37: the brown fog as a SEPARATE clearable layer (Chris, Nov 16) ----
+  // The underground is built in LAYERS. The dirt layer is
+  // underground-map-hd.jpg (uniform light dirt, no fog). The brown fog sits
+  // on top as its own layer. The live fog-map (underground-fog-map.jpg) is
+  // that dirt WITH the fog baked in — it is used ONLY to initialise the fog
+  // layer's shape, never drawn as the background, and never edited. The fog
+  // layer is a low-res mask + canvas (the fog is soft/dark, so low res is
+  // fine and the upscale blur softens the edge). The entrance hexagon is
+  // cleared from it at game start; the miner will clear other hexagons one
+  // at a time later (checkpoint 4). Never paste a dirt patch over the fog.
+  // The mask is the source of truth (0 = clear dirt, 255 = fog); the canvas
+  // is only the display of the mask. No full-res offscreen canvas: the fog
+  // layer is 1/8 scale (704x1250, ~3.5 MB), never 5625x10000 (~225 MB).
+  var FOG_FC = 8;
+  var FOG_FW = Math.ceil(WORLD.w / FOG_FC), FOG_FH = Math.ceil(WORLD.h / FOG_FC);
+  var FOG_RGB = [87, 61, 34]; // the brown fog's flat dark brown
+  var FOG_RED = 120; // fog-map pixels with red below this are fog (fog ~87, clear ~153)
+  var FOG_FEATHER = 20; // world units of soft edge when a hexagon is cleared
+  var fogMask = new Uint8Array(FOG_FW * FOG_FH); // 0 = clear, 255 = fog
+  var fogC = null, fogX = null, fogImg = null, fogReady = false, fogInitFailed = false;
+  // Signed distance from a point to a hexagon edge (negative inside,
+  // positive outside, 0 on the edge). Convex-polygon SDF: the max over the
+  // six edge normals of (dot(p - centre, n) - apothem).
+  function hexDist(px, py, cx, cy, w) {
+    var dx = px - cx, dy = py - cy, a = w * Math.sqrt(3) / 4, s3 = Math.sqrt(3) / 2;
+    var d0 = dx * s3 + dy * 0.5 - a, d1 = dy - a, d2 = -dx * s3 + dy * 0.5 - a;
+    var d3 = -dx * s3 - dy * 0.5 - a, d4 = -dy - a, d5 = dx * s3 - dy * 0.5 - a;
+    return Math.max(d0, d1, d2, d3, d4, d5);
+  }
+  // Threshold fog-map pixels into the fog mask: dark = fog (255), light =
+  // clear pocket (0). data is an ImageData.data RGBA array, already at fog
+  // resolution (FOG_FW x FOG_FH). Returns the number of fog cells.
+  function fogThreshold(data) {
+    var n = 0, i, cell;
+    for (i = 0; i < data.length; i += 4) {
+      cell = i / 4;
+      if (cell >= fogMask.length) break;
+      if (data[i] < FOG_RED) { fogMask[cell] = 255; n++; } else { fogMask[cell] = 0; }
+    }
+    return n;
+  }
+  // Erase one hexagon from the fog mask with a SOFT feathered edge (no hard
+  // line, no sticker edge). Only clears (never re-fogs). The feather is a
+  // smooth falloff across FOG_FEATHER world units centred on the hexagon
+  // edge. Only cells in the hexagon's bounding box are touched.
+  function clearFogHexMask(cx, cy, w) {
+    var r = w / 2 + FOG_FEATHER, f2 = FOG_FEATHER / 2;
+    var i0 = Math.max(0, Math.floor((cx - r) / FOG_FC)), i1 = Math.min(FOG_FW - 1, Math.ceil((cx + r) / FOG_FC));
+    var j0 = Math.max(0, Math.floor((cy - r) / FOG_FC)), j1 = Math.min(FOG_FH - 1, Math.ceil((cy + r) / FOG_FC));
+    var i, j, k, px, py, d, t, target;
+    for (j = j0; j <= j1; j++) {
+      for (i = i0; i <= i1; i++) {
+        px = i * FOG_FC + FOG_FC / 2; py = j * FOG_FC + FOG_FC / 2;
+        d = hexDist(px, py, cx, cy, w);
+        t = (d + f2) / FOG_FEATHER; if (t < 0) t = 0; else if (t > 1) t = 1;
+        target = Math.round(255 * t);
+        k = j * FOG_FW + i;
+        if (target < fogMask[k]) fogMask[k] = target;
+      }
+    }
+  }
+  // Write the fog mask into the display canvas (guarded: the harness fake
+  // canvas has no putImageData, and the game must never crash on it).
+  function fogMaskToCanvas() {
+    if (!fogX || !fogImg) return false;
+    try {
+      var d = fogImg.data, k, n = fogMask.length;
+      for (k = 0; k < n; k++) { d[k * 4] = FOG_RGB[0]; d[k * 4 + 1] = FOG_RGB[1]; d[k * 4 + 2] = FOG_RGB[2]; d[k * 4 + 3] = fogMask[k]; }
+      fogX.putImageData(fogImg, 0, 0);
+      return true;
+    } catch (e) { return false; }
+  }
+  function initFog() {
+    if (fogReady) return true;
+    if (fogInitFailed) return false;
+    if (typeof art === 'undefined' || !art.underFog || !art.underFog.complete || !art.underFog.naturalWidth) return false;
+    try {
+      fogC = document.createElement('canvas');
+      fogC.width = FOG_FW; fogC.height = FOG_FH;
+      fogX = fogC.getContext('2d');
+      if (!fogX || typeof fogX.drawImage !== 'function' || typeof fogX.getImageData !== 'function' || typeof fogX.putImageData !== 'function') { fogInitFailed = true; return false; }
+      fogX.drawImage(art.underFog, 0, 0, FOG_FW, FOG_FH);
+      var id = fogX.getImageData(0, 0, FOG_FW, FOG_FH);
+      fogThreshold(id.data);
+      // The entrance hexagon is clear of brown fog from the start of the game.
+      clearFogHexMask(ENTRANCE.x, ENTRANCE.y, HEXW);
+      // Display canvas for the mask.
+      try { fogImg = fogX.createImageData(FOG_FW, FOG_FH); } catch (e) { fogImg = null; }
+      if (!fogImg) { try { fogImg = new ImageData(new Uint8ClampedArray(FOG_FW * FOG_FH * 4), FOG_FW, FOG_FH); } catch (e2) { fogImg = null; } }
+      fogMaskToCanvas();
+      fogReady = true;
+      // The fog-map image is only needed to initialise the fog layer; release
+      // it so the phone does not hold two 56 MP decoded bitmaps.
+      try { art.underFog = null; } catch (e3) {}
+      return true;
+    } catch (e) { fogInitFailed = true; return false; }
+  }
+  // Public: clear one hexagon from the fog (the miner, checkpoint 4).
+  function clearFogHex(cx, cy, w) {
+    if (!fogReady) return false;
+    clearFogHexMask(cx, cy, w);
+    fogMaskToCanvas();
+    return true;
+  }
+  function drawFog() {
+    if (typeof ctx === 'undefined') return;
+    if (!fogReady) { if (!initFog()) return; }
+    if (!fogC) return;
+    ctx.save();
+    ctx.imageSmoothingEnabled = true;
+    ctx.drawImage(fogC, 0, 0, WORLD.w, WORLD.h);
+    ctx.restore();
+  }
+  window.BASE_FOG = {
+    draw: drawFog,
+    init: initFog,
+    clearHex: clearFogHex,
+    get ready() { return fogReady; },
+    get cell() { return FOG_FC; },
+    get size() { return { w: FOG_FW, h: FOG_FH }; },
+    get mask() { return fogMask; },
+    // Test hooks (pure logic, no canvas needed).
+    _hexDist: hexDist,
+    _threshold: fogThreshold,
+    _clearMask: clearFogHexMask
+  };
   // The item box only needs to TOUCH the entrance hexagon (Chris): any part of
   // the box overlapping or intersecting the hexagon counts — it may hang over
   // the edge. Only a box that does not touch the hexagon at all is rejected.
