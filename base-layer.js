@@ -492,11 +492,11 @@
       tendDueAt: QT + EGG_CYCLE.TEND_AT_S[0], tendAppearedAt: null, spoilAt: null, hatchAt: null
     };
   }
-  // v1 first-play fast hatch (index.html armFirstPlayHatch, FIRST_PLAY_HATCH_S=30):
-  // the FIRST basket lay hatches in 30 s with no tends and no spoil, so the
+  // v1 first-play fast hatch (index.html armFirstPlayHatch, FIRST_PLAY_HATCH_S=15 — Chris, Nov 16: 15 s, was 30 s):
+  // the FIRST basket lay hatches in 15 s with no tends and no spoil, so the
   // player sees a hatch fast the first time. Only ever runs once per session.
   var firstPlayHatch = false;
-  var FIRST_PLAY_HATCH_S = 30;
+  var FIRST_PLAY_HATCH_S = 15;
   function armFirstPlayHatch() {
     if (firstPlayHatch) return;
     var p = basketPlaced();
@@ -730,7 +730,11 @@
     ctx.restore();
   }
   function newKid(g, x, y) { // v1 newKid
-    var a = { id: 'k' + (++antN), gen: g, x: x, y: y, state: 'idle', path: [], cb: null, wf: 0, flip: false, m: KID_SCALE, ph: Math.random() * 3, slot: null, arrT: null, growT0: null, hidden: false };
+    // v30 fix 4 (Chris): one kid per park item — rode = has used a park item
+    // (only a kid who rode moves on to school); schooled = finished school
+    // and grew; toSchool/schoolDesk = assigned to a desk this trip;
+    // wanderAt = when this idle kid next wanders near where he was born.
+    var a = { id: 'k' + (++antN), gen: g, x: x, y: y, state: 'idle', path: [], cb: null, wf: 0, flip: false, m: KID_SCALE, ph: Math.random() * 3, slot: null, arrT: null, growT0: null, hidden: false, rode: false, schooled: false, toSchool: false, schoolDesk: null, wanderAt: 0 };
     ANTS.push(a); g.kids.push(a); return a;
   }
   function walkAnt(a, p, cb) { a.state = 'walk'; a.path = [{ x: p.x, y: p.y }]; a.cb = cb || null; } // v1 walkAnt
@@ -747,7 +751,8 @@
       if (s >= d - 1e-6) a.path.shift();
     }
     if (!a.path.length) {
-      a.state = a.slot ? 'ride' : 'idle'; a.arrT = QT;
+      a.state = a.slot ? 'ride' : 'idle'; a.arrT = QT; // v30 fix 4: the moment he starts riding he has had his turn on that item (rode=true) — a kid walking to a slot that gets erased never rode, so he can take another slot
+      if (a.slot) a.rode = true;
       var cb = a.cb; a.cb = null; cb && cb();
     }
   }
@@ -805,8 +810,10 @@
     order.forEach(function (id) {
       placed.forEach(function (p) {
         if (p.id === id && !p.building) {
-          if (id === 'teetertotter') { slots.push({ piece: id, k: 0, p: p }); slots.push({ piece: id, k: 1, p: p }); }
-          else slots.push({ piece: id, k: 0, p: p });
+          // v30 fix 4 (Chris): ONE kid per park item. v1's seesaw has TWO
+          // seats (makeSlots pushes k:0 and k:1), but Chris's rule overrides
+          // it — the teeter totter gets ONE slot, like every other piece.
+          slots.push({ piece: id, k: 0, p: p });
         }
       });
     });
@@ -819,7 +826,7 @@
     }
     return false;
   }
-  function playSpots(n) { // v1 playSpots: ride slots first, extras idle on the floor
+  function playSpots(n, bx, by) { // v1 playSpots: ride slots first, extras idle on the floor
     var slots = parkSlots();
     var out = [], used = {};
     for (var i = 0; i < n; i++) {
@@ -833,9 +840,11 @@
         var spot = rideSpot(s.p, s.piece, s.k);
         out.push({ x: spot.x, y: spot.y, slot: s });
       } else {
-        var p0 = slots.length ? slots[0].p : null;
-        var bx = p0 ? p0.cx : ENTRANCE.x, by = p0 ? p0.floorY : ENTRANCE.y;
-        out.push({ x: bx + (i - 1) * 16, y: by + 6, slot: null });
+        // v30 fix 4 (Chris): a kid with no free slot does NOT queue on a
+        // busy piece — he stays IDLE near where he was born (the basket /
+        // nursery), bx/by = the gen's birth spot. He waits there for a slot.
+        var ibx = (bx != null) ? bx : ENTRANCE.x, iby = (by != null) ? by : ENTRANCE.y;
+        out.push({ x: ibx + (i - 0.5) * 14, y: iby + 6, slot: null });
       }
     }
     return out;
@@ -851,14 +860,17 @@
     for (var i = 0; i < placed.length; i++) if (placed[i].id === 'desk' && !placed[i].building) return placed[i];
     return null;
   }
-  function deskSpots(d) {
-    if (!d) return [];
-    // v1 kidschool: the kids STAND at the desk (no sitting pose). Two kids
-    // flank the single desk, feet on the ground.
-    return [
-      { x: d.cx - d.w / 2 - 6, y: d.floorY },
-      { x: d.cx + d.w / 2 + 6, y: d.floorY }
-    ];
+  function deskSpots() {
+    // v30 fix 4 (Chris): ONE kid per desk. v1 kidschool flanks ONE desk
+    // with TWO kids, but Chris's rule overrides it — each desk takes one
+    // kid, standing at the desk's front centre. Extra kids wait near where
+    // they were born until a desk is free or a new one is built.
+    var out = [];
+    for (var i = 0; i < placed.length; i++) {
+      var p = placed[i];
+      if (p.id === 'desk' && !p.building) out.push({ x: p.cx, y: p.floorY, desk: p });
+    }
+    return out;
   }
   function releaseStage(g) { // v1 releaseStage (playground part)
     if (g.stage === 'playground') {
@@ -868,36 +880,119 @@
   function goToPlayground(g) { // v1 goTo (playground)
     releaseStage(g);
     g.stage = 'playground'; g.phase = 'move';
-    var spots = playSpots(g.kids.length);
+    var spots = playSpots(g.kids.length, g.bx, g.by); // v30 fix 4: idle extras go near the birth spot
     g.kids.forEach(function (a, i) {
       a.slot = spots[i].slot || null;
       walkAnt(a, { x: spots[i].x, y: spots[i].y });
     });
   }
   function goToSchool(g) { // v1 goTo (kidschool)
+    // v30 fix 4 (Chris): ONE kid per desk, and only kids who RODE a park
+    // item move on to school. A kid who never rode stays idle near where he
+    // was born — he gets a desk slot later, when one is free or a new desk
+    // is built (tryAssignSchool). A kid who already grew never goes again.
+    var spots = deskSpots();
+    if (!spots.length) return; // no desk to go to — the gen stays where it is
+    var schoolKids0 = g.kids.filter(function (a) { return a.rode && a.m <= KID_SCALE && !a.schooled; });
+    if (!schoolKids0.length) return; // nobody has ridden yet — the gen stays where it is
     releaseStage(g);
     g.stage = 'kidschool'; g.phase = 'move';
-    var d = deskPlaced();
-    var spots = deskSpots(d);
-    g.kids.forEach(function (a, i) {
-      a.slot = null;
-      walkAnt(a, spots.length ? spots[i % spots.length] : { x: a.x, y: a.y });
+    g.kids.forEach(function (a) { a.slot = null; a.toSchool = false; a.schoolDesk = null; });
+    var schoolKids = g.kids.filter(function (a) { return a.rode && a.m <= KID_SCALE && !a.schooled; });
+    schoolKids.forEach(function (a, i) {
+      if (i < spots.length) {
+        a.toSchool = true; a.schoolDesk = spots[i].desk.uid;
+        walkAnt(a, { x: spots[i].x, y: spots[i].y });
+      } else {
+        // no free desk for this kid — he waits near where he was born
+        walkAnt(a, { x: g.bx + (g.kids.indexOf(a) - 0.5) * 14, y: g.by + 6 });
+      }
     });
+    // Kids who never rode stay where they are (idle near the birth area).
   }
   function startGrow(g) { // v1 startGrow
     g.phase = 'grow'; g.growEnd = QT + CYCLE1.GROW_S;
-    g.kids.forEach(function (a) { a.state = 'grow'; a.growT0 = QT; });
+    // v30 fix 4: only the kids who WENT to school grow — a kid who waited
+    // near the birth area (never rode, or no free desk) stays a kid until
+    // his own school trip.
+    g.kids.forEach(function (a) { if (a.toSchool && a.m <= KID_SCALE && !a.schooled) { a.state = 'grow'; a.growT0 = QT; } });
+  }
+  function tryAssignIdleKids(g) {
+    // v30 fix 4 (Chris): an idle kid takes a park slot when one OPENS (a
+    // rider finishes and gets off) or a NEW park item is built. Only kids
+    // who have NOT yet ridden take a slot — a kid who already rode has had
+    // his turn and moves on to school instead. One kid per slot, per piece.
+    if (!g || g.stage !== 'playground') return;
+    var slots = parkSlots();
+    for (var i = 0; i < g.kids.length; i++) {
+      var a = g.kids[i];
+      if (a.state !== 'idle' || a.slot || a.rode || a.m > KID_SCALE || a.schooled) continue;
+      for (var j = 0; j < slots.length; j++) {
+        if (slotTaken(slots[j].p.uid, slots[j].k)) continue;
+        var spot = rideSpot(slots[j].p, slots[j].piece, slots[j].k);
+        a.slot = slots[j];
+        walkAnt(a, { x: spot.x, y: spot.y });
+        break;
+      }
+    }
+  }
+  function deskFree() {
+    // A placed desk no kid is currently assigned to (toSchool) — a slot for
+    // a leftover kid's school trip.
+    var spots = deskSpots();
+    for (var i = 0; i < spots.length; i++) {
+      var busy = false;
+      for (var j = 0; j < ANTS.length; j++) {
+        if (ANTS[j].schoolDesk === spots[i].desk.uid && ANTS[j].toSchool) { busy = true; break; }
+      }
+      if (!busy) return spots[i].desk;
+    }
+    return null;
+  }
+  function tryAssignSchool(g) {
+    // v30 fix 4 (Chris): a kid who RODE but never got a desk (too few desks)
+    // gets his school trip when a desk frees up or a new desk is built.
+    // Never interrupts an active playground stage (move/stall).
+    if (!g || g.stage === 'kidschool' || g.phase === 'move' || g.phase === 'stall') return;
+    var left = g.kids.some(function (a) { return a.rode && a.m <= KID_SCALE && !a.schooled; });
+    if (!left) return;
+    if (!deskFree()) return;
+    goToSchool(g);
+  }
+  function wanderIdleKids(g) {
+    // v30 fix 4 (Chris): the idle baby ant "can walk around a bit" near
+    // where he was born. An idle kid who has not ridden yet, in the nursery
+    // or playground stage and not in the middle of a move, takes a short
+    // wander near the birth spot every few seconds.
+    if (!g || g.phase === 'move' || g.phase === 'grow' || g.phase === 'done') return;
+    if (g.stage !== 'nursery' && g.stage !== 'playground') return;
+    var bx = (g.bx != null) ? g.bx : ENTRANCE.x, by = (g.by != null) ? g.by : ENTRANCE.y;
+    for (var i = 0; i < g.kids.length; i++) {
+      var a = g.kids[i];
+      if (a.state !== 'idle' || a.slot || a.rode || a.m > KID_SCALE || a.schooled || a.toSchool) continue;
+      if (QT < a.wanderAt) continue;
+      a.wanderAt = QT + 4 + Math.random() * 4;
+      walkAnt(a, { x: bx + (Math.random() * 2 - 1) * 18, y: by + 6 + (Math.random() * 2 - 1) * 6 });
+    }
   }
   function checkSlidePass(g) {
     // Chris: the desk unlocks when the ants complete their FIRST PASS on the
     // slide — one full slide loop (v1: 123 frames @ 12 fps = 10.25s), counted
     // from the moment the kid arrives on the slide (arrT).
+    // v30 fix 2: this runs on EVERY stepKids tick for every playground-stage
+    // gen, whatever the gen's phase — it used to run only inside the 12 s
+    // 'stall' phase, so if the stall ended (or the gen was in another phase)
+    // before the loop finished, the desk never unlocked. The desk also
+    // switches the menu to the park tab so he SEES it appear (it was easy to
+    // miss while the crown tab was showing). No switch while he is placing
+    // an item (mode 'carrying'), so a placement is never interrupted.
     if (firstSlidePass) return;
     for (var i = 0; i < g.kids.length; i++) {
       var a = g.kids[i];
       if (a.state === 'ride' && a.slot && a.slot.piece === 'slide' && a.arrT != null) {
         if (QT - a.arrT >= PLAY_LOOP.slide.frames / PLAY_LOOP.slide.fps) {
           firstSlidePass = true;
+          if (mode !== 'carrying') activeTab = 'park'; // show the desk the moment it unlocks
           renderMenu(); // the desk appears on the park tab
           break;
         }
@@ -908,6 +1003,20 @@
     for (var i = 0; i < ANTS.length; i++) stepAnt(ANTS[i], dt);
     for (var j = 0; j < GENS.length; j++) {
       var g = GENS[j];
+      if (g.stage === 'playground') checkSlidePass(g); // v30 fix 2: every tick, any phase — the desk unlocks the moment a kid finishes one full slide loop, not only inside the stall
+      if (g.stage === 'playground' && g.phase === 'wait') {
+        // v30 fix 4: riders rotate off their pieces after one full play
+        // stage, so a waiting kid can take the freed slot; a leftover kid
+        // who rode gets his school trip when a desk is free.
+        g.kids.forEach(function (a) {
+          if (a.state === 'ride' && a.arrT != null && QT - a.arrT >= CYCLE1.PLAY_S) {
+            a.slot = null; a.state = 'idle'; // rode is already true (set when he started riding)
+          }
+        });
+        tryAssignIdleKids(g);
+        tryAssignSchool(g);
+      }
+      wanderIdleKids(g); // v30 fix 4: idle kids wander a bit near the birth spot
       if (g.phase === 'move') {
         var arrived = g.kids.every(function (a) { return a.state !== 'walk'; });
         if (arrived) {
@@ -915,19 +1024,32 @@
           g.until = QT + (g.stage === 'playground' ? CYCLE1.PLAY_S : g.stage === 'kidschool' ? CYCLE1.SCHOOL_S : 0);
         }
       } else if (g.phase === 'stall') {
-        if (g.stage === 'playground') checkSlidePass(g);
         if (QT >= g.until) {
           if (g.stage === 'playground') {
             if (deskPlaced()) goToSchool(g);
-            else g.phase = 'wait'; // school next, once the desk is built
+            else {
+              // v30 fix 4: the riders get off when the stage ends — the
+              // pieces are free again, so a waiting kid can take one.
+              g.kids.forEach(function (a) { if (a.state === 'ride') { a.slot = null; a.state = 'idle'; } });
+              g.phase = 'wait'; // school next, once the desk is built
+              tryAssignIdleKids(g);
+            }
           } else if (g.stage === 'kidschool') {
             startGrow(g);
           }
         }
       } else if (g.phase === 'grow') {
         if (QT >= g.growEnd) {
-          g.kids.forEach(function (a) { a.m = 1; a.state = 'idle'; });
-          g.phase = 'done'; // grown ants idle (no job rooms in checkpoint 3)
+          // v30 fix 4: only the kids who went to school grow. If some kids
+          // still have not been to school (they never rode, or there was no
+          // free desk), the gen is not done — they wait near the birth area
+          // for a desk slot (tryAssignSchool) or a park slot.
+          g.kids.forEach(function (a) {
+            if (a.state === 'grow') { a.m = 1; a.state = 'idle'; a.schooled = true; a.toSchool = false; a.schoolDesk = null; }
+          });
+          var left = g.kids.some(function (a) { return a.m <= KID_SCALE && !a.schooled; });
+          if (left) { g.stage = 'playground'; g.phase = 'wait'; }
+          else g.phase = 'done'; // grown ants idle (no job rooms in checkpoint 3)
         }
       }
     }
@@ -939,7 +1061,9 @@
     // new kids go straight to the playground (v1 afterHatch/goNext).
     p.egg = null; // the basket empties (v1: both eggs hatched -> empty)
     genN++;
-    var g = { id: genN, stage: 'nursery', phase: 'idle', kids: [], until: 0, growEnd: 0 };
+    // v30 fix 4: the gen remembers its BIRTH SPOT (the basket it hatched
+    // from) — an idle kid stays near it, never queues on a busy park item.
+    var g = { id: genN, stage: 'nursery', phase: 'idle', kids: [], until: 0, growEnd: 0, bx: p.cx, by: p.floorY };
     GENS.push(g);
     var bx = p.cx, by = p.floorY;
     for (var i = 0; i < 2; i++) newKid(g, bx + (i === 0 ? -6 : 6), by + 2);
@@ -968,10 +1092,17 @@
         var g = GENS[j];
         if (g.stage === 'kidschool' && (g.phase === 'move' || g.phase === 'stall')) {
           g.stage = 'playground'; g.phase = 'wait';
-          g.kids.forEach(function (a) { if (a.state === 'walk') { a.path = []; a.state = 'idle'; } });
+          g.kids.forEach(function (a) {
+            a.toSchool = false; a.schoolDesk = null; // no longer going to school
+            if (a.state === 'walk') { a.path = []; a.state = 'idle'; }
+            // a kid who was at the desk waits near where he was born
+            if (a.rode && a.m <= KID_SCALE && !a.schooled) walkAnt(a, { x: g.bx + (g.kids.indexOf(a) - 0.5) * 14, y: g.by + 6 });
+          });
         }
       }
     }
+    // v30 fix 4: a freed kid who never rode can take another free slot.
+    for (var k = 0; k < GENS.length; k++) tryAssignIdleKids(GENS[k]);
   }
 
   // ---- CHECKPOINT 2: the four item reactions (v1 queenScript, at placed positions) ----
@@ -1103,6 +1234,9 @@
         for (var i = 0; i < GENS.length; i++) {
           var g = GENS[i];
           if (g.stage === 'nursery' && (g.phase === 'idle' || g.phase === 'wait')) goToPlayground(g);
+          // v30 fix 4: a NEW park item means a free slot — an idle kid who
+          // was waiting near the birth area takes it.
+          if (g.stage === 'playground') tryAssignIdleKids(g);
         }
       });
     } else if (id === 'desk') {
@@ -1475,8 +1609,8 @@
     get kids() { // CHECKPOINT 3: the kids, generations, and the park/desk gates
       return {
         parkUnlocked: parkUnlocked, firstSlidePass: firstSlidePass,
-        kids: ANTS.map(function (a) { return { id: a.id, m: a.m, state: a.state, x: Math.round(a.x), y: Math.round(a.y), slot: a.slot ? a.slot.piece + ':' + a.slot.k : null }; }),
-        gens: GENS.map(function (g) { return { id: g.id, stage: g.stage, phase: g.phase, kids: g.kids.length }; }),
+        kids: ANTS.map(function (a) { return { id: a.id, m: a.m, state: a.state, x: Math.round(a.x), y: Math.round(a.y), slot: a.slot ? a.slot.piece + ':' + a.slot.k : null, rode: a.rode, schooled: a.schooled, toSchool: a.toSchool }; }),
+        gens: GENS.map(function (g) { return { id: g.id, stage: g.stage, phase: g.phase, kids: g.kids.length, bx: g.bx, by: g.by }; }),
         parkVisible: PARK_ITEMS.filter(function (it) { return isVisible(it.id); }).map(function (it) { return it.id; }),
         parkPrices: (function () { var out = {}; PARK_ITEMS.forEach(function (it) { out[it.id] = { count: placedCount(it.id), next: nextPrice(it.id) }; }); return out; })()
       };
@@ -1526,7 +1660,7 @@
     // border-top), so the outline flows continuously from the tab into the
     // menu's top edge as one folder outline. The tab's flat bottom meets
     // the menu body below with no gap, so it reads as part of the folder.
-    '.bl-tab{border:0;padding:5px 20px 4px;margin-bottom:-1px;cursor:pointer;line-height:0;display:flex;justify-content:center;align-items:center;background:linear-gradient(180deg,#3d2c1d,#2a1c11 60%,#20140c);clip-path:polygon(0 100%,0 0,60% 0,80% 100%,100% 100%);box-shadow:inset 0 1px 0 rgba(255,214,160,.18),inset 0 -4px 0 rgba(0,0,0,.35)}' +
+    '.bl-tab{border:0;width:97px;box-sizing:border-box;padding:5px 20px 4px;margin-bottom:-1px;cursor:pointer;line-height:0;display:flex;justify-content:center;align-items:center;background:linear-gradient(180deg,#3d2c1d,#2a1c11 60%,#20140c);clip-path:polygon(0 100%,0 0,60% 0,80% 100%,100% 100%);box-shadow:inset 0 1px 0 rgba(255,214,160,.18),inset 0 -4px 0 rgba(0,0,0,.35)}' + // v30 fix 1: FIXED width so the park tab is the SAME SIZE as the crown tab — the slide picture (124x112) is narrower than the crown (255x112), so an auto-width park tab came out ~29px narrower. 97px = the crown tab's width (25px-high crown image ~57px + 40px padding).
     '.bl-tab img{height:25px;width:auto;display:block;clip-path:inset(0 33.2% 0 33%);transform:translateX(-14px)}' +
     '.bl-tab.bl-tab-park img{clip-path:none;transform:none}' + // the slide is a plain item picture, not the crown (no clip, no nudge)
     '.bl-tab.on{background:linear-gradient(180deg,#5a4128,#38271c 55%,#2e1d12);box-shadow:inset 0 1px 0 rgba(255,220,170,.35),inset 0 -4px 0 rgba(0,0,0,.4);filter:drop-shadow(0 3px 3px rgba(0,0,0,.45))}' +
