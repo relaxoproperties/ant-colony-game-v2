@@ -26,7 +26,16 @@
 // first; the fridge unlocks after she settles on the bed, the cooler after she
 // eats at the fridge, the basket after she drinks at the cooler. The basket is
 // last (no playground in checkpoint 2). Checkpoint 2 stops at 8 brains.
+// CHECKPOINT 3 (Nov 16, v29): the park + kids school, layered on checkpoint 2.
+// The eggs now hatch into BABY ANTS (kids, v1's GENS/newKid/walkAnt + kid
+// sprites). A new PARK tab (slide picture) appears once the first babies
+// hatch. It offers the four park items (slide free, swing set / teeter totter /
+// spinning circle $10 first copy) and, once the ants complete their FIRST PASS
+// on the slide (one full 10.25s slide loop), the DESK (first free, next $10).
+// Kids ride the placed park pieces on v1's play loops, then stand at the desk
+// for school (10s, v1 CYCLE1.SCHOOL_S) and grow to adult size (1.2s).
 // ?checkpoint=2 skips the opening for testing: straight underground, menu open.
+// ?checkpoint=3 does the same for checkpoint 3 testing.
 (function () {
   'use strict';
   var URLQ = new URLSearchParams(location.search);
@@ -43,15 +52,37 @@
     { id: 'fridge',     name: 'Fridge',      src: 'assets/items/fridge.png?v=27', cx: 2770, floorY: 5060, w: 18.0, thumb: 'background-position:center 13px;' },
     { id: 'watercooler',name: 'Water cooler',src: 'assets/items/water-cooler.png',cx: 2855, floorY: 5055, w: 19.5, thumb: 'background-position:center 19px;' }
   ];
+  // ---- CHECKPOINT 3: the park items + the desk (Chris, Nov 16) ----
+  // The park tab's four items + the desk. Sizes are v1's playground-A /
+  // kid-school-combined template px x the world scale (0.173 world/px, the
+  // same scale as the queen items): slide 124px -> 21.5, swing 150px -> 26.0,
+  // teeter 200px -> 34.6, spinning circle 160px -> 27.7, desk 72px -> 12.5.
+  // `first` = the FIRST copy's price (Chris): the slide and the desk are FREE
+  // first; the swing set, teeter totter and spinning circle are $10 first.
+  // After the first copy the per-type price escalates by $10 (nextPrice).
+  // Default spots are inside the entrance hexagon (fallbacks only; the
+  // player places them). The park items and the desk are placed in the SAME
+  // entrance hexagon as the queen items (checkpoint 2's locked "only one
+  // hexagon" design) — v1's playground is a separate hex room, but checkpoint
+  // 2 redesigned placement to the single entrance hexagon, and Chris's
+  // checkpoint 3 words describe items on a tab, not a new area.
+  var PARK_ITEMS = [
+    { id: 'slide',         name: 'Slide',          src: 'assets/items/slide.png',           cx: 2812, floorY: 5080, w: 21.5, first: 0 },
+    { id: 'swingset',      name: 'Swing set',      src: 'assets/items/swing-set.png',       cx: 2770, floorY: 5075, w: 26.0, first: 10 },
+    { id: 'teetertotter',  name: 'Teeter totter',  src: 'assets/items/teeter-totter.png',   cx: 2860, floorY: 5075, w: 34.6, first: 10 },
+    { id: 'spinningcircle',name: 'Spinning circle',src: 'assets/items/spinning-circle.png', cx: 2812, floorY: 5100, w: 27.7, first: 10 },
+    { id: 'desk',          name: 'Desk',           src: 'assets/items/desk.png',            cx: 2790, floorY: 5090, w: 12.5, first: 0 }
+  ];
+  var ALL_ITEMS = ITEMS.concat(PARK_ITEMS);
   var IMGS = {};
-  ITEMS.forEach(function (it) {
+  ALL_ITEMS.forEach(function (it) {
     var im = new Image();
     im.src = it.src;
     IMGS[it.id] = im;
     it.h = it.w * 0.8; // replaced on load with the true aspect
     im.onload = function () { if (im.naturalHeight) it.h = it.w * im.naturalHeight / im.naturalWidth; };
   });
-  function itemById(id) { var found = null; ITEMS.forEach(function (x) { if (x.id === id) found = x; }); return found; }
+  function itemById(id) { var found = null; ALL_ITEMS.forEach(function (x) { if (x.id === id) found = x; }); return found; } // CHECKPOINT 3: park + desk live in ALL_ITEMS too (queen-only search broke their prices and place())
   function itemH(it) { var im = IMGS[it.id]; return (im && im.naturalWidth) ? it.w * im.naturalHeight / im.naturalWidth : it.w * 0.8; }
 
   // ---- CHECKPOINT 2: the unlock rule (Chris, Nov 15, basket gated Nov 16) ----
@@ -67,10 +98,24 @@
   // menu availability is gated. Moving an item changes nothing.
   // An item is either visible and buildable, or hidden. No "Locked" cards.
   var bedGate = false; // opens when she settles on the bed
+  // CHECKPOINT 3 gates (Chris, Nov 16): the park tab and its four items only
+  // appear once the first babies HATCH (v1: the first hatch unlocks the
+  // playground). The desk stays hidden until the ants complete their FIRST
+  // PASS on the slide (one full slide loop), then it appears. Hidden items
+  // are never shown as "Locked" — they simply are not there yet.
+  var parkUnlocked = false; // opens when the first babies hatch
+  var firstSlidePass = false; // set when a kid completes one full slide loop
   function isVisible(id) {
     if (id === 'leafbed') return true;
     if (id === 'eggbasket') return bedGate && isBuilt('fridge') && isBuilt('watercooler');
+    if (id === 'desk') return parkUnlocked && firstSlidePass;
+    if (id === 'slide' || id === 'swingset' || id === 'teetertotter' || id === 'spinningcircle') return parkUnlocked;
     return bedGate;
+  }
+  function openPark() {
+    if (parkUnlocked) return;
+    parkUnlocked = true;
+    renderMenu();
   }
   function openBedGate() {
     if (bedGate) return;
@@ -92,12 +137,16 @@
   // or digging does not count yet — the basket only unlocks once the fridge
   // and the cooler are both actually built.
   function isBuilt(id) { for (var i = 0; i < placed.length; i++) if (placed[i].id === id && !placed[i].building) return true; return false; }
-  // Seed-money price of the NEXT copy of a type (Chris, Nov 15): the 1st is
-  // FREE, then 10, 20, 30... — each next copy costs 10 more than the last,
-  // counted PER TYPE. The player starts with ZERO seed money (Chris,
-  // Nov 16), so a priced copy is unaffordable until he explains how seed
-  // money is earned. No earning method or wallet exists yet.
-  function nextPrice(id) { return placedCount(id) * 10; } // 0 = FREE for the first copy
+  // Seed-money price of the NEXT copy of a type (Chris, Nov 15 + Nov 16):
+  // the FIRST copy costs `first` (0 = FREE for the queen items, the slide
+  // and the desk; 10 for the swing set, teeter totter and spinning circle),
+  // then each next copy costs 10 more than the last, counted PER TYPE
+  // (slide 0/10/20..., swing 10/20/30..., desk 0/10/20...). The player
+  // starts with ZERO seed money (Chris, Nov 16), so a priced copy is
+  // unaffordable until he explains how seed money is earned. No earning
+  // method or wallet exists yet.
+  function firstPrice(id) { var it = itemById(id); return (it && it.first) ? it.first : 0; }
+  function nextPrice(id) { return firstPrice(id) + placedCount(id) * 10; }
   // Seed-money balance: the player starts with ZERO (Chris, Nov 16).
   // No earning method or wallet exists yet — he will explain how seed
   // money is earned at a future checkpoint, when it matters. canAfford()
@@ -203,6 +252,7 @@
     }
     stepRoomTimers();
     stepEggs();
+    stepKids(dt); // CHECKPOINT 3: the kids walk, ride, go to school, grow
     drawQueen(now);
     drawBrainBubble(now);
     drawRoomTimerBubbles(now);
@@ -417,8 +467,8 @@
   // Spoil: a tend untapped for 120s spoils the basket; tap the fried-egg bubble
   // and she removes the spoiled eggs (2s) and the basket is empty again.
   // Hatch: at +8 min (all tends done) the eggs hatch and the basket empties.
-  // The hatch itself spawns kid ants in v1 (GENS/newKid/walkAnt + kid sprites) —
-  // that whole kid system is NOT ported, so no babies appear yet (see report).
+  // The hatch spawns 2 kid ants in v1 (GENS/newKid/walkAnt + kid sprites) —
+  // checkpoint 3 ports that whole kid system (see "the kids" above).
   var EGG_CYCLE = {
     TEND_AT_S: [120, 240, 360],
     TEND_COUNT: 3,
@@ -483,8 +533,8 @@
         e.state = 'spoiled'; e.tendAppearedAt = null; e.spoilAt = null; e.hatchAt = null;
       }
     } else if (QT >= e.hatchAt && !QN.busy) {
-      // Hatch: v1 spawns kid ants here (GENS/newKid) — NOT ported. The basket empties.
-      p.egg = null;
+      // Hatch: v1 spawns 2 kid ants here (GENS/newKid) — checkpoint 3 ports it.
+      hatchKids(p);
     }
   }
   function runBasketJob(kind) {
@@ -594,6 +644,333 @@
       runBasketJob('tend');
     } else if (b.kind === 'spoil') {
       runBasketJob('remove');
+    }
+  }
+
+  // ---- CHECKPOINT 3: the kids (v1 GENS/newKid/walkAnt + kid sprites) ----
+  // v1's generation system, ported to world coords. v1's kid positions are
+  // chamber-image px; the base layer is world coords, so speeds and offsets
+  // are x KW (HEX.w/791 world per chamber px). Two kids hatch per basket.
+  // They idle near the nursery, ride the placed park pieces on v1's play
+  // loops, stand at the desk for school, then grow to adults. Cycle 1
+  // (Chris's checkpoint 3): nursery -> playground -> kidschool -> grow.
+  // CYCLE1 waits (v1): PLAY_S 12 (playground stage), SCHOOL_S 10 (school
+  // stage), GROW_S 1.2 (grow). The desk unlock is NOT the 12s stage end —
+  // Chris: it unlocks when the ants complete their FIRST PASS on the slide
+  // (one full 10.25s slide loop, 123 frames @ 12 fps).
+  var KW = HEX.w / 791;
+  var KID_SCALE = 0.5; // v1: kid = 0.5 x Albert
+  var KID_SPEED = 2.5437173536208046 * 12 * KW; // v1 KID_SPEED (chamber px/s) -> world/s
+  var AD_SPEED = KID_SPEED / KID_SCALE; // v1: grown ants
+  var KSTEP = 8.364, K_SIDE_AD = 0.2027512636394711; // v1 STEP + K_SIDE_AD
+  var IDLE_PLAY = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 0, 0, 0], IDLE_FPS = 7; // v1 OT12 idle
+  var CYCLE1 = { PLAY_S: 12, SCHOOL_S: 10, GROW_S: 1.2 }; // v1
+  var GENS = [], ANTS = [], genN = 0, antN = 0;
+  // v1 play timing (kid-play/*-timing.json, 12 fps). One full loop = one
+  // pass/ride. The slide loop is 10.25s — the "first pass" that unlocks the
+  // desk. The JSONs are fetched for the per-frame rider animation; the loop
+  // lengths below are v1's numbers, so the mechanic works even before a
+  // JSON finishes loading. `tl` is v1's PG piece top-left (room template px).
+  var PLAY_LOOP = {
+    slide: { key: 'slide', json: 'assets/kid-play/slide/kid-slide-timing.json', frames: 123, fps: 12, tl: [268, 898] },
+    swingset: { key: 'swing', json: 'assets/kid-play/swing/kid-swing-timing.json', frames: 24, fps: 12, tl: [465, 742] },
+    spinningcircle: { key: 'merry', json: 'assets/kid-play/merry-go-round/kid-merry-go-round-timing.json', frames: 54, fps: 12, tl: [575, 980] },
+    teetertotter: { key: 'seesaw', json: 'assets/kid-play/seesaw/kid-seesaw-timing.json', frames: 48, fps: 12, tl: [325, 1119] }
+  };
+  var PLAY_JSON = {};
+  Object.keys(PLAY_LOOP).forEach(function (id) {
+    var cfg = PLAY_LOOP[id];
+    if (typeof fetch === 'function') {
+      fetch(cfg.json).then(function (r) { return r.json(); }).then(function (d) { PLAY_JSON[cfg.key] = d; }).catch(function () { PLAY_JSON[cfg.key] = null; });
+    }
+  });
+  // Ride-spot offsets (world) from a placed piece's top-left, from v1's
+  // first timeline frame feet minus the piece tl (PG). The kid walks TO this
+  // spot; the play loop then moves the rider each frame.
+  var RIDE_OFF = {
+    slide: [[2.11, 16.83]],
+    swingset: [[16.85, 13.00]],
+    spinningcircle: [[13.84, 9.46]],
+    teetertotter: [[3.69, 10.69], [30.92, 3.01]]
+  };
+  function rideSpot(p, id, k) {
+    var off = (RIDE_OFF[id] || [[0, 0]])[k || 0];
+    var it = itemById(id);
+    var h = it ? itemH(it) : p.w * 0.8;
+    return { x: p.cx - p.w / 2 + off[0], y: p.floorY - h + off[1] };
+  }
+  var KIDIMG = {};
+  function kidImg(name) {
+    var src = (name.indexOf('wdo') === 0 || name.indexOf('wu') === 0)
+      ? 'assets/kid-play/kid-frames-extra/kid50/' + name
+      : 'assets/kid/kid-frames/kid50/' + name;
+    if (!KIDIMG[src]) { var im = new Image(); im.src = src; KIDIMG[src] = im; }
+    return KIDIMG[src];
+  }
+  function kidAnchorFor(name) {
+    if (name.indexOf('idle') === 0) return [34, 78]; // v1 kid-frames.json
+    if (name.indexOf('side') === 0) return [36, 46]; // v1 kid-frames.json
+    return [30, 78]; // wdo / wu, v1 kid-frames-extra.json
+  }
+  function kidSrcName(s) { // v1 srcName: 'wu-plain frame N' -> 'wu_NN.png'
+    var m = /^(wu|wdo)-plain frame (\d+)/.exec(s || '');
+    if (m) return m[1] + '_' + String(+m[2]).padStart(2, '0') + '.png';
+    return s;
+  }
+  function pad2n(n) { return String(n).padStart(2, '0'); }
+  function drawKidSprite(name, x, y, flip, m) {
+    var im = kidImg(name);
+    if (!im || !im.complete || !im.naturalWidth) return;
+    var sc = KW * (m / KID_SCALE); // kid (m 0.5) -> natural x KW; grown (m 1) -> 2x
+    var an = kidAnchorFor(name);
+    ctx.save();
+    ctx.translate(Math.round(x), Math.round(y));
+    if (flip) ctx.scale(-1, 1);
+    ctx.drawImage(im, -an[0] * sc, -an[1] * sc, im.naturalWidth * sc, im.naturalHeight * sc);
+    ctx.restore();
+  }
+  function newKid(g, x, y) { // v1 newKid
+    var a = { id: 'k' + (++antN), gen: g, x: x, y: y, state: 'idle', path: [], cb: null, wf: 0, flip: false, m: KID_SCALE, ph: Math.random() * 3, slot: null, arrT: null, growT0: null, hidden: false };
+    ANTS.push(a); g.kids.push(a); return a;
+  }
+  function walkAnt(a, p, cb) { a.state = 'walk'; a.path = [{ x: p.x, y: p.y }]; a.cb = cb || null; } // v1 walkAnt
+  function stepAnt(a, dt) { // v1 stepAnt (world coords)
+    if (a.state !== 'walk') return;
+    var sp = a.m <= KID_SCALE ? KID_SPEED : AD_SPEED * a.m;
+    var left = sp * dt;
+    while (left > 0 && a.path.length) {
+      var p = a.path[0], dx = p.x - a.x, dy = p.y - a.y, d = Math.hypot(dx, dy);
+      if (Math.abs(dx) > 0.3) a.flip = dx < 0;
+      var s = Math.min(left, d);
+      a.x += dx / (d || 1) * s; a.y += dy / (d || 1) * s; left -= s;
+      a.wf += s / (KSTEP * K_SIDE_AD * a.m * KW);
+      if (s >= d - 1e-6) a.path.shift();
+    }
+    if (!a.path.length) {
+      a.state = a.slot ? 'ride' : 'idle'; a.arrT = QT;
+      var cb = a.cb; a.cb = null; cb && cb();
+    }
+  }
+  function drawKid(a) {
+    if (a.state === 'gone' || a.hidden) return;
+    if (a.state === 'ride') { drawRider(a); return; }
+    if (a.state === 'grow') { // v1: smooth scale-up on the locked idle
+      var k = clamp((QT - a.growT0) / CYCLE1.GROW_S, 0, 1);
+      var m = KID_SCALE + (1 - KID_SCALE) * ease(k);
+      drawKidSprite('idle_' + pad2n(IDLE_PLAY[Math.floor((QT + a.ph) * IDLE_FPS) % IDLE_PLAY.length]) + '.png', a.x, a.y, false, m);
+      return;
+    }
+    if (a.state === 'walk') {
+      drawKidSprite('side_' + pad2n(Math.floor(a.wf) % 16) + '.png', a.x, a.y, a.flip, a.m);
+      return;
+    }
+    drawKidSprite('idle_' + pad2n(IDLE_PLAY[Math.floor((QT + a.ph) * IDLE_FPS) % IDLE_PLAY.length]) + '.png', a.x, a.y, false, a.m);
+  }
+  function drawRider(a) {
+    // v1 drawRider: the rider's position + sprite come from the play loop's
+    // current frame (feet + src), relative to the placed piece. The piece
+    // image itself is static in checkpoint 3 (v1's moving swing/plank/top
+    // are not ported yet); the rider animates. The slide is static in v1
+    // too (only the kid moves), so the slide ride is complete.
+    var s = a.slot;
+    if (!s) return;
+    var cfg = PLAY_LOOP[s.piece];
+    var p = s.p;
+    var it = itemById(s.piece);
+    var h = it ? itemH(it) : p.w * 0.8;
+    var tlx = p.cx - p.w / 2, tly = p.floorY - h;
+    var J = PLAY_JSON[cfg.key];
+    var feet = null, src = null, flip = false;
+    if (J && J.timeline) {
+      var idx = Math.floor((QT - a.arrT) * cfg.fps) % cfg.frames;
+      var fr = J.timeline[idx];
+      if (fr && fr.kid && fr.kid[s.k]) { feet = fr.kid[s.k].feet; src = fr.kid[s.k].src; flip = !!fr.kid[s.k].flip; }
+    }
+    if (!feet) {
+      var spot = rideSpot(p, s.piece, s.k);
+      drawKidSprite('idle_' + pad2n(IDLE_PLAY[Math.floor((QT + a.ph) * IDLE_FPS) % IDLE_PLAY.length]) + '.png', spot.x, spot.y, false, a.m);
+      return;
+    }
+    var wx = tlx + (feet[0] - cfg.tl[0]) * KW;
+    var wy = tly + (feet[1] - cfg.tl[1]) * KW;
+    drawKidSprite(kidSrcName(src || 'idle_00.png'), wx, wy, flip, a.m);
+  }
+  // ---- playground slots (the placed park pieces are the slots) ----
+  function parkSlots() {
+    // v1 makeSlots order is swing, slide, merry, seesaw — checkpoint 3 puts
+    // the slide FIRST so the first kid rides the slide (the desk unlock
+    // depends on the slide pass) and the free gateway item is used first.
+    var order = ['slide', 'swingset', 'spinningcircle', 'teetertotter'];
+    var slots = [];
+    order.forEach(function (id) {
+      placed.forEach(function (p) {
+        if (p.id === id && !p.building) {
+          if (id === 'teetertotter') { slots.push({ piece: id, k: 0, p: p }); slots.push({ piece: id, k: 1, p: p }); }
+          else slots.push({ piece: id, k: 0, p: p });
+        }
+      });
+    });
+    return slots;
+  }
+  function slotTaken(pUid, k) {
+    for (var i = 0; i < ANTS.length; i++) {
+      var a = ANTS[i];
+      if (a.slot && a.slot.p.uid === pUid && a.slot.k === k && a.state !== 'gone') return true;
+    }
+    return false;
+  }
+  function playSpots(n) { // v1 playSpots: ride slots first, extras idle on the floor
+    var slots = parkSlots();
+    var out = [], used = {};
+    for (var i = 0; i < n; i++) {
+      var s = null;
+      for (var j = 0; j < slots.length; j++) {
+        var key = slots[j].p.uid + ':' + slots[j].k;
+        if (used[key] || slotTaken(slots[j].p.uid, slots[j].k)) continue;
+        s = slots[j]; used[key] = true; break;
+      }
+      if (s) {
+        var spot = rideSpot(s.p, s.piece, s.k);
+        out.push({ x: spot.x, y: spot.y, slot: s });
+      } else {
+        var p0 = slots.length ? slots[0].p : null;
+        var bx = p0 ? p0.cx : ENTRANCE.x, by = p0 ? p0.floorY : ENTRANCE.y;
+        out.push({ x: bx + (i - 1) * 16, y: by + 6, slot: null });
+      }
+    }
+    return out;
+  }
+  function parkPiecesBuilt() {
+    for (var i = 0; i < placed.length; i++) {
+      var id = placed[i].id;
+      if ((id === 'slide' || id === 'swingset' || id === 'teetertotter' || id === 'spinningcircle') && !placed[i].building) return true;
+    }
+    return false;
+  }
+  function deskPlaced() {
+    for (var i = 0; i < placed.length; i++) if (placed[i].id === 'desk' && !placed[i].building) return placed[i];
+    return null;
+  }
+  function deskSpots(d) {
+    if (!d) return [];
+    // v1 kidschool: the kids STAND at the desk (no sitting pose). Two kids
+    // flank the single desk, feet on the ground.
+    return [
+      { x: d.cx - d.w / 2 - 6, y: d.floorY },
+      { x: d.cx + d.w / 2 + 6, y: d.floorY }
+    ];
+  }
+  function releaseStage(g) { // v1 releaseStage (playground part)
+    if (g.stage === 'playground') {
+      g.kids.forEach(function (a) { if (a.slot) a.slot = null; if (a.state === 'ride') a.state = 'idle'; });
+    }
+  }
+  function goToPlayground(g) { // v1 goTo (playground)
+    releaseStage(g);
+    g.stage = 'playground'; g.phase = 'move';
+    var spots = playSpots(g.kids.length);
+    g.kids.forEach(function (a, i) {
+      a.slot = spots[i].slot || null;
+      walkAnt(a, { x: spots[i].x, y: spots[i].y });
+    });
+  }
+  function goToSchool(g) { // v1 goTo (kidschool)
+    releaseStage(g);
+    g.stage = 'kidschool'; g.phase = 'move';
+    var d = deskPlaced();
+    var spots = deskSpots(d);
+    g.kids.forEach(function (a, i) {
+      a.slot = null;
+      walkAnt(a, spots.length ? spots[i % spots.length] : { x: a.x, y: a.y });
+    });
+  }
+  function startGrow(g) { // v1 startGrow
+    g.phase = 'grow'; g.growEnd = QT + CYCLE1.GROW_S;
+    g.kids.forEach(function (a) { a.state = 'grow'; a.growT0 = QT; });
+  }
+  function checkSlidePass(g) {
+    // Chris: the desk unlocks when the ants complete their FIRST PASS on the
+    // slide — one full slide loop (v1: 123 frames @ 12 fps = 10.25s), counted
+    // from the moment the kid arrives on the slide (arrT).
+    if (firstSlidePass) return;
+    for (var i = 0; i < g.kids.length; i++) {
+      var a = g.kids[i];
+      if (a.state === 'ride' && a.slot && a.slot.piece === 'slide' && a.arrT != null) {
+        if (QT - a.arrT >= PLAY_LOOP.slide.frames / PLAY_LOOP.slide.fps) {
+          firstSlidePass = true;
+          renderMenu(); // the desk appears on the park tab
+          break;
+        }
+      }
+    }
+  }
+  function stepKids(dt) {
+    for (var i = 0; i < ANTS.length; i++) stepAnt(ANTS[i], dt);
+    for (var j = 0; j < GENS.length; j++) {
+      var g = GENS[j];
+      if (g.phase === 'move') {
+        var arrived = g.kids.every(function (a) { return a.state !== 'walk'; });
+        if (arrived) {
+          g.phase = 'stall';
+          g.until = QT + (g.stage === 'playground' ? CYCLE1.PLAY_S : g.stage === 'kidschool' ? CYCLE1.SCHOOL_S : 0);
+        }
+      } else if (g.phase === 'stall') {
+        if (g.stage === 'playground') checkSlidePass(g);
+        if (QT >= g.until) {
+          if (g.stage === 'playground') {
+            if (deskPlaced()) goToSchool(g);
+            else g.phase = 'wait'; // school next, once the desk is built
+          } else if (g.stage === 'kidschool') {
+            startGrow(g);
+          }
+        }
+      } else if (g.phase === 'grow') {
+        if (QT >= g.growEnd) {
+          g.kids.forEach(function (a) { a.m = 1; a.state = 'idle'; });
+          g.phase = 'done'; // grown ants idle (no job rooms in checkpoint 3)
+        }
+      }
+    }
+  }
+  function hatchKids(p) {
+    // v1 stepBaskets/onBasketHatched: 2 kids per basket, spawned at the
+    // basket, then they walk to nursery idle spots. The FIRST hatch unlocks
+    // the playground (the park tab). If park pieces are already built, the
+    // new kids go straight to the playground (v1 afterHatch/goNext).
+    p.egg = null; // the basket empties (v1: both eggs hatched -> empty)
+    genN++;
+    var g = { id: genN, stage: 'nursery', phase: 'idle', kids: [], until: 0, growEnd: 0 };
+    GENS.push(g);
+    var bx = p.cx, by = p.floorY;
+    for (var i = 0; i < 2; i++) newKid(g, bx + (i === 0 ? -6 : 6), by + 2);
+    if (!parkUnlocked) openPark();
+    if (parkPiecesBuilt()) {
+      goToPlayground(g);
+    } else {
+      g.kids.forEach(function (a, i) {
+        walkAnt(a, { x: bx + (i === 0 ? -16 : 16), y: by + 6 });
+      });
+    }
+  }
+  function releaseKidsFor(p) {
+    // A park piece / desk was erased or picked up to move: free any kid
+    // riding it or walking to it. Erasing the desk cancels the school stage
+    // (the gen waits for the desk to be built again).
+    for (var i = 0; i < ANTS.length; i++) {
+      var a = ANTS[i];
+      if (a.slot && a.slot.p.uid === p.uid) {
+        a.slot = null;
+        if (a.state === 'ride' || a.state === 'walk') { a.path = []; a.state = 'idle'; }
+      }
+    }
+    if (p.id === 'desk') {
+      for (var j = 0; j < GENS.length; j++) {
+        var g = GENS[j];
+        if (g.stage === 'kidschool' && (g.phase === 'move' || g.phase === 'stall')) {
+          g.stage = 'playground'; g.phase = 'wait';
+          g.kids.forEach(function (a) { if (a.state === 'walk') { a.path = []; a.state = 'idle'; } });
+        }
+      }
     }
   }
 
@@ -714,6 +1091,34 @@
           queenHome(function () { QN.busy = false; runningScriptId = null; armFirstPlayHatch(); runPending(); });
         });
       });
+    } else if (id === 'slide' || id === 'swingset' || id === 'teetertotter' || id === 'spinningcircle') {
+      // CHECKPOINT 3 (v1): the queen has no reaction to the playground — the
+      // KIDS go there. The queen walks to the spot (the build sequence), then
+      // returns home; a generation waiting near the nursery is sent to play.
+      QN.busy = true;
+      queenTo(spot.x, spot.y, function () {
+        queenWait(0.5, function () {
+          queenHome(function () { QN.busy = false; runningScriptId = null; runPending(); });
+        });
+        for (var i = 0; i < GENS.length; i++) {
+          var g = GENS[i];
+          if (g.stage === 'nursery' && (g.phase === 'idle' || g.phase === 'wait')) goToPlayground(g);
+        }
+      });
+    } else if (id === 'desk') {
+      // CHECKPOINT 3 (v1): the queen has no reaction to the school — the
+      // KIDS go there. The queen walks to the spot, then returns home; a
+      // generation waiting for school (playground done) is sent to the desk.
+      QN.busy = true;
+      queenTo(spot.x, spot.y, function () {
+        queenWait(0.5, function () {
+          queenHome(function () { QN.busy = false; runningScriptId = null; runPending(); });
+        });
+        for (var i = 0; i < GENS.length; i++) {
+          var g = GENS[i];
+          if (g.stage === 'playground' && g.phase === 'wait') goToSchool(g);
+        }
+      });
     }
   }
   function runPending() {
@@ -799,6 +1204,7 @@
     for (var j = basketQueue.length - 1; j >= 0; j--) basketQueue.splice(j, 1);
     if ((id === 'fridge' || id === 'watercooler') && !remaining) clearRoomTimer(id);
     if (id === 'eggbasket' && !remaining) basketJob = null;
+    if (id === 'slide' || id === 'swingset' || id === 'teetertotter' || id === 'spinningcircle' || id === 'desk') releaseKidsFor(p); // CHECKPOINT 3: free any kid riding it / at school there
     brainReset(); // v1: any build activity distracts the queen
     if (id === 'leafbed') {
       // Her home is the bed she settled on; erasing a different bed leaves it.
@@ -934,6 +1340,7 @@
     if (idx < 0) return;
     var p = placed[idx];
     cancelBuild(p.uid); // a build in progress for THIS copy stops with it
+    if (p.id === 'slide' || p.id === 'swingset' || p.id === 'teetertotter' || p.id === 'spinningcircle' || p.id === 'desk') releaseKidsFor(p); // CHECKPOINT 3: picking it up frees any kid riding it / at school there
     moveFrom = p; // keep the whole placed object, not just its spot (a moved basket keeps its eggs)
     placed.splice(idx, 1);
     brainReset(); // v1: any build activity distracts the queen
@@ -983,6 +1390,10 @@
         ctx.drawImage(im, p.cx - p.w / 2, p.floorY - h, p.w, h);
         ctx.restore();
       });
+      // CHECKPOINT 3: the kids — drawn after the placed items (on top, like
+      // the queen), y-sorted among themselves by foot y. A rider is drawn by
+      // its play loop (drawRider); a walker / idler by its own sprite.
+      ANTS.slice().sort(function (a, b) { return a.y - b.y; }).forEach(function (a) { drawKid(a); });
       // CHECKPOINT 2: the carried ghost — white while it can be set down, red when it cannot.
       if (mode === 'carrying' && ghost && carryId) {
         var it = itemById(carryId);
@@ -1060,7 +1471,16 @@
       var p = basketPlaced();
       return p && p.egg ? { state: p.egg.state, tendsDone: p.egg.tendsDone, left: basketTimer(p) } : null;
     },
-    get queen() { return { x: queen.x, y: queen.y, mode: QN.mode, busy: QN.busy, settled: QN.settled, home: QN.home }; }
+    get queen() { return { x: queen.x, y: queen.y, mode: QN.mode, busy: QN.busy, settled: QN.settled, home: QN.home }; },
+    get kids() { // CHECKPOINT 3: the kids, generations, and the park/desk gates
+      return {
+        parkUnlocked: parkUnlocked, firstSlidePass: firstSlidePass,
+        kids: ANTS.map(function (a) { return { id: a.id, m: a.m, state: a.state, x: Math.round(a.x), y: Math.round(a.y), slot: a.slot ? a.slot.piece + ':' + a.slot.k : null }; }),
+        gens: GENS.map(function (g) { return { id: g.id, stage: g.stage, phase: g.phase, kids: g.kids.length }; }),
+        parkVisible: PARK_ITEMS.filter(function (it) { return isVisible(it.id); }).map(function (it) { return it.id; }),
+        parkPrices: (function () { var out = {}; PARK_ITEMS.forEach(function (it) { out[it.id] = { count: placedCount(it.id), next: nextPrice(it.id) }; }); return out; })()
+      };
+    }
   };
   // Test handle for the timer bubbles (tap entry points, same as the canvas tap).
   window.BASE_TEST = {
@@ -1071,7 +1491,14 @@
     tapRoomTimerBubble: tapRoomTimerBubble,
     tapBasketBubble: tapBasketBubble,
     get eraseMode() { return eraseMode; }, // v28: menu-bulldozer erase mode, armed or not
-    get placed() { return placed.slice(); }
+    get placed() { return placed.slice(); },
+    // CHECKPOINT 3: the park tab / kids state (read-only, for the harness).
+    get parkUnlocked() { return parkUnlocked; },
+    get firstSlidePass() { return firstSlidePass; },
+    get kids() { return ANTS.slice(); },
+    get gens() { return GENS.slice(); },
+    get tabs() { return TABS.map(function (t) { return t.id; }); },
+    get activeTab() { return activeTab; }
   };
 
   // ---- the build menu (always on, just the four items + the bulldozer) ----
@@ -1101,6 +1528,7 @@
     // the menu body below with no gap, so it reads as part of the folder.
     '.bl-tab{border:0;padding:5px 20px 4px;margin-bottom:-1px;cursor:pointer;line-height:0;display:flex;justify-content:center;align-items:center;background:linear-gradient(180deg,#3d2c1d,#2a1c11 60%,#20140c);clip-path:polygon(0 100%,0 0,60% 0,80% 100%,100% 100%);box-shadow:inset 0 1px 0 rgba(255,214,160,.18),inset 0 -4px 0 rgba(0,0,0,.35)}' +
     '.bl-tab img{height:25px;width:auto;display:block;clip-path:inset(0 33.2% 0 33%);transform:translateX(-14px)}' +
+    '.bl-tab.bl-tab-park img{clip-path:none;transform:none}' + // the slide is a plain item picture, not the crown (no clip, no nudge)
     '.bl-tab.on{background:linear-gradient(180deg,#5a4128,#38271c 55%,#2e1d12);box-shadow:inset 0 1px 0 rgba(255,220,170,.35),inset 0 -4px 0 rgba(0,0,0,.4);filter:drop-shadow(0 3px 3px rgba(0,0,0,.45))}' +
     '.bvFly{position:absolute;z-index:9461;width:28px;height:auto;margin:-14px 0 0 -14px;pointer-events:none}' +
     // v1's food/water meters (index.html #bvMeters / .bm3-meter): the little
@@ -1133,7 +1561,8 @@
   // assets/menu-ant/hat-crown-lowered.webp, copied unchanged (md5 46a84515).
   // The tab structure is ready for more tabs later; only the crown tab exists now.
   var CROWN_SRC = 'assets/menu-ant/hat-crown-lowered.webp';
-  var TABS = [{ id: 'queen', icon: CROWN_SRC, items: ITEMS }];
+  var SLIDE_SRC = 'assets/items/slide.png'; // CHECKPOINT 3: the park tab's picture is the slide
+  var TABS = [{ id: 'queen', icon: CROWN_SRC, items: ITEMS }, { id: 'park', icon: SLIDE_SRC, items: PARK_ITEMS }];
   var activeTab = 'queen';
   function tabOf(id) { for (var i = 0; i < TABS.length; i++) if (TABS[i].id === id) return TABS[i]; return TABS[0]; }
 
@@ -1198,18 +1627,19 @@
 
   function renderMenu() {
     if (!tray) return;
+    if (activeTab === 'park' && !parkUnlocked) activeTab = 'queen'; // the park tab cannot be active before the first hatch
     var html = '<div class="bl-head">' +
       '<div class="bl-tabs">' +
       TABS.map(function (t) {
-        return '<button type="button" class="bl-tab' + (t.id === activeTab ? ' on' : '') + '" data-tab="' + t.id + '" aria-label="' + t.id + '"><img alt="" draggable="false" src="' + t.icon + '"></button>';
+        if (t.id === 'park' && !parkUnlocked) return ''; // the park tab is hidden until the first hatch (no "Locked" tab)
+        return '<button type="button" class="bl-tab' + (t.id === 'park' ? ' bl-tab-park' : '') + (t.id === activeTab ? ' on' : '') + '" data-tab="' + t.id + '" aria-label="' + t.id + '"><img alt="" draggable="false" src="' + t.icon + '"></button>';
       }).join('') +
       '</div>' +
       '<button type="button" class="bl-dozer' + (eraseMode ? ' on' : '') + '" id="blDozer" aria-label="Bulldozer: remove a placed item">\uD83D\uDE9C</button></div>' +
       '<div class="bl-cards">';
     tabOf(activeTab).items.forEach(function (it) {
       if (!isVisible(it.id)) return; // the bed gate: hidden items are not shown at all, never "Locked"
-      var n = placedCount(it.id); // copies of this type on the floor
-      var price = n * 10; // the NEXT copy: FREE first, then 10, 20, 30... seed money (per type)
+      var price = nextPrice(it.id); // the NEXT copy: firstPrice + 10 per copy already placed (per type)
       var afford = canAfford(price); // green when he can build, red only when he cannot afford it
       var active = (mode !== 'idle' && carryId === it.id);
       html += '<div class="bl-card">' +
@@ -1447,9 +1877,10 @@
 
   renderMenu();
 
-  // TEST-ONLY ?start=downstairs / ?checkpoint=2: skip the (LOCKED) opening to the exact real arrival state.
+  // TEST-ONLY ?start=downstairs / ?checkpoint=2 / ?checkpoint=3: skip the (LOCKED) opening to the exact real arrival state.
   // ?checkpoint=2 is Chris's Checkpoint 2 test link: straight underground, menu open, ready to place.
-  if (URLQ.get('start') === 'downstairs' || URLQ.get('checkpoint') === '2') {
+  // ?checkpoint=3 is the same for checkpoint 3 testing.
+  if (URLQ.get('start') === 'downstairs' || URLQ.get('checkpoint') === '2' || URLQ.get('checkpoint') === '3') {
     var go = function () {
       if (typeof ready !== 'undefined' && !ready) { setTimeout(go, 40); return; }
       loadBasement();
