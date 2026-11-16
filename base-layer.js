@@ -1642,6 +1642,7 @@
     '.bl-title{color:#f3e6c8;font-size:17px;font-weight:700;letter-spacing:.5px}' +
     '.bl-dozer{border:2px solid #82562f;border-radius:12px;background:rgba(255,244,220,.14);color:#f3e6c8;font-size:22px;line-height:1;padding:6px 12px;cursor:pointer}' +
     '.bl-dozer.on{background:#a93226;border-color:#e74c3c}' +
+    '.bl-dozer img{height:22px;width:auto;display:block}' + // v31: the bulldozer picture (cut from Chris's photo), same height as the old emoji so the button stays the same size
     '.bl-cards{display:flex;gap:10px;justify-content:flex-start;border-top:2px solid #82562f}' +
     '.bl-card{flex:0 0 calc((100% - 30px)/4);position:relative;background:linear-gradient(#2b1c11,#1e130d);border:1px solid #1d100a;border-radius:14px;padding:8px 6px 8px;display:flex;flex-direction:column;align-items:center;gap:5px;box-shadow:inset 0 3px 12px #08040299}' +
     '.bl-thumb{width:100%;height:104px;background-size:contain;background-repeat:no-repeat;background-position:center bottom}' +
@@ -1684,6 +1685,7 @@
     '.bl-brow button{border:0;border-radius:10px;padding:8px 12px;font-size:14px;font-weight:700;cursor:pointer}' +
     '.bl-bmove{background:linear-gradient(180deg,#7fb069,#4c8a3f);color:#fff}' +
     '.bl-berase{background:linear-gradient(180deg,#a93226,#7e241b);color:#fff}' +
+    '.bl-berase img{height:16px;width:auto;vertical-align:-2px;margin-right:2px}' + // v31: the bulldozer picture next to "Erase", same cut-out as the menu button
     '.bl-byes{background:linear-gradient(180deg,#7fb069,#4c8a3f);color:#fff}' +
     '.bl-bno{background:#5a5148;color:#e8dcc8}';
   document.head.appendChild(style);
@@ -1696,6 +1698,7 @@
   // The tab structure is ready for more tabs later; only the crown tab exists now.
   var CROWN_SRC = 'assets/menu-ant/hat-crown-lowered.webp';
   var SLIDE_SRC = 'assets/items/slide.png'; // CHECKPOINT 3: the park tab's picture is the slide
+  var BULLDOZER_SRC = 'assets/items/bulldozer.png?v=31'; // v31: Chris's bulldozer photo, cut out (white background removed) — the old tractor emoji was a tractor, not a bulldozer. Blade at the front, left.
   var TABS = [{ id: 'queen', icon: CROWN_SRC, items: ITEMS }, { id: 'park', icon: SLIDE_SRC, items: PARK_ITEMS }];
   var activeTab = 'queen';
   function tabOf(id) { for (var i = 0; i < TABS.length; i++) if (TABS[i].id === id) return TABS[i]; return TABS[0]; }
@@ -1769,7 +1772,7 @@
         return '<button type="button" class="bl-tab' + (t.id === 'park' ? ' bl-tab-park' : '') + (t.id === activeTab ? ' on' : '') + '" data-tab="' + t.id + '" aria-label="' + t.id + '"><img alt="" draggable="false" src="' + t.icon + '"></button>';
       }).join('') +
       '</div>' +
-      '<button type="button" class="bl-dozer' + (eraseMode ? ' on' : '') + '" id="blDozer" aria-label="Bulldozer: remove a placed item">\uD83D\uDE9C</button></div>' +
+      '<button type="button" class="bl-dozer' + (eraseMode ? ' on' : '') + '" id="blDozer" aria-label="Bulldozer: remove a placed item"><img alt="" draggable="false" src="' + BULLDOZER_SRC + '"></button></div>' +
       '<div class="bl-cards">';
     tabOf(activeTab).items.forEach(function (it) {
       if (!isVisible(it.id)) return; // the bed gate: hidden items are not shown at all, never "Locked"
@@ -1848,7 +1851,7 @@
     } else {
       el.innerHTML = '<div class="bl-bname">' + name + '</div>' +
         '<div class="bl-brow"><button type="button" class="bl-bmove" data-act="move">\u2194\uFE0F Move</button>' +
-        '<button type="button" class="bl-berase" data-act="erase">\uD83D\uDE9C Erase</button></div>';
+        '<button type="button" class="bl-berase" data-act="erase"><img alt="" draggable="false" src="' + BULLDOZER_SRC + '"> Erase</button></div>';
     }
     el.querySelectorAll('[data-act]').forEach(function (b) {
       b.addEventListener('click', function (e) {
