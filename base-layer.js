@@ -12,8 +12,11 @@
 // item). Tap a placed item and a bubble appears: arrows to MOVE it inside the
 // hex, bulldozer to ERASE it (asks "are you sure?" first).
 // CHECKPOINT 2 TIMERS (Nov 15, v1 values, reused not invented): every item has
-// a timer. Bed = the brain timer (120s resting on the bed -> brain bubble above
-// her head, tap = +1 brain, 2-3 coins tracked, no HUD, no idea minigame).
+// a timer. Bed = the brain timer: v1's counter above her head in the royal
+// chamber counts down 120s while she rests on the bed (NP5 drawTag, "02:00");
+// at 0:00 the brain bubble appears, tap = +1 brain, 2-3 coins tracked,
+// no HUD, no idea minigame. The counter IS the brain-giver. CHECKPOINT 2 STOPS
+// at 8 brains (squirrel at 9 and idea game at 10 are later checkpoints).
 // Fridge = kitchen room timer 5:00, cooler = water room timer 7:00: a countdown
 // over the item; at 00:00 a leaf/drop bubble appears, tap = she eats/drinks (3s)
 // and the timer restarts. Basket = the egg cycle: lay (2s) -> tends at +2/+4/+6
@@ -140,7 +143,7 @@
     // Pauses while placing; resets when she leaves the bed (brainReset calls).
     var brainIdle = QN.mode === 'idle' && !QN.busy && mode !== 'carrying' &&
       (typeof state === 'undefined' || state === 'underground' || state === 'menu') && atHome();
-    if (mode !== 'carrying' && brainIdle && !BR.ready) {
+    if (mode !== 'carrying' && brainIdle && !BR.ready && BR.brains < BRAIN_CAP) {
       BR.t += dt;
       if (BR.t >= BRAIN_EVERY) BR.ready = true;
     }
@@ -165,6 +168,7 @@
   // whenever she leaves the bed (any build activity distracts her, v1 brainReset).
   var BRAIN_EVERY = 120; // v1 CHAMBER_BUB.EVERY_S
   var BRAIN_COINS = [2, 3]; // v1
+  var BRAIN_CAP = 8; // CHECKPOINT 2 ends at 8 brains (v1's squirrel comes at 9, idea game at 10 — later checkpoints)
   var BR = { t: 0, ready: false, brains: 0, coins: 0 };
   function brainReset() { BR.t = 0; }
   function queenHeadW() { return { x: queen.x, y: queen.y - QUEEN_UNDER_W * 0.58 }; } // v1
@@ -182,22 +186,53 @@
     var h = queenHeadW(), r = bubbleR();
     return { kind: 'brain', x: h.x, y: h.y - r - 4 / (spp * view.s), r: r }; // v1, hidden while placing
   }
+  // v1's brain counter (port-b TIMERS_SRC, NP5 drawTag, unchanged from dfc7b054):
+  // the counter on top of the queen in the royal chamber IS the brain-giver.
+  // It counts down the 120s brain timer above her head; at 0:00 the brain
+  // bubble appears and tapping it gives +1 brain and 2-3 coins, and the
+  // counter restarts. mmss is zero-padded ("02:00"); the tag is drawn in
+  // screen space (constant size whatever the zoom), white with a dark outline,
+  // baseline bottom, at queen.y - QUEEN_UNDER_W*0.62. Same condition as v1:
+  // only while she rests idle and settled on the bed, not ready, not busy.
+  // v1 draws it in underground AND menu states, with no placing check (the
+  // timer itself pauses while placing). No meters in checkpoint 2, so the
+  // starve-red flash does not apply (always white).
+  function brainMmss(sec) {
+    sec = Math.max(0, Math.ceil(sec - 1e-6));
+    return String(Math.floor(sec / 60)).padStart(2, '0') + ':' + String(sec % 60).padStart(2, '0');
+  }
+  function drawTag(x, y, txt, mid, col) {
+    var m = ctx.getTransform(), X = m.a * x + m.c * y + m.e, Y = m.b * x + m.d * y + m.f, d = view.d || 1;
+    ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.font = '700 ' + (11 * d) + "px 'BM3 Sans','DejaVu Sans',sans-serif";
+    ctx.textAlign = 'center'; ctx.textBaseline = mid ? 'middle' : 'bottom';
+    ctx.lineJoin = 'round'; ctx.lineWidth = 3 * d; ctx.strokeStyle = 'rgba(0,0,0,.72)';
+    ctx.strokeText(txt, X, Y); ctx.fillStyle = col || '#fff'; ctx.fillText(txt, X, Y);
+    ctx.restore();
+  }
   function drawBrainBubble(now) {
     var b = brainBubble();
-    if (!b) return;
-    var k = 1 + .06 * Math.sin(now / 200), Rr = b.r * k, lw = 3 / (spp * view.s); // v1 pulse
-    ctx.save();
-    ctx.beginPath(); ctx.arc(b.x, b.y, Rr, 0, 7);
-    ctx.fillStyle = 'rgba(255,255,255,.92)'; ctx.fill();
-    ctx.lineWidth = lw; ctx.strokeStyle = '#f3cf82'; ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(b.x - Rr * .28, b.y + Rr * .9);
-    ctx.lineTo(b.x, b.y + Rr * 1.32); ctx.lineTo(b.x + Rr * .28, b.y + Rr * .9);
-    ctx.closePath(); ctx.fillStyle = 'rgba(255,255,255,.92)'; ctx.fill();
-    if (IBRAIN.complete && IBRAIN.naturalWidth) {
-      var q = Rr * 1.5;
-      ctx.drawImage(IBRAIN, b.x - q / 2, b.y - q / 2, q, q);
+    if (b) {
+      var k = 1 + .06 * Math.sin(now / 200), Rr = b.r * k, lw = 3 / (spp * view.s); // v1 pulse
+      ctx.save();
+      ctx.beginPath(); ctx.arc(b.x, b.y, Rr, 0, 7);
+      ctx.fillStyle = 'rgba(255,255,255,.92)'; ctx.fill();
+      ctx.lineWidth = lw; ctx.strokeStyle = '#f3cf82'; ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(b.x - Rr * .28, b.y + Rr * .9);
+      ctx.lineTo(b.x, b.y + Rr * 1.32); ctx.lineTo(b.x + Rr * .28, b.y + Rr * .9);
+      ctx.closePath(); ctx.fillStyle = 'rgba(255,255,255,.92)'; ctx.fill();
+      if (IBRAIN.complete && IBRAIN.naturalWidth) {
+        var q = Rr * 1.5;
+        ctx.drawImage(IBRAIN, b.x - q / 2, b.y - q / 2, q, q);
+      }
+      ctx.restore();
+      return;
     }
-    ctx.restore();
+    // v1 brain counter (see above): counts down BRAIN_EVERY-BR.t above her head.
+    // Checkpoint 2 stops at 8 brains: no counter once she has 8.
+    if (BR.brains < BRAIN_CAP && !BR.ready && atHome() && QN.mode === 'idle' && !QN.busy) {
+      drawTag(queen.x, queen.y - QUEEN_UNDER_W * 0.62, brainMmss(BRAIN_EVERY - BR.t), 0, 0);
+    }
   }
   // v1 floatTxt2 (DOM): a floating "+1" at screen coords, then it fades away.
   function worldToScreen(x, y) {
@@ -217,7 +252,7 @@
     setTimeout(function () { if (d.parentNode) d.parentNode.removeChild(d); }, 700);
   }
   function tapBrainBubble(b) {
-    BR.ready = false; BR.t = 0; BR.brains += 1;
+    BR.ready = false; BR.t = 0; BR.brains = Math.min(BRAIN_CAP, BR.brains + 1); // checkpoint 2 stops at 8 brains
     var n = BRAIN_COINS[0] + Math.floor(Math.random() * (BRAIN_COINS[1] - BRAIN_COINS[0] + 1));
     BR.coins += n;
     floatTxt('+1', b.x, b.y);
@@ -996,7 +1031,7 @@
       if (typeof ready !== 'undefined' && !ready) { setTimeout(go, 40); return; }
       loadBasement();
       if (!basementReady) { setTimeout(go, 40); return; }
-      emergeT0 = performance.now() - BC.EMERGE_SECONDS * 1000 - 1;
+      emergeT0 = performance.now() - BC.EMERGE_SECONDS * 1000 - 1; emerged = true; // she already walked out in checkpoint 1; never replay on later descents
       begin('underground');
       // Snap the camera to the real arrival view. The descending transition
       // does this in the real flow; the hook skips it, so without this the
