@@ -485,6 +485,50 @@
   };
   var IEGG = new Image(); IEGG.src = 'assets/items/egg-cutout.png';
   var IBASKET_EMPTY = new Image(); IBASKET_EMPTY.src = 'assets/items/egg-basket-empty.png';
+  // ---- CHECKPOINT 3, v34: v1's egg-cracking hatch (index.html, hatch-timeline.json, 12 fps) ----
+  // Ported as-is from v1, not invented. The eggs CRACK and the little ants
+  // climb OUT of them. Timeline frames (12 fps, 127 frames = 10.6 s):
+  // 0-5 two eggs; 6-27 the egg wobbles and cracks (crack_stage 0-5);
+  // 28+ the shells open and the kid climbs out of the bowl (idle frames,
+  // rim-clipped while in the bowl); at frame 60 the real kid ant spawns at
+  // LAND and walks to a nursery spot; the shells fade to frame 126; the
+  // basket empties when the left egg passes frame 126 (11.5 s after h0).
+  // The left egg runs 1 s behind the right (STAGGER_S). All coordinates are
+  // v1 nursery room px, relative to the basket's top-left; the basket art
+  // is 113x133, so the world scale is the placed basket's width / 113.
+  var HATCH = {
+    FRONT_TL: [647, 1012], LAND: [830, 1165], STAGGER_S: 1.0, BASKET_GAP_S: 1.5,
+    LOFF: { x: -18.97, y: 1.76 }, PIV: { x: 72.1, y: 61 }, CAP_PIV: { x: 71.3, y: 43.5 }, NEST_Y: 62.5,
+    BASKET_W: 113
+  };
+  var HATCH_TL; // undefined = still loading, false = failed to load, object = the timeline JSON
+  if (typeof fetch === 'function') {
+    fetch('assets/kid/hatch-timeline.json').then(function (r) { return r.json(); }).then(function (d) { HATCH_TL = d; }).catch(function () { HATCH_TL = false; });
+  } else { HATCH_TL = false; }
+  var HATCHIMG = {};
+  function hatchImg(name) {
+    var src = 'assets/kid/egg-overlays/' + name;
+    if (!HATCHIMG[src]) { var im = new Image(); im.src = src; HATCHIMG[src] = im; }
+    return HATCHIMG[src];
+  }
+  var IBASKET2 = new Image(); IBASKET2.src = 'assets/items/basket-two-eggs.png'; // v1 BASKET2 (two-eggs basket, 113x133)
+  var leftEggCut = null;
+  function getLeftEgg() { // v1: the approved left egg's own pixels (soft clip of the two-eggs basket)
+    if (leftEggCut) return leftEggCut;
+    if (!IBASKET2.complete || !IBASKET2.naturalWidth) return null;
+    try {
+      var c = document.createElement('canvas'); c.width = 113; c.height = 133;
+      var g = c.getContext('2d');
+      if (!g) return null;
+      g.save(); g.beginPath(); g.ellipse(70.8 + HATCH.LOFF.x + 0.5, 48.9 + HATCH.LOFF.y + 0.5, 9.9, 12.7, 4 * Math.PI / 180, 0, 7); g.clip(); g.drawImage(IBASKET2, 0, 0); g.restore();
+      leftEggCut = c; return c;
+    } catch (err) { return null; } // a canvas failure must never break the draw — the left egg just stays uncut
+  }
+  function rimClipLocal(off) { // v1 rimClip: keeps only the part of the kid above the basket rim (in the bowl)
+    ctx.beginPath(); ctx.moveTo(-80 + off.x, -300);
+    for (var x = -80; x <= 200; x += 2) { var t = clamp((x - 58) / 45, -1, 1), ry = 40 + 32 * Math.sqrt(1 - t * t); ctx.lineTo(x + off.x, Math.min(ry, HATCH.NEST_Y) + off.y); }
+    ctx.lineTo(200 + off.x, -300); ctx.closePath(); ctx.clip();
+  }
   var basketJob = null; // 'tend' | 'remove' while she is doing a basket job
   var basketQueue = []; // kinds waiting while she is busy
   function basketPlaced() {
@@ -533,6 +577,7 @@
     var p = basketPlaced();
     if (!p || !p.egg) return;
     var e = p.egg;
+    if (e.state === 'hatch') { stepHatch(p); return; }
     if (e.state !== 'two') return;
     if (e.tendsDone < EGG_CYCLE.TEND_COUNT) {
       if (e.tendAppearedAt == null && QT >= e.tendDueAt) { e.tendAppearedAt = QT; e.spoilAt = QT + EGG_CYCLE.SPOIL_WINDOW_S; }
@@ -540,9 +585,145 @@
         e.state = 'spoiled'; e.tendAppearedAt = null; e.spoilAt = null; e.hatchAt = null;
       }
     } else if (QT >= e.hatchAt && !QN.busy) {
-      // Hatch: v1 spawns 2 kid ants here (GENS/newKid) — checkpoint 3 ports it.
-      hatchKids(p);
+      // v34: the eggs crack and the kids climb out (v1 hatch timeline).
+      // If the timeline hasn't loaded yet, wait (retry next tick); if it
+      // failed to load, fall back to the instant hatch so the game never stalls.
+      if (HATCH_TL === undefined) return;
+      if (HATCH_TL === false) { hatchKids(p); return; }
+      startHatch(p);
     }
+  }
+  // ---- v34: the egg-cracking hatch (v1 hatchGen / stepBaskets / onBasketHatched) ----
+  function startHatch(p) {
+    // v1 hatchGen: the basket enters the 'hatch' state and the cracking
+    // timeline runs (12 fps). The gen is made now; its kids join it as
+    // they spawn at frame 60. The basket empties at 11.5 s (finishHatch).
+    var e = p.egg;
+    e.state = 'hatch'; e.h0 = QT; e.spawned = [false, false];
+    genN++;
+    e.gen = { id: genN, stage: 'nursery', phase: 'idle', kids: [], until: 0, growEnd: 0, bx: p.cx, by: p.floorY };
+    GENS.push(e.gen);
+  }
+  function hatchScale(p) {
+    return p.w / HATCH.BASKET_W; // world per v1 room px
+  }
+  function hatchBasketTop(p) {
+    var im = IMGS['eggbasket'];
+    var h = im ? p.w * im.naturalHeight / im.naturalWidth : p.w;
+    return { bx: p.cx - p.w / 2, by: p.floorY - h, s: hatchScale(p) };
+  }
+  function stepHatch(p) {
+    var e = p.egg;
+    var fR = Math.floor((QT - e.h0) * 12);
+    var fL = Math.floor((QT - e.h0 - HATCH.STAGGER_S) * 12);
+    // v1 stepBaskets: at frame 60 the real kid spawns at LAND and walks to a nursery spot.
+    if (fR >= 60 && !e.spawned[0]) { e.spawned[0] = true; spawnHatchKid(p, e.gen, 0); }
+    if (fL >= 60 && !e.spawned[1]) { e.spawned[1] = true; spawnHatchKid(p, e.gen, 1); }
+    // v1: both eggs hatched (left frame past 126) -> the basket empties.
+    if (fL > 126) finishHatch(p);
+  }
+  function spawnHatchKid(p, g, i) {
+    var o = i ? HATCH.LOFF : { x: 0, y: 0 };
+    var t = hatchBasketTop(p);
+    var lx = t.bx + (HATCH.LAND[0] - HATCH.FRONT_TL[0] + o.x) * t.s;
+    var ly = t.by + (HATCH.LAND[1] - HATCH.FRONT_TL[1] + o.y) * t.s;
+    var a = newKid(g, lx, ly);
+    walkAnt(a, { x: p.cx + (i === 0 ? -16 : 16), y: p.floorY + 6 }); // kids hang around the Nursery
+  }
+  function finishHatch(p) {
+    // v1 onBasketHatched: the basket empties; the first hatch unlocks the
+    // playground (the park tab). If park pieces are already built, the new
+    // kids go straight to the playground (v1 afterHatch/goNext).
+    var g = p.egg.gen;
+    p.egg = null;
+    if (!parkUnlocked) openPark();
+    if (g && parkPiecesBuilt()) goToPlayground(g);
+  }
+  // ---- v34: drawing the cracking hatch (v1 drawBasket / drawEgg) ----
+  // Everything is drawn in v1's room-px space, translated to the placed
+  // basket's top-left and scaled by the basket's width / 113. The emerging
+  // kid is drawn at the base layer's kid size (KW), so it matches the real
+  // kid ant that takes over at frame 60 — no size jump at the handoff.
+  function drawHatchBasket(p) {
+    var e = p.egg;
+    var TL = HATCH_TL && HATCH_TL.timeline;
+    if (!TL) return;
+    var t = hatchBasketTop(p);
+    var fR = Math.floor((QT - e.h0) * 12);
+    var fL = Math.floor((QT - e.h0 - HATCH.STAGGER_S) * 12);
+    ctx.save();
+    ctx.translate(t.bx, t.by);
+    ctx.scale(t.s, t.s);
+    // v1 drawBasket: the basket base while the eggs are still whole. After
+    // the left egg starts cracking there is no base in v1 (the room art
+    // carries the wicker) — here the basket is a placed item, so the empty
+    // basket stays underneath so the wicker never vanishes mid-hatch.
+    if (fR < 6) {
+      if (IBASKET2.complete && IBASKET2.naturalWidth) ctx.drawImage(IBASKET2, 0, 0);
+    } else if (fL < 6) {
+      var tk = hatchImg('basket-front-spot_right-egg-taken-out_WORKING-LAYER.png');
+      if (tk && tk.complete && tk.naturalWidth) ctx.drawImage(tk, 0, 0);
+    } else {
+      if (IBASKET_EMPTY.complete && IBASKET_EMPTY.naturalWidth) ctx.drawImage(IBASKET_EMPTY, 0, 0);
+    }
+    drawHatchEgg(fR, false, t.s);
+    drawHatchEgg(fL, true, t.s);
+    ctx.restore();
+  }
+  function drawHatchEgg(f, isLeft, s) {
+    if (f < 6 || f > 126) return;
+    var TL = HATCH_TL && HATCH_TL.timeline;
+    if (!TL) return;
+    var e = TL[f];
+    var o = isLeft ? HATCH.LOFF : { x: 0, y: 0 };
+    if (f < 28 && e.egg) { // the egg wobbles and cracks
+      var st = e.egg.crack_stage;
+      ctx.save();
+      ctx.translate(HATCH.PIV.x + o.x, HATCH.PIV.y + o.y);
+      ctx.rotate(-e.egg.angle * Math.PI / 180);
+      ctx.translate(-(HATCH.PIV.x + o.x), -(HATCH.PIV.y + o.y));
+      if (!isLeft) {
+        var im = hatchImg(st ? 'egg-right-cracked-stage-' + st + '.png' : 'egg-right-cutout_from-approved-two-eggs.png');
+        if (im && im.complete && im.naturalWidth) ctx.drawImage(im, 0, 0);
+      } else {
+        var c = getLeftEgg();
+        if (c) ctx.drawImage(c, 0, 0);
+        if (st) {
+          var cl = hatchImg('crack-lines-stage-' + st + '.png');
+          if (cl && cl.complete && cl.naturalWidth) ctx.drawImage(cl, o.x, o.y);
+        }
+      }
+      ctx.restore();
+      return;
+    }
+    var sh = e.shells, k = (e.kid && f < 60) ? e.kid : null, inBowl = !!(k && k.in_bowl);
+    var drawKidLocal = function () { // the kid climbing out of the egg, at the base layer's kid size
+      if (!k) return;
+      var im = kidImg('idle_' + pad2n(k.src_frame) + '.png');
+      if (!im || !im.complete || !im.naturalWidth) return;
+      var ks = KW / s;
+      var an = kidAnchorFor('idle_' + pad2n(k.src_frame) + '.png');
+      var fx = k.feet[0] - HATCH.FRONT_TL[0] + o.x, fy = k.feet[1] - HATCH.FRONT_TL[1] + o.y;
+      ctx.save();
+      if (inBowl) rimClipLocal(o);
+      ctx.drawImage(im, fx - an[0] * ks, fy - an[1] * ks, im.naturalWidth * ks, im.naturalHeight * ks);
+      ctx.restore();
+    };
+    var drawShells = function () { // the cracked shells, fading in the basket
+      if (!sh || sh.alpha <= 0) return;
+      ctx.save();
+      ctx.globalAlpha *= sh.alpha;
+      var sb = hatchImg('shell-bottom-cup-open.png');
+      if (sb && sb.complete && sb.naturalWidth) ctx.drawImage(sb, o.x, o.y);
+      ctx.translate(sh.cap[0], sh.cap[1]);
+      ctx.translate(HATCH.CAP_PIV.x + o.x, HATCH.CAP_PIV.y + o.y);
+      ctx.rotate(-sh.cap[2] * Math.PI / 180);
+      ctx.translate(-(HATCH.CAP_PIV.x + o.x), -(HATCH.CAP_PIV.y + o.y));
+      var cap = hatchImg('shell-top-cap.png');
+      if (cap && cap.complete && cap.naturalWidth) ctx.drawImage(cap, o.x, o.y);
+      ctx.restore();
+    };
+    if (inBowl) { drawKidLocal(); drawShells(); } else { drawShells(); drawKidLocal(); }
   }
   function runBasketJob(kind) {
     var p = basketPlaced();
@@ -1524,15 +1705,20 @@
   window.BASE_ITEMS = {
     draw: function () {
       if (typeof ctx === 'undefined') return;
-      // CHECKPOINT 2: the one entrance hexagon, lit green (the other game's placing colours) while placing or moving.
+      // CHECKPOINT 2: the one entrance hexagon, green OUTLINE only while
+      // placing or moving (v34, Chris: the green fill inside it was a haze
+      // that hid the dirt — the hexagon is now an exposed clear patch, so
+      // building items in it is easy to see). The other game's placing
+      // colours: the outline stays green.
       if (mode !== 'idle' && (state === 'underground' || state === 'menu')) {
         ctx.save();
         ctx.beginPath(); hexPath(ENTRANCE.x, ENTRANCE.y, HEXW); ctx.closePath();
-        ctx.fillStyle = 'rgba(120,230,110,.20)'; ctx.fill();
         ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(150,255,140,.75)'; ctx.stroke();
         ctx.restore();
       }
       placed.forEach(function (p) {
+        // v34: a hatching basket draws v1's cracking-egg timeline, not the plain basket.
+        if (p.id === 'eggbasket' && p.egg && p.egg.state === 'hatch') { drawHatchBasket(p); return; }
         var im = IMGS[p.id];
         // The basket shows the empty basket until she lays, then two eggs.
         if (p.id === 'eggbasket' && !p.egg) im = IBASKET_EMPTY;
@@ -1662,7 +1848,10 @@
     get kids() { return ANTS.slice(); },
     get gens() { return GENS.slice(); },
     get tabs() { return TABS.map(function (t) { return t.id; }); },
-    get activeTab() { return activeTab; }
+    get activeTab() { return activeTab; },
+    // v34: the cracking hatch (read-only, for the harness).
+    get hatchTimelineLoaded() { return !!HATCH_TL; },
+    get basketEgg() { var p = basketPlaced(); return p && p.egg ? { state: p.egg.state, h0: p.egg.h0, spawned: p.egg.spawned ? p.egg.spawned.slice() : null } : null; }
   };
 
   // ---- the build menu (always on, just the four items + the bulldozer) ----
