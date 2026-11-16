@@ -1064,7 +1064,8 @@
     '.bl-card{flex:0 0 calc((100% - 30px)/4);position:relative;background:linear-gradient(#2b1c11,#1e130d);border:1px solid #1d100a;border-radius:14px;padding:8px 6px 8px;display:flex;flex-direction:column;align-items:center;gap:5px;box-shadow:inset 0 3px 12px #08040299}' +
     '.bl-thumb{width:100%;height:104px;background-size:contain;background-repeat:no-repeat;background-position:center bottom}' +
     '.bl-name{color:#f3e6c8;font-size:14px}' +
-    '.bl-build{position:absolute;top:6px;right:6px;border:0;border-radius:9px;background:linear-gradient(180deg,#7fb069,#4c8a3f);color:#fff;font-size:13px;font-weight:700;padding:5px 9px;cursor:pointer}' +
+    '.bl-price{color:#fff;font-weight:700}' +
+    '.bl-build{position:absolute;top:6px;right:6px;border:0;border-radius:9px;background:linear-gradient(180deg,#e74c3c,#c0392b);color:#fff;font-size:13px;font-weight:700;padding:5px 9px;cursor:pointer}' +
     '.bl-build:disabled{background:#5a5148;cursor:default}' +
     '.bl-cancel{background:linear-gradient(180deg,#a93226,#7e241b)}' +
     '.bl-tabs{display:flex;gap:8px;padding:0;align-items:flex-end}' +
@@ -1173,10 +1174,10 @@
       var active = (mode !== 'idle' && carryId === it.id);
       html += '<div class="bl-card">' +
         '<div class="bl-thumb" style="background-image:url(' + it.src + ')"></div>' +
-        '<div class="bl-name">' + it.name + '</div>' +
+        '<div class="bl-name">' + it.name + (price === 0 ? '' : ' <span class="bl-price">$' + price + '</span>') + '</div>' +
         (active
           ? '<button type="button" class="bl-build bl-cancel" data-cancel="' + it.id + '">\u2715 Cancel</button>'
-          : '<button type="button" class="bl-build" data-build="' + it.id + '">' + (price === 0 ? 'BUILD' : 'BUILD \uD83C\uDF31 ' + price) + '</button>') +
+          : '<button type="button" class="bl-build" data-build="' + it.id + '">BUILD</button>') +
         '</div>';
     });
     html += '</div>';
