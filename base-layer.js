@@ -52,8 +52,8 @@
     { id: 'fridge',     name: 'Fridge',      src: 'assets/items/fridge.png?v=27', cx: 2770, floorY: 5060, w: 18.0, thumb: 'background-position:center 13px;' },
     { id: 'watercooler',name: 'Water cooler',src: 'assets/items/water-cooler.png',cx: 2855, floorY: 5055, w: 19.5, thumb: 'background-position:center 19px;' }
   ];
-  // ---- CHECKPOINT 3: the park items + the desk (Chris, Nov 16) ----
-  // The park tab's four items + the desk. Sizes are v1's playground-A /
+  // ---- CHECKPOINT 3: the park items (Chris, Nov 16) ----
+  // The park tab's four items. Sizes are v1's playground-A /
   // kid-school-combined template px x the world scale (0.173 world/px, the
   // same scale as the queen items): slide 124px -> 21.5, swing 150px -> 26.0,
   // teeter 200px -> 34.6, spinning circle 160px -> 27.7, desk 72px -> 12.5.
@@ -70,10 +70,16 @@
     { id: 'slide',         name: 'Slide',          src: 'assets/items/slide.png',           cx: 2812, floorY: 5080, w: 21.5, first: 0 },
     { id: 'swingset',      name: 'Swing set',      src: 'assets/items/swing-set.png',       cx: 2770, floorY: 5075, w: 26.0, first: 10 },
     { id: 'teetertotter',  name: 'Teeter totter',  src: 'assets/items/teeter-totter.png',   cx: 2860, floorY: 5075, w: 34.6, first: 10 },
-    { id: 'spinningcircle',name: 'Spinning circle',src: 'assets/items/spinning-circle.png', cx: 2812, floorY: 5100, w: 27.7, first: 10 },
+    { id: 'spinningcircle',name: 'Spinning circle',src: 'assets/items/spinning-circle.png', cx: 2812, floorY: 5100, w: 27.7, first: 10 }
+  ];
+  // ---- CHECKPOINT 3: the school tab (Chris, Nov 16, v32) ----
+  // The desk does NOT live on the park tab. It has its OWN school tab, which
+  // appears only after the first slide pass (like the park tab appears only
+  // after the first hatch). The school tab's picture is the desk.
+  var SCHOOL_ITEMS = [
     { id: 'desk',          name: 'Desk',           src: 'assets/items/desk.png',            cx: 2790, floorY: 5090, w: 12.5, first: 0 }
   ];
-  var ALL_ITEMS = ITEMS.concat(PARK_ITEMS);
+  var ALL_ITEMS = ITEMS.concat(PARK_ITEMS, SCHOOL_ITEMS);
   var IMGS = {};
   ALL_ITEMS.forEach(function (it) {
     var im = new Image();
@@ -83,6 +89,7 @@
     im.onload = function () { if (im.naturalHeight) it.h = it.w * im.naturalHeight / im.naturalWidth; };
   });
   function itemById(id) { var found = null; ALL_ITEMS.forEach(function (x) { if (x.id === id) found = x; }); return found; } // CHECKPOINT 3: park + desk live in ALL_ITEMS too (queen-only search broke their prices and place())
+  function placedByUid(uid) { for (var i = 0; i < placed.length; i++) if (placed[i].uid === uid) return placed[i]; return null; } // v32 fix 3: find a placed item by uid (to mark a desk used when a kid arrives at it)
   function itemH(it) { var im = IMGS[it.id]; return (im && im.naturalWidth) ? it.w * im.naturalHeight / im.naturalWidth : it.w * 0.8; }
 
   // ---- CHECKPOINT 2: the unlock rule (Chris, Nov 15, basket gated Nov 16) ----
@@ -752,7 +759,8 @@
     }
     if (!a.path.length) {
       a.state = a.slot ? 'ride' : 'idle'; a.arrT = QT; // v30 fix 4: the moment he starts riding he has had his turn on that item (rode=true) — a kid walking to a slot that gets erased never rode, so he can take another slot
-      if (a.slot) a.rode = true;
+      if (a.slot) { a.rode = true; a.slot.p.used = true; } // v32 fix 3: the moment he starts riding, this item is USED — one slide means ONE ant. No other kid ever takes it over; an idle kid waits for a newly built item.
+      if (a.toSchool && a.schoolDesk) { var dd = placedByUid(a.schoolDesk); if (dd) dd.used = true; } // v32 fix 3: the moment he arrives at the desk for school, that desk is USED — no other kid takes it over.
       var cb = a.cb; a.cb = null; cb && cb();
     }
   }
@@ -805,11 +813,15 @@
     // v1 makeSlots order is swing, slide, merry, seesaw — checkpoint 3 puts
     // the slide FIRST so the first kid rides the slide (the desk unlock
     // depends on the slide pass) and the free gateway item is used first.
+    // v32 fix 3 (Chris): only NEVER-used pieces are slots. Once a kid has
+    // ridden a piece it is USED and no other kid ever takes it over — one
+    // slide means ONE ant to the playground; the other ant stays at the
+    // basket until a NEW park item is built.
     var order = ['slide', 'swingset', 'spinningcircle', 'teetertotter'];
     var slots = [];
     order.forEach(function (id) {
       placed.forEach(function (p) {
-        if (p.id === id && !p.building) {
+        if (p.id === id && !p.building && !p.used) {
           // v30 fix 4 (Chris): ONE kid per park item. v1's seesaw has TWO
           // seats (makeSlots pushes k:0 and k:1), but Chris's rule overrides
           // it — the teeter totter gets ONE slot, like every other piece.
@@ -863,12 +875,14 @@
   function deskSpots() {
     // v30 fix 4 (Chris): ONE kid per desk. v1 kidschool flanks ONE desk
     // with TWO kids, but Chris's rule overrides it — each desk takes one
-    // kid, standing at the desk's front centre. Extra kids wait near where
-    // they were born until a desk is free or a new one is built.
+    // kid, standing at the desk's front centre.
+    // v32 fix 3 (Chris): only NEVER-used desks are spots. Once a kid has
+    // gone to school at a desk it is USED and no other kid ever takes it
+    // over — a kid who rode but never got a desk waits for a NEW desk.
     var out = [];
     for (var i = 0; i < placed.length; i++) {
       var p = placed[i];
-      if (p.id === 'desk' && !p.building) out.push({ x: p.cx, y: p.floorY, desk: p });
+      if (p.id === 'desk' && !p.building && !p.used) out.push({ x: p.cx, y: p.floorY, desk: p });
     }
     return out;
   }
@@ -889,8 +903,10 @@
   function goToSchool(g) { // v1 goTo (kidschool)
     // v30 fix 4 (Chris): ONE kid per desk, and only kids who RODE a park
     // item move on to school. A kid who never rode stays idle near where he
-    // was born — he gets a desk slot later, when one is free or a new desk
-    // is built (tryAssignSchool). A kid who already grew never goes again.
+    // was born — he gets a desk slot later, when a NEW desk is built
+    // (tryAssignSchool). A kid who already grew never goes again.
+    // v32 fix 3: a desk a kid already used is never taken over — only
+    // NEVER-used desks are offered (deskSpots filters used ones out).
     var spots = deskSpots();
     if (!spots.length) return; // no desk to go to — the gen stays where it is
     var schoolKids0 = g.kids.filter(function (a) { return a.rode && a.m <= KID_SCALE && !a.schooled; });
@@ -918,10 +934,14 @@
     g.kids.forEach(function (a) { if (a.toSchool && a.m <= KID_SCALE && !a.schooled) { a.state = 'grow'; a.growT0 = QT; } });
   }
   function tryAssignIdleKids(g) {
-    // v30 fix 4 (Chris): an idle kid takes a park slot when one OPENS (a
-    // rider finishes and gets off) or a NEW park item is built. Only kids
-    // who have NOT yet ridden take a slot — a kid who already rode has had
-    // his turn and moves on to school instead. One kid per slot, per piece.
+    // v32 fix 3 (Chris): an idle kid takes a park slot ONLY when a NEW park
+    // item is built. A slot a rider finished and got off is USED — it is
+    // never taken over. One slide means ONE ant to the playground; the other
+    // ant stays at the basket until a new item is built. Only kids who have
+    // NOT yet ridden take a slot — a kid who already rode has had his turn
+    // and moves on to school instead. One kid per slot, per piece.
+    // (parkSlots only lists NEVER-used pieces, so a freed slot is never
+    // offered here at all.)
     if (!g || g.stage !== 'playground') return;
     var slots = parkSlots();
     for (var i = 0; i < g.kids.length; i++) {
@@ -937,8 +957,9 @@
     }
   }
   function deskFree() {
-    // A placed desk no kid is currently assigned to (toSchool) — a slot for
-    // a leftover kid's school trip.
+    // A placed, NEVER-used desk no kid is currently assigned to (toSchool) —
+    // a slot for a leftover kid's school trip. A desk a kid already used is
+    // never offered again (v32 fix 3); only a newly built desk counts.
     var spots = deskSpots();
     for (var i = 0; i < spots.length; i++) {
       var busy = false;
@@ -951,8 +972,9 @@
   }
   function tryAssignSchool(g) {
     // v30 fix 4 (Chris): a kid who RODE but never got a desk (too few desks)
-    // gets his school trip when a desk frees up or a new desk is built.
-    // Never interrupts an active playground stage (move/stall).
+    // gets his school trip when a NEW desk is built. Never interrupts an
+    // active playground stage (move/stall). A used desk is never taken over
+    // (v32 fix 3) — deskFree only returns never-used desks.
     if (!g || g.stage === 'kidschool' || g.phase === 'move' || g.phase === 'stall') return;
     var left = g.kids.some(function (a) { return a.rode && a.m <= KID_SCALE && !a.schooled; });
     if (!left) return;
@@ -982,18 +1004,21 @@
     // v30 fix 2: this runs on EVERY stepKids tick for every playground-stage
     // gen, whatever the gen's phase — it used to run only inside the 12 s
     // 'stall' phase, so if the stall ended (or the gen was in another phase)
-    // before the loop finished, the desk never unlocked. The desk also
-    // switches the menu to the park tab so he SEES it appear (it was easy to
-    // miss while the crown tab was showing). No switch while he is placing
-    // an item (mode 'carrying'), so a placement is never interrupted.
+    // before the loop finished, the desk never unlocked.
+    // v32 fix 2: the desk lives on its OWN school tab (not the park tab).
+    // The school tab opens the moment the first slide pass completes, and
+    // the menu switches to it so he SEES the desk appear (it was easy to
+    // miss while another tab was showing). No switch while he is placing an
+    // item (mode 'carrying'), so a placement is never interrupted.
     if (firstSlidePass) return;
     for (var i = 0; i < g.kids.length; i++) {
       var a = g.kids[i];
       if (a.state === 'ride' && a.slot && a.slot.piece === 'slide' && a.arrT != null) {
         if (QT - a.arrT >= PLAY_LOOP.slide.frames / PLAY_LOOP.slide.fps) {
           firstSlidePass = true;
-          if (mode !== 'carrying') activeTab = 'park'; // show the desk the moment it unlocks
-          renderMenu(); // the desk appears on the park tab
+          schoolUnlocked = true;
+          if (mode !== 'carrying') activeTab = 'school'; // show the school tab (with the desk) the moment it unlocks
+          renderMenu(); // the school tab appears, with the desk on it
           break;
         }
       }
@@ -1005,9 +1030,10 @@
       var g = GENS[j];
       if (g.stage === 'playground') checkSlidePass(g); // v30 fix 2: every tick, any phase — the desk unlocks the moment a kid finishes one full slide loop, not only inside the stall
       if (g.stage === 'playground' && g.phase === 'wait') {
-        // v30 fix 4: riders rotate off their pieces after one full play
-        // stage, so a waiting kid can take the freed slot; a leftover kid
-        // who rode gets his school trip when a desk is free.
+        // v32 fix 3: riders rotate off their pieces after one full play
+        // stage — but the piece they got off is USED, so a waiting kid does
+        // NOT take it. He stays at the basket until a NEW park item is built.
+        // A leftover kid who rode gets his school trip when a NEW desk is built.
         g.kids.forEach(function (a) {
           if (a.state === 'ride' && a.arrT != null && QT - a.arrT >= CYCLE1.PLAY_S) {
             a.slot = null; a.state = 'idle'; // rode is already true (set when he started riding)
@@ -1028,8 +1054,9 @@
           if (g.stage === 'playground') {
             if (deskPlaced()) goToSchool(g);
             else {
-              // v30 fix 4: the riders get off when the stage ends — the
-              // pieces are free again, so a waiting kid can take one.
+              // v32 fix 3: the riders get off when the stage ends — but the
+              // pieces they got off are USED, so a waiting kid does NOT take
+              // one. He stays at the basket until a NEW park item is built.
               g.kids.forEach(function (a) { if (a.state === 'ride') { a.slot = null; a.state = 'idle'; } });
               g.phase = 'wait'; // school next, once the desk is built
               tryAssignIdleKids(g);
@@ -1101,7 +1128,7 @@
         }
       }
     }
-    // v30 fix 4: a freed kid who never rode can take another free slot.
+    // v32 fix 3: a freed kid who never rode can take another NEVER-USED slot (a new item) — never one a kid already used.
     for (var k = 0; k < GENS.length; k++) tryAssignIdleKids(GENS[k]);
   }
 
@@ -1566,7 +1593,7 @@
       // v1: the item is added with t0 = DIG_PEND (not dug yet — no cloud,
       // invisible). The queen walks to the spot first; the cloud starts only
       // when she arrives; the timer starts only after the item is built.
-      placed.push({ uid: uid, id: it.id, cx: pcx, floorY: pfy, w: it.w, building: true, t0: DIG_PEND, cost: cost });
+      placed.push({ uid: uid, id: it.id, cx: pcx, floorY: pfy, w: it.w, building: true, t0: DIG_PEND, cost: cost, used: false }); // v32 fix 3: `used` = a kid has ridden this item (park piece) or gone to school at it (desk). One slide means ONE ant — an idle kid never takes over an item a kid already used; he waits for a newly built item.
       queenFree = true; // the QN system takes over from here; checkpoint 1 is done
       brainReset(); // v1: any build activity distracts the queen
       renderMenu();
@@ -1608,11 +1635,13 @@
     get queen() { return { x: queen.x, y: queen.y, mode: QN.mode, busy: QN.busy, settled: QN.settled, home: QN.home }; },
     get kids() { // CHECKPOINT 3: the kids, generations, and the park/desk gates
       return {
-        parkUnlocked: parkUnlocked, firstSlidePass: firstSlidePass,
+        parkUnlocked: parkUnlocked, firstSlidePass: firstSlidePass, schoolUnlocked: schoolUnlocked,
         kids: ANTS.map(function (a) { return { id: a.id, m: a.m, state: a.state, x: Math.round(a.x), y: Math.round(a.y), slot: a.slot ? a.slot.piece + ':' + a.slot.k : null, rode: a.rode, schooled: a.schooled, toSchool: a.toSchool }; }),
         gens: GENS.map(function (g) { return { id: g.id, stage: g.stage, phase: g.phase, kids: g.kids.length, bx: g.bx, by: g.by }; }),
         parkVisible: PARK_ITEMS.filter(function (it) { return isVisible(it.id); }).map(function (it) { return it.id; }),
-        parkPrices: (function () { var out = {}; PARK_ITEMS.forEach(function (it) { out[it.id] = { count: placedCount(it.id), next: nextPrice(it.id) }; }); return out; })()
+        schoolVisible: SCHOOL_ITEMS.filter(function (it) { return isVisible(it.id); }).map(function (it) { return it.id; }),
+        parkPrices: (function () { var out = {}; PARK_ITEMS.forEach(function (it) { out[it.id] = { count: placedCount(it.id), next: nextPrice(it.id) }; }); return out; })(),
+        schoolPrices: (function () { var out = {}; SCHOOL_ITEMS.forEach(function (it) { out[it.id] = { count: placedCount(it.id), next: nextPrice(it.id) }; }); return out; })()
       };
     }
   };
@@ -1629,6 +1658,7 @@
     // CHECKPOINT 3: the park tab / kids state (read-only, for the harness).
     get parkUnlocked() { return parkUnlocked; },
     get firstSlidePass() { return firstSlidePass; },
+    get schoolUnlocked() { return schoolUnlocked; }, // v32: the school tab is open once the first slide pass is done
     get kids() { return ANTS.slice(); },
     get gens() { return GENS.slice(); },
     get tabs() { return TABS.map(function (t) { return t.id; }); },
@@ -1663,7 +1693,8 @@
     // the menu body below with no gap, so it reads as part of the folder.
     '.bl-tab{border:0;width:97px;box-sizing:border-box;padding:5px 20px 4px;margin-bottom:-1px;cursor:pointer;line-height:0;display:flex;justify-content:center;align-items:center;background:linear-gradient(180deg,#3d2c1d,#2a1c11 60%,#20140c);clip-path:polygon(0 100%,0 0,60% 0,80% 100%,100% 100%);box-shadow:inset 0 1px 0 rgba(255,214,160,.18),inset 0 -4px 0 rgba(0,0,0,.35)}' + // v30 fix 1: FIXED width so the park tab is the SAME SIZE as the crown tab — the slide picture (124x112) is narrower than the crown (255x112), so an auto-width park tab came out ~29px narrower. 97px = the crown tab's width (25px-high crown image ~57px + 40px padding).
     '.bl-tab img{height:25px;width:auto;display:block;clip-path:inset(0 33.2% 0 33%);transform:translateX(-14px)}' +
-    '.bl-tab.bl-tab-park img{clip-path:none;transform:none}' + // the slide is a plain item picture, not the crown (no clip, no nudge)
+    '.bl-tab.bl-tab-park img{clip-path:none;transform:translateX(-13px)}' + // v32 fix 1: centre the slide in the park tab — it sat too far right. Same kind of centring as the crown's -14px: the tab's asymmetric shape puts its visual centre at 34.2px (35.2% of 97px), not the geometric 48.5px, and the slide's own ink sits 1.48px left of its image centre at display scale, so the image needs -13px to read centred.
+    '.bl-tab.bl-tab-school img{clip-path:none;transform:translateX(-14px)}' + // v32 fix 2: the school tab's picture is the desk (a plain item picture, no clip). Same tab asymmetry as the crown, and the desk's ink sits only 0.29px left of its image centre at display scale, so it needs the same -14px as the crown to read centred.
     '.bl-tab.on{background:linear-gradient(180deg,#5a4128,#38271c 55%,#2e1d12);box-shadow:inset 0 1px 0 rgba(255,220,170,.35),inset 0 -4px 0 rgba(0,0,0,.4);filter:drop-shadow(0 3px 3px rgba(0,0,0,.45))}' +
     '.bvFly{position:absolute;z-index:9461;width:28px;height:auto;margin:-14px 0 0 -14px;pointer-events:none}' +
     // v1's food/water meters (index.html #bvMeters / .bm3-meter): the little
@@ -1691,15 +1722,18 @@
   document.head.appendChild(style);
 
   // ---- CHECKPOINT 2: the Build menu tabs ----
-  // The menu will hold many kinds of things to build later, so it has tabs.
-  // The first (and for now only) tab is the queen tab: the four queen items
-  // (leaf bed, egg basket, fridge, water cooler). Its icon is v1's crown,
-  // assets/menu-ant/hat-crown-lowered.webp, copied unchanged (md5 46a84515).
-  // The tab structure is ready for more tabs later; only the crown tab exists now.
+  // The menu holds the things to build, on tabs. The queen tab holds the four
+  // queen items (leaf bed, egg basket, fridge, water cooler). Its icon is v1's
+  // crown, assets/menu-ant/hat-crown-lowered.webp, copied unchanged (md5
+  // 46a84515). The park tab (checkpoint 3) holds the four park items; its
+  // icon is the slide. The school tab (checkpoint 3, v32) holds the desk; its
+  // icon is the desk. Each tab's picture is its key item.
   var CROWN_SRC = 'assets/menu-ant/hat-crown-lowered.webp';
   var SLIDE_SRC = 'assets/items/slide.png'; // CHECKPOINT 3: the park tab's picture is the slide
-  var BULLDOZER_SRC = 'assets/items/bulldozer.png?v=31'; // v31: Chris's bulldozer photo, cut out (white background removed) — the old tractor emoji was a tractor, not a bulldozer. Blade at the front, left.
-  var TABS = [{ id: 'queen', icon: CROWN_SRC, items: ITEMS }, { id: 'park', icon: SLIDE_SRC, items: PARK_ITEMS }];
+  var DESK_SRC = 'assets/items/desk.png'; // CHECKPOINT 3, v32: the school tab's picture is the desk
+  var schoolUnlocked = false; // v32: opens when a kid completes the first slide pass (the school tab appears, with the desk on it)
+  var BULLDOZER_SRC = 'assets/items/bulldozer.png?v=32'; // v32 fix 4: the CARTOON bulldozer from the other game Chris likes better (side view, facing left, big front blade) — cut from his reference screenshot, button background removed, edges decontaminated. Replaces the v31 photo cut-out. Never the tractor emoji.
+  var TABS = [{ id: 'queen', icon: CROWN_SRC, items: ITEMS }, { id: 'park', icon: SLIDE_SRC, items: PARK_ITEMS }, { id: 'school', icon: DESK_SRC, items: SCHOOL_ITEMS }];
   var activeTab = 'queen';
   function tabOf(id) { for (var i = 0; i < TABS.length; i++) if (TABS[i].id === id) return TABS[i]; return TABS[0]; }
 
@@ -1765,11 +1799,13 @@
   function renderMenu() {
     if (!tray) return;
     if (activeTab === 'park' && !parkUnlocked) activeTab = 'queen'; // the park tab cannot be active before the first hatch
+    if (activeTab === 'school' && !schoolUnlocked) activeTab = 'queen'; // v32: the school tab cannot be active before the first slide pass
     var html = '<div class="bl-head">' +
       '<div class="bl-tabs">' +
       TABS.map(function (t) {
         if (t.id === 'park' && !parkUnlocked) return ''; // the park tab is hidden until the first hatch (no "Locked" tab)
-        return '<button type="button" class="bl-tab' + (t.id === 'park' ? ' bl-tab-park' : '') + (t.id === activeTab ? ' on' : '') + '" data-tab="' + t.id + '" aria-label="' + t.id + '"><img alt="" draggable="false" src="' + t.icon + '"></button>';
+        if (t.id === 'school' && !schoolUnlocked) return ''; // v32: the school tab is hidden until the first slide pass (no "Locked" tab)
+        return '<button type="button" class="bl-tab' + (t.id === 'park' ? ' bl-tab-park' : t.id === 'school' ? ' bl-tab-school' : '') + (t.id === activeTab ? ' on' : '') + '" data-tab="' + t.id + '" aria-label="' + t.id + '"><img alt="" draggable="false" src="' + t.icon + '"></button>';
       }).join('') +
       '</div>' +
       '<button type="button" class="bl-dozer' + (eraseMode ? ' on' : '') + '" id="blDozer" aria-label="Bulldozer: remove a placed item"><img alt="" draggable="false" src="' + BULLDOZER_SRC + '"></button></div>' +
