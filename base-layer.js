@@ -1073,8 +1073,8 @@
     // colour), a lighter top for depth, a darker bottom edge for thickness,
     // and a cast shadow under the active tab. The tab's flat bottom meets
     // the menu body below with no gap, so it reads as part of the folder.
-    '.bl-tab{border:0;padding:7px 20px 5px;margin-bottom:-1px;cursor:pointer;line-height:0;background:linear-gradient(180deg,#3d2c1d,#2a1c11 60%,#20140c);clip-path:polygon(0 100%,0 0,60% 0,80% 35%,100% 35%,100% 100%);box-shadow:inset 0 1px 0 rgba(255,214,160,.18),inset 0 -4px 0 rgba(0,0,0,.35)}' +
-    '.bl-tab img{height:30px;width:auto;display:block;clip-path:inset(0 33.2% 0 33%)}' +
+    '.bl-tab{border:0;padding:4px 20px 3px;margin-bottom:-1px;cursor:pointer;line-height:0;background:linear-gradient(180deg,#3d2c1d,#2a1c11 60%,#20140c);clip-path:polygon(0 100%,0 0,60% 0,80% 35%,100% 35%,100% 100%);box-shadow:inset 0 1px 0 rgba(255,214,160,.18),inset 0 -4px 0 rgba(0,0,0,.35)}' +
+    '.bl-tab img{height:20px;width:auto;display:block;clip-path:inset(0 33.2% 0 33%)}' +
     '.bl-tab.on{background:linear-gradient(180deg,#5a4128,#38271c 55%,#2e1d12);box-shadow:inset 0 1px 0 rgba(255,220,170,.35),inset 0 -4px 0 rgba(0,0,0,.4);filter:drop-shadow(0 3px 3px rgba(0,0,0,.45))}' +
     '.bvFly{position:absolute;z-index:9461;width:28px;height:auto;margin:-14px 0 0 -14px;pointer-events:none}' +
     // v1's food/water meters (index.html #bvMeters / .bm3-meter): the little
