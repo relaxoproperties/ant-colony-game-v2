@@ -264,7 +264,8 @@
     drawBrainBubble(now);
     drawRoomTimerBubbles(now);
     drawBasketBubbles(now);
-    drawPlaygroundStageTimer(now); // v39 fix 1: the slide ride's timer (the playground stage countdown)
+    drawPlaygroundStageTimer(now); // v40 fix 2: the slide ride's timer ABOVE the slide
+    drawSchoolStageTimer(now); // v40 fix 4: the desk timer ABOVE the desk (grow when it finishes)
     if (QN.mode === 'walk') positionTarget();
   }
   window.BASE_QUEEN = {
@@ -449,24 +450,50 @@
       }
     }
   }
-  // ---- v39 fix 1: the SLIDE timer (the playground STAGE timer, v1) ----
-  // Chris: "I don't even think I saw a timer on that" (when the ant finished
-  // the slide). v1 DOES have a timer during the park ride — the playground
-  // STAGE timer (12s, CYCLE1.PLAY_S), drawn at the playground room centre
-  // (v1 drawTimers, port-b.js:387: GENS.forEach(g=>{if(g.phase==='stall'&&
-  // g.until>T&&g.stage!=='nursery'){...tag(p.x,p.y,g.until-T,...)}}) at
-  // toW(r.tl.x+540, r.tl.y+1075.5)). It is NOT on the slide or the kid — the
-  // slide loop itself (123 frames @ 12 fps, 10.25s) has no timer and loops
-  // seamlessly. Checkpoint 3 has no separate playground room — the park
-  // items sit in the entrance hexagon — so the timer is drawn at the
-  // entrance hexagon centre (2812, 5039), in v1's drawTag style (zero-padded
-  // mmss, white 11px bold, dark outline). It counts 00:12 -> 00:00; when it
-  // hits 00:00 the stage ends (the existing stall-end behaviour).
+  // ---- v40 fix 2: the SLIDE timer goes ABOVE THE SLIDE (Chris, Nov 16) ----
+  // v39 drew the playground stage timer (12s) at the entrance hexagon centre.
+  // Chris: "The timer for the slide must be above the slide." So the timer is
+  // drawn above the park piece the kid is RIDING — the slide, swing set,
+  // teeter totter or spinning circle — at that piece's position, in v1's
+  // drawTag style (zero-padded mmss, white 11px bold, dark outline), the
+  // same "above the item" offset as the fridge/cooler room timers (piece
+  // top - 8). It is the kid's 12s ride countdown (arrT + PLAY_S - QT): the
+  // first ride AND a later ride (a waiting kid taking a freed piece) both
+  // show it, and when it hits 00:00 the kid gets off (the existing 12s ride
+  // rule). If two kids ride two pieces, each piece shows its own timer above
+  // it. NOT at the hexagon centre, NOT on the slide or the kid — ABOVE the
+  // piece.
   function drawPlaygroundStageTimer(now) {
+    for (var i = 0; i < ANTS.length; i++) {
+      var a = ANTS[i];
+      if (a.state !== 'ride' || !a.slot || !a.slot.p || a.arrT == null) continue;
+      var left = a.arrT + CYCLE1.PLAY_S - QT;
+      if (left <= 0) continue;
+      var p = a.slot.p, it = itemById(a.slot.piece);
+      var h = it ? itemH(it) : p.w * 0.8;
+      drawTag(p.cx, p.floorY - h - 8, brainMmss(left), 1, 0);
+    }
+  }
+  // ---- v40 fix 4: the DESK timer goes ABOVE THE DESK (Chris, Nov 16) ----
+  // "Then the timer for the desk should be above the desk. And when that
+  // timer is complete, that is when the ant grows up." The school stage
+  // timer (10s, v1 CYCLE1.SCHOOL_S) is drawn above each desk a kid is
+  // STUDYING at, in v1's drawTag style (zero-padded mmss, white 11px bold,
+  // dark outline), above the top of the ksDesk drawing (desk floorY -
+  // KSDESK_W - 8). One timer per occupied desk; two kids at two desks each
+  // see their own timer above their desk. When the timer hits 00:00 the
+  // existing stall-end rule runs startGrow — the kid grows up (1.2s, v1
+  // CYCLE1.GROW_S) — so the grow IS triggered by the desk timer completing.
+  function drawSchoolStageTimer(now) {
     for (var i = 0; i < GENS.length; i++) {
       var g = GENS[i];
-      if (g.stage === 'playground' && g.phase === 'stall' && g.until > QT) {
-        drawTag(ENTRANCE.x, ENTRANCE.y, brainMmss(g.until - QT), 1, 0);
+      if (g.stage !== 'kidschool' || g.phase !== 'stall' || g.until <= QT) continue;
+      for (var j = 0; j < g.kids.length; j++) {
+        var a = g.kids[j];
+        if (!a.toSchool || a.schoolDesk == null || a.state !== 'idle') continue;
+        var d = placedByUid(a.schoolDesk);
+        if (!d) continue;
+        drawTag(d.cx, d.floorY - KSDESK_W - 8, brainMmss(g.until - QT), 1, 0);
       }
     }
   }
@@ -927,15 +954,31 @@
     }
     return false;
   }
+  // v40 fix 3: the ant in the desk animation must be the SAME SIZE as the
+  // ant before he sits (Chris: "The animation of the ant at the desk is
+  // smaller relative to the ant before he uses the desk"). Measured Nov 16:
+  // kid sprite idle frame 74x92, visible height 68 px (rows 11-79), drawn at
+  // KW (HEX.w/791) -> 11.77 world. ksDesk frame 100x100: kid head top row
+  // 23, feet (anchor) row 94 -> kid height 71 px. v39 drew the frame at the
+  // desk width (12.5), so the kid read 12.5/16.57 = 0.75x — ~25% too small.
+  // The frame scale is (68*KW)/71 world/px, so the frame width is
+  // 100*(68*KW)/71 = 16.57 world and the kid in it is 71*16.57/100 = 11.77
+  // world — exactly the sprite kid's height. The desk in the frame gets
+  // bigger too (it is baked in) — correct; the kid matching is what matters.
+  // The anchor (50,94) still lands at the desk's foot (d.cx, d.floorY), so
+  // the kid stays grounded at the desk.
+  var KSDESK_W = 100 * KW * 68 / 71;
   function drawKsDesk(a) {
     // v1 ksDesk: the kid + wooden desk, one loop frame, anchored at the
     // desk's foot (the kid's feet). The frame is 100x100; it is drawn at
-    // the desk item's width so it reads as the desk he is sitting at.
+    // KSDESK_W (v40 fix 3) so the kid in it is the same size as the kid
+    // sprite before he sat down — NOT at the desk item's width (v39, which
+    // made him ~25% too small).
     var d = placedByUid(a.schoolDesk);
     if (!d) return;
     var im = ksDeskFrame(a);
     if (!im || !im.complete || !im.naturalWidth) return;
-    var w = d.w, h = w * im.naturalHeight / im.naturalWidth;
+    var w = KSDESK_W, h = w * im.naturalHeight / im.naturalWidth;
     var ax = KSDESK_AX / im.naturalWidth, ay = KSDESK_AY / im.naturalHeight;
     ctx.drawImage(im, d.cx - ax * w, d.floorY - ay * h, w, h);
   }
