@@ -108,6 +108,30 @@ function warmMap(){if(!(art.map&&art.map.width>1))return;const t0=performance.no
 const WARM=document.createElement('canvas');WARM.width=WARM.height=2;const wctx=WARM.getContext('2d');
 setInterval(()=>{if(document.hidden||state==='intro'||state==='landing'||!(art.map&&art.map.complete))return;
  try{if(art.map&&art.map.complete)wctx.drawImage(art.map,0,0,2,2);if(art.wide&&art.wide.complete)wctx.drawImage(art.wide,0,0,2,2)}catch(e){}},300);
+// v40 fix 1 (Chris Nov 16): the upstairs must be LOADED the moment the queen
+// arrives in the basement, so the UP tap goes up instantly. The 2x2 keepalive
+// above only keeps a LOW-RES decode alive — the first FULL-SIZE draw of the
+// 56 MP map still stalls ~1 s, so the up press felt dead. When she arrives
+// downstairs, draw the whole upstairs view once at FULL SIZE on an offscreen
+// canvas: that pays the full decode then, while she is idle in the basement
+// (emergence done, menu open), and the UP tap only runs the reveal with warm
+// images. Runs once per page load, 1.5 s after arrival so it never freezes
+// the 1.1 s emergence; retries if the surface images are not ready yet.
+const UPWARM=document.createElement('canvas');const upwctx=UPWARM.getContext('2d');
+let upstairsWarmed=false,upwarmTries=0;
+function warmUpstairs(){
+  if(upstairsWarmed)return;
+  if(!(art.map&&art.map.complete&&art.wide&&art.wide.complete)){if(++upwarmTries<6)setTimeout(warmUpstairs,1000);return}
+  upstairsWarmed=true;
+  try{
+    UPWARM.width=canvas.width;UPWARM.height=canvas.height;
+    const keep=ctx;ctx=upwctx;
+    const d=view.d;ctx.setTransform(d,0,0,d,0,0);ctx.translate(view.x,view.y);ctx.scale(view.s,view.s);
+    drawSurface('entered',0,performance.now());
+    ctx=keep;
+    olog('upstairs warmed (full-size) on arrival');
+  }catch(e){ctx=mainCtx;olog('upstairs warm failed '+e.message)}
+}
 const gateOpen=()=>{if(ready||gateWarm)return;gateWarm=true;warmMap();requestAnimationFrame(()=>{ready=true;olog('opening gate ready');if(video.ended)videoDone=true;if(videoDone&&state==='intro')begin('landing')})};
 Promise.all(loads).then(gateOpen).catch(e=>{olog('opening gate error '+(e&&e.message));gateOpen()});
 function syncFloors(){
@@ -139,7 +163,7 @@ function begin(next){
     pan=0;queenTarget.style.display='none';menu.classList.remove('open');if(next==='descending'&&!emerged)emergeT0=0;
     pointers.clear();gesture=null;tapCandidate=null;
   }
-  if(next==='underground'){if(!emergeT0)emergeT0=performance.now();emerged=true;pan=0;if(!(window.BV&&BV.started)&&!(window.BASE_QUEEN&&BASE_QUEEN.free)){queen.x=APPEAR.x;queen.y=APPEAR.y}queenTarget.style.width='72px';queenTarget.style.height='72px';queenTarget.style.display='block';positionTarget();queenTarget.click()}   // BASE: the build menu opens by itself when she gets downstairs, and stays on
+  if(next==='underground'){if(!emergeT0)emergeT0=performance.now();emerged=true;pan=0;if(!(window.BV&&BV.started)&&!(window.BASE_QUEEN&&BASE_QUEEN.free)){queen.x=APPEAR.x;queen.y=APPEAR.y}queenTarget.style.width='72px';queenTarget.style.height='72px';queenTarget.style.display='block';positionTarget();queenTarget.click();setTimeout(warmUpstairs,1500)}   // BASE: the build menu opens by itself when she gets downstairs, and stays on. v40 fix 1: upstairs loaded the moment she arrives (full-size warm, after the 1.1 s emergence) — the UP tap goes up instantly.
   if(next==='entered'){pan=0;queenTarget.style.display='none';menu.classList.remove('open')}
   syncFloors();
 }
@@ -352,5 +376,5 @@ goUp.addEventListener('click',e=>{e.preventDefault();if((state==='underground'||
 // Read-only diagnostics for verification; no visible debug UI and no autoplay shortcuts.
 window.openingDemo={get openLog(){return OPEN_LOG.slice()},get land(){return {f0:LAND.f0,n:LAND.n,seen:LAND.seen.size,lag:landLag,trace:LAND.trace}},traceLanding(){LAND.trace=[]},get basementReady(){return basementReady},get stage(){return state},get videoWhy(){return videoWhy},downEnd:()=>downEnd(),get queen(){return {...queen}},get tile(){return TILE},get spp(){return spp},get lookX(){return lookX},get lookY(){return lookY},HEX,CEILING_HEX,FLOOR_HEX,HORIZON_Y,BUILT_CEILINGS,horizonPath,CHAMBER,ROOM_COMPOSE,COMPOSE_X,APPEAR,QUEEN_DOWN_W,QUEEN_DOWN_BOB,VIDEO_FADE_SECONDS,LANDING_FPS,LANDING_SECONDS,FLOOR_REVEAL_SECONDS,get revealProgress(){return floorRevealProgress()},get panProgress(){return floorRevealProgress()},get dip(){return {startLookY:floorLookYStart,world:floorDipWorld,phonePx:floorDipWorld*spp*view.s,lastDownWorld:lastDownDipWorld}},get menuPan(){return pan},BC,APPEAR,QUEEN_UNDER_W,get view(){return {...view}},get hexCss(){return HEX.w*spp*view.s},get spiralCss(){const c=worldToCanvas(BC.SPIRAL_W.x,BC.SPIRAL_W.y);return {x:view.x+c.x*view.s,y:view.y+(c.y-pan)*view.s}},get queenDrawn(){return {...queen,w:QUEEN_UNDER_W,emerge:emergeT0?clamp((performance.now()-emergeT0)/1000/BC.EMERGE_SECONDS):0}},INITIAL,MAP_RECT,MIN_SPP,MAX_SPP,worldToCanvas,plainToCanvas,setView(v){spp=v.spp??spp;lookX=v.lookX??lookX;lookY=v.lookY??lookY;cameraBounds();positionTarget()},jump(next){begin(next)},seek(seconds){started=performance.now()-seconds*1000}};
 </script>
-<script src="base-layer.js?v=39"></script>
+<script src="base-layer.js?v=40"></script>
 </body></html>
