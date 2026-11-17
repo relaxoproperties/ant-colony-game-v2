@@ -1096,7 +1096,11 @@
     if (!a.path.length) {
       a.state = a.slot ? 'ride' : 'idle'; a.arrT = QT; // v30 fix 4: the moment he starts riding he has had his turn on that item (rode=true) — a kid walking to a slot that gets erased never rode, so he can take another slot
       if (a.slot) { a.rode = true; } // v39: rode = has had his turn on a park item (gates school). The item itself is NOT used up — it FREES when he gets off, and a waiting kid takes it (Chris's capacity rule). The v32 "used forever" rule is gone.
-      // v39: no `used` on the desk either — a desk FREES when its kid grows/leaves; a waiting kid takes a freed desk. (v32 marked it used forever.)
+      // v39: no `used` on the desk either — a desk FREES when its kid
+      // leaves it for the next thing, never on grow (v43 drawer rule: the
+      // grown ant stays at the desk, so a waiting kid takes a freed desk
+      // only when its ant leaves, or a NEW desk is built). (v32 marked it
+      // used forever.)
       var cb = a.cb; a.cb = null; cb && cb();
     }
   }
@@ -1219,15 +1223,25 @@
     // kid, standing at the desk's front centre.
     // v39 (Chris's capacity rule): a desk is a spot whenever it is BUILT
     // and no kid is currently at school on it (assigned, walking there, or
-    // studying). A desk FREES when its kid grows/leaves — a waiting kid
-    // takes a freed desk. The v32 "used forever" rule is gone.
+    // studying). The v32 "used forever" rule is gone.
+    // v43 (Chris's DRAWER rule, Nov 17): an item is a drawer — an ant in
+    // it occupies it whether the timer is done, starting, or in the middle.
+    // The desk frees ONLY when its ant physically leaves it for the next
+    // thing. A grown-up ant STAYS at the desk (there is no next thing in
+    // checkpoint 3 — Chris will explain it in a future checkpoint), so the
+    // desk stays occupied by him; a second ant needs a second desk. The
+    // busy check is therefore the ant's schoolDesk association (set when he
+    // is assigned, kept while he studies, grows, and stands there grown),
+    // NOT toSchool — toSchool is cleared when he grows (so the ksDesk loop
+    // stops and the blue desk shows again), which is drawing only, not
+    // occupancy. Do NOT free the desk when he grows up.
     var out = [];
     for (var i = 0; i < placed.length; i++) {
       var p = placed[i];
       if (p.id !== 'desk' || p.building) continue;
       var busy = false;
       for (var j = 0; j < ANTS.length; j++) {
-        if (ANTS[j].toSchool && ANTS[j].schoolDesk === p.uid) { busy = true; break; }
+        if (ANTS[j].schoolDesk === p.uid && ANTS[j].state !== 'gone') { busy = true; break; }
       }
       if (!busy) out.push({ x: p.cx, y: p.floorY, desk: p });
     }
@@ -1263,7 +1277,12 @@
     if (!schoolKids0.length) return; // nobody has ridden yet — the gen stays where it is
     schoolKids0.forEach(function (a) { if (a.slot) a.slot = null; if (a.state === 'ride') a.state = 'idle'; });
     g.stage = 'kidschool'; g.phase = 'move';
-    g.kids.forEach(function (a) { a.toSchool = false; a.schoolDesk = null; });
+    // v43 (drawer rule): only reset the school assignment for kids who
+    // have NOT grown yet. A grown-up ant KEEPS his schoolDesk — he is
+    // still standing at his desk (occupying it), and clearing it here
+    // would wrongly free that desk for another kid. Schooled kids never
+    // go to school again, so skipping them changes nothing for this trip.
+    g.kids.forEach(function (a) { if (!a.schooled) { a.toSchool = false; a.schoolDesk = null; } });
     var schoolKids = g.kids.filter(function (a) { return a.rode && a.m <= KID_SCALE && !a.schooled; });
     schoolKids.forEach(function (a, i) {
       if (i < spots.length) {
@@ -1308,19 +1327,22 @@
     }
   }
   function deskFree() {
-    // A built desk no kid is currently assigned to (toSchool) — a slot for
-    // a leftover kid's school trip. (v39: deskSpots already filters out
-    // desks a kid is at school on, so the first spot is a free desk. A desk
-    // frees when its kid grows/leaves — a waiting kid takes a freed desk.)
+    // A built desk no kid is currently at (schoolDesk) — a slot for a
+    // leftover kid's school trip. (v39: deskSpots already filters out desks
+    // a kid is at school on, so the first spot is a free desk. v43: a desk
+    // does NOT free when its kid grows — the grown ant stays at it, so a
+    // waiting kid takes a freed desk only when its ant leaves for the next
+    // thing, or a NEW desk is built.)
     var spots = deskSpots();
     return spots.length ? spots[0].desk : null;
   }
   function tryAssignSchool(g) {
     // v30 fix 4 (Chris): a kid who RODE but never got a desk (too few desks)
-    // gets his school trip when a desk FREES (its kid grew/left) or a new
-    // desk is built. Never interrupts an active playground stage (move/stall).
-    // (v39: deskFree returns a built desk no kid is at school on — a freed
-    // desk counts, not only a newly built one.)
+    // gets his school trip when a desk FREES (its ant left for the next
+    // thing) or a new desk is built. Never interrupts an active playground
+    // stage (move/stall). (v39: deskFree returns a built desk no kid is at
+    // school on — a freed desk counts, not only a newly built one. v43: a
+    // desk does NOT free when its kid grows — the grown ant stays at it.)
     if (!g || g.stage === 'kidschool' || g.phase === 'move' || g.phase === 'stall') return;
     var left = g.kids.some(function (a) { return a.rode && a.m <= KID_SCALE && !a.schooled; });
     if (!left) return;
@@ -1420,7 +1442,15 @@
           // free desk), the gen is not done — they wait near the birth area
           // for a desk slot (tryAssignSchool) or a park slot.
           g.kids.forEach(function (a) {
-            if (a.state === 'grow') { a.m = 1; a.state = 'idle'; a.schooled = true; a.toSchool = false; a.schoolDesk = null; }
+            // v43 (Chris's DRAWER rule, Nov 17): when he grows up he STAYS
+            // at the desk — he only gets out of the drawer when the player
+            // builds the next thing he is going to, and there is no next
+            // thing in checkpoint 3. So schoolDesk is KEPT (the desk stays
+            // occupied by him; deskSpots treats it as busy). toSchool is
+            // cleared so the ksDesk loop stops and the blue desk shows
+            // again — that is drawing only, not occupancy. Do NOT clear
+            // schoolDesk here and do NOT free the desk when he grows up.
+            if (a.state === 'grow') { a.m = 1; a.state = 'idle'; a.schooled = true; a.toSchool = false; }
           });
           var left = g.kids.some(function (a) { return a.m <= KID_SCALE && !a.schooled; });
           if (left) { g.stage = 'playground'; g.phase = 'wait'; }
@@ -1483,6 +1513,16 @@
       }
     }
     if (p.id === 'desk') {
+      // v43 (drawer rule): schoolDesk now persists after grow (the grown
+      // ant stays at his desk), so erasing/moving a desk must clear it for
+      // ANY ant at that desk — including a grown-up ant standing at it —
+      // or the (rebuilt/moved) desk would stay wrongly occupied by an ant
+      // who is no longer there. A grown ant just stays idle where he is
+      // (nowhere to go in checkpoint 3); a kid is walked back by the gen
+      // loop below.
+      for (var m = 0; m < ANTS.length; m++) {
+        if (ANTS[m].schoolDesk === p.uid) { ANTS[m].schoolDesk = null; ANTS[m].toSchool = false; }
+      }
       for (var j = 0; j < GENS.length; j++) {
         var g = GENS[j];
         if (g.stage === 'kidschool' && (g.phase === 'move' || g.phase === 'stall')) {
@@ -2290,7 +2330,7 @@
     get kids() { // CHECKPOINT 3: the kids, generations, and the park/desk gates
       return {
         parkUnlocked: parkUnlocked, firstSlidePass: firstSlidePass, schoolUnlocked: schoolUnlocked,
-        kids: ANTS.map(function (a) { return { id: a.id, m: a.m, state: a.state, x: Math.round(a.x), y: Math.round(a.y), slot: a.slot ? a.slot.piece + ':' + a.slot.k : null, rode: a.rode, schooled: a.schooled, toSchool: a.toSchool }; }),
+        kids: ANTS.map(function (a) { return { id: a.id, m: a.m, state: a.state, x: Math.round(a.x), y: Math.round(a.y), slot: a.slot ? a.slot.piece + ':' + a.slot.k : null, rode: a.rode, schooled: a.schooled, toSchool: a.toSchool, schoolDesk: a.schoolDesk }; }),
         gens: GENS.map(function (g) { return { id: g.id, stage: g.stage, phase: g.phase, kids: g.kids.length, bx: g.bx, by: g.by }; }),
         parkVisible: PARK_ITEMS.filter(function (it) { return isVisible(it.id); }).map(function (it) { return it.id; }),
         schoolVisible: SCHOOL_ITEMS.filter(function (it) { return isVisible(it.id); }).map(function (it) { return it.id; }),
