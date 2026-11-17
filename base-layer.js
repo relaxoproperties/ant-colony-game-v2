@@ -89,7 +89,7 @@
     im.onload = function () { if (im.naturalHeight) it.h = it.w * im.naturalHeight / im.naturalWidth; };
   });
   function itemById(id) { var found = null; ALL_ITEMS.forEach(function (x) { if (x.id === id) found = x; }); return found; } // CHECKPOINT 3: park + desk live in ALL_ITEMS too (queen-only search broke their prices and place())
-  function placedByUid(uid) { for (var i = 0; i < placed.length; i++) if (placed[i].uid === uid) return placed[i]; return null; } // v32 fix 3: find a placed item by uid (to mark a desk used when a kid arrives at it)
+  function placedByUid(uid) { for (var i = 0; i < placed.length; i++) if (placed[i].uid === uid) return placed[i]; return null; } // v39: find a placed item by uid (the ksDesk loop draws at its desk's position)
   function itemH(it) { var im = IMGS[it.id]; return (im && im.naturalWidth) ? it.w * im.naturalHeight / im.naturalWidth : it.w * 0.8; }
 
   // ---- CHECKPOINT 2: the unlock rule (Chris, Nov 15, basket gated Nov 16) ----
@@ -264,6 +264,7 @@
     drawBrainBubble(now);
     drawRoomTimerBubbles(now);
     drawBasketBubbles(now);
+    drawPlaygroundStageTimer(now); // v39 fix 1: the slide ride's timer (the playground stage countdown)
     if (QN.mode === 'walk') positionTarget();
   }
   window.BASE_QUEEN = {
@@ -445,6 +446,27 @@
           ctx.drawImage(ic, b.x - w / 2, b.y - hh / 2, w, hh);
         }
         ctx.restore();
+      }
+    }
+  }
+  // ---- v39 fix 1: the SLIDE timer (the playground STAGE timer, v1) ----
+  // Chris: "I don't even think I saw a timer on that" (when the ant finished
+  // the slide). v1 DOES have a timer during the park ride — the playground
+  // STAGE timer (12s, CYCLE1.PLAY_S), drawn at the playground room centre
+  // (v1 drawTimers, port-b.js:387: GENS.forEach(g=>{if(g.phase==='stall'&&
+  // g.until>T&&g.stage!=='nursery'){...tag(p.x,p.y,g.until-T,...)}}) at
+  // toW(r.tl.x+540, r.tl.y+1075.5)). It is NOT on the slide or the kid — the
+  // slide loop itself (123 frames @ 12 fps, 10.25s) has no timer and loops
+  // seamlessly. Checkpoint 3 has no separate playground room — the park
+  // items sit in the entrance hexagon — so the timer is drawn at the
+  // entrance hexagon centre (2812, 5039), in v1's drawTag style (zero-padded
+  // mmss, white 11px bold, dark outline). It counts 00:12 -> 00:00; when it
+  // hits 00:00 the stage ends (the existing stall-end behaviour).
+  function drawPlaygroundStageTimer(now) {
+    for (var i = 0; i < GENS.length; i++) {
+      var g = GENS[i];
+      if (g.stage === 'playground' && g.phase === 'stall' && g.until > QT) {
+        drawTag(ENTRANCE.x, ENTRANCE.y, brainMmss(g.until - QT), 1, 0);
       }
     }
   }
@@ -872,6 +894,51 @@
       fetch(cfg.json).then(function (r) { return r.json(); }).then(function (d) { PLAY_JSON[cfg.key] = d; }).catch(function () { PLAY_JSON[cfg.key] = null; });
     }
   });
+  // ---- v39 fix 2: the desk ANIMATION (v1 ksDesk, port-b.js:34) ----
+  // 24 frames, 8 fps, a kid sitting at a small WOODEN desk (the kid and
+  // the desk are drawn TOGETHER in every frame — the desk is baked into the
+  // loop). The static blue-topped desk + pink stool is the EMPTY station;
+  // the moment a kid sits at a desk for school, the static desk is hidden
+  // and this loop plays instead (v1 standingKS, port-b.js:122-127). The
+  // frames are copied UNCHANGED from v1 (assets/portb/np5loops/desk/) —
+  // no stool, no blue top, no pink. The MENU desk image stays the blue
+  // desk (Chris likes it); only the in-world desk during school changes.
+  var KSDESK_N = 24, KSDESK_FPS = 8, KSDESK_AX = 50, KSDESK_AY = 94; // v1 ksDesk: 24 frames, 8 fps, anchor (50,94) in a 100x100 frame
+  var KSDESK = [];
+  for (var kdi = 0; kdi < KSDESK_N; kdi++) {
+    var kdim = new Image();
+    kdim.src = 'assets/kid/desk-study/chris_ant_study_desk_v3_roompx_' + String(kdi).padStart(2, '0') + '.png?v=39';
+    KSDESK.push(kdim);
+  }
+  function ksDeskFrame(a) {
+    // the loop frame for a kid studying at a desk, counted from when he arrived (arrT), 8 fps, looping
+    var idx = Math.floor((QT - (a.arrT != null ? a.arrT : QT)) * KSDESK_FPS) % KSDESK_N;
+    if (idx < 0) idx += KSDESK_N;
+    return KSDESK[idx];
+  }
+  function deskOccupied(uid) {
+    // a kid is SITTING at this desk studying (arrived, idle, toSchool) —
+    // the static blue desk is hidden while he studies (the ksDesk loop is
+    // drawn instead). While he walks there, or once he grows/leaves, the
+    // desk shows again.
+    for (var i = 0; i < ANTS.length; i++) {
+      var a = ANTS[i];
+      if (a.toSchool && a.schoolDesk === uid && a.state === 'idle') return true;
+    }
+    return false;
+  }
+  function drawKsDesk(a) {
+    // v1 ksDesk: the kid + wooden desk, one loop frame, anchored at the
+    // desk's foot (the kid's feet). The frame is 100x100; it is drawn at
+    // the desk item's width so it reads as the desk he is sitting at.
+    var d = placedByUid(a.schoolDesk);
+    if (!d) return;
+    var im = ksDeskFrame(a);
+    if (!im || !im.complete || !im.naturalWidth) return;
+    var w = d.w, h = w * im.naturalHeight / im.naturalWidth;
+    var ax = KSDESK_AX / im.naturalWidth, ay = KSDESK_AY / im.naturalHeight;
+    ctx.drawImage(im, d.cx - ax * w, d.floorY - ay * h, w, h);
+  }
   // Ride-spot offsets (world) from a placed piece's top-left, from v1's
   // first timeline frame feet minus the piece tl (PG). The kid walks TO this
   // spot; the play loop then moves the rider each frame.
@@ -940,14 +1007,19 @@
     }
     if (!a.path.length) {
       a.state = a.slot ? 'ride' : 'idle'; a.arrT = QT; // v30 fix 4: the moment he starts riding he has had his turn on that item (rode=true) — a kid walking to a slot that gets erased never rode, so he can take another slot
-      if (a.slot) { a.rode = true; a.slot.p.used = true; } // v32 fix 3: the moment he starts riding, this item is USED — one slide means ONE ant. No other kid ever takes it over; an idle kid waits for a newly built item.
-      if (a.toSchool && a.schoolDesk) { var dd = placedByUid(a.schoolDesk); if (dd) dd.used = true; } // v32 fix 3: the moment he arrives at the desk for school, that desk is USED — no other kid takes it over.
+      if (a.slot) { a.rode = true; } // v39: rode = has had his turn on a park item (gates school). The item itself is NOT used up — it FREES when he gets off, and a waiting kid takes it (Chris's capacity rule). The v32 "used forever" rule is gone.
+      // v39: no `used` on the desk either — a desk FREES when its kid grows/leaves; a waiting kid takes a freed desk. (v32 marked it used forever.)
       var cb = a.cb; a.cb = null; cb && cb();
     }
   }
   function drawKid(a) {
     if (a.state === 'gone' || a.hidden) return;
     if (a.state === 'ride') { drawRider(a); return; }
+    // v39 fix 2: a kid STUDYING at a desk is the ksDesk loop (v1) — the kid
+    // at a small wooden desk, baked together — not the idle kid sprite and
+    // not the blue desk. The static blue desk is hidden while he studies
+    // (see BASE_ITEMS.draw / deskOccupied).
+    if (a.state === 'idle' && a.toSchool && a.schoolDesk != null) { drawKsDesk(a); return; }
     if (a.state === 'grow') { // v1: smooth scale-up on the locked idle
       var k = clamp((QT - a.growT0) / CYCLE1.GROW_S, 0, 1);
       var m = KID_SCALE + (1 - KID_SCALE) * ease(k);
@@ -994,15 +1066,15 @@
     // v1 makeSlots order is swing, slide, merry, seesaw — checkpoint 3 puts
     // the slide FIRST so the first kid rides the slide (the desk unlock
     // depends on the slide pass) and the free gateway item is used first.
-    // v32 fix 3 (Chris): only NEVER-used pieces are slots. Once a kid has
-    // ridden a piece it is USED and no other kid ever takes it over — one
-    // slide means ONE ant to the playground; the other ant stays at the
-    // basket until a NEW park item is built.
+    // v39 (Chris's capacity rule): a piece is a slot whenever it is BUILT —
+    // NOT only when never-used. It is OCCUPIED while a kid is walking to it
+    // or riding it (slotTaken) and FREED the moment he gets off; a waiting
+    // kid takes a freed piece. The v32 "used forever" rule is gone.
     var order = ['slide', 'swingset', 'spinningcircle', 'teetertotter'];
     var slots = [];
     order.forEach(function (id) {
       placed.forEach(function (p) {
-        if (p.id === id && !p.building && !p.used) {
+        if (p.id === id && !p.building) {
           // v30 fix 4 (Chris): ONE kid per park item. v1's seesaw has TWO
           // seats (makeSlots pushes k:0 and k:1), but Chris's rule overrides
           // it — the teeter totter gets ONE slot, like every other piece.
@@ -1057,13 +1129,19 @@
     // v30 fix 4 (Chris): ONE kid per desk. v1 kidschool flanks ONE desk
     // with TWO kids, but Chris's rule overrides it — each desk takes one
     // kid, standing at the desk's front centre.
-    // v32 fix 3 (Chris): only NEVER-used desks are spots. Once a kid has
-    // gone to school at a desk it is USED and no other kid ever takes it
-    // over — a kid who rode but never got a desk waits for a NEW desk.
+    // v39 (Chris's capacity rule): a desk is a spot whenever it is BUILT
+    // and no kid is currently at school on it (assigned, walking there, or
+    // studying). A desk FREES when its kid grows/leaves — a waiting kid
+    // takes a freed desk. The v32 "used forever" rule is gone.
     var out = [];
     for (var i = 0; i < placed.length; i++) {
       var p = placed[i];
-      if (p.id === 'desk' && !p.building && !p.used) out.push({ x: p.cx, y: p.floorY, desk: p });
+      if (p.id !== 'desk' || p.building) continue;
+      var busy = false;
+      for (var j = 0; j < ANTS.length; j++) {
+        if (ANTS[j].toSchool && ANTS[j].schoolDesk === p.uid) { busy = true; break; }
+      }
+      if (!busy) out.push({ x: p.cx, y: p.floorY, desk: p });
     }
     return out;
   }
@@ -1084,17 +1162,20 @@
   function goToSchool(g) { // v1 goTo (kidschool)
     // v30 fix 4 (Chris): ONE kid per desk, and only kids who RODE a park
     // item move on to school. A kid who never rode stays idle near where he
-    // was born — he gets a desk slot later, when a NEW desk is built
-    // (tryAssignSchool). A kid who already grew never goes again.
-    // v32 fix 3: a desk a kid already used is never taken over — only
-    // NEVER-used desks are offered (deskSpots filters used ones out).
+    // was born — he gets a desk slot later, when a desk frees (tryAssignSchool).
+    // A kid who already grew never goes again.
+    // v39: only the kids GOING to school leave their park pieces. A kid who
+    // just took a freed piece (has not ridden yet) KEEPS his slot — he stays
+    // at the park while his sibling goes to school. (v1's releaseStage freed
+    // EVERY slot, but v1 moved the whole gen together; Chris's per-kid flow
+    // lets a waiting kid take the freed piece the moment its rider leaves.)
     var spots = deskSpots();
     if (!spots.length) return; // no desk to go to — the gen stays where it is
     var schoolKids0 = g.kids.filter(function (a) { return a.rode && a.m <= KID_SCALE && !a.schooled; });
     if (!schoolKids0.length) return; // nobody has ridden yet — the gen stays where it is
-    releaseStage(g);
+    schoolKids0.forEach(function (a) { if (a.slot) a.slot = null; if (a.state === 'ride') a.state = 'idle'; });
     g.stage = 'kidschool'; g.phase = 'move';
-    g.kids.forEach(function (a) { a.slot = null; a.toSchool = false; a.schoolDesk = null; });
+    g.kids.forEach(function (a) { a.toSchool = false; a.schoolDesk = null; });
     var schoolKids = g.kids.filter(function (a) { return a.rode && a.m <= KID_SCALE && !a.schooled; });
     schoolKids.forEach(function (a, i) {
       if (i < spots.length) {
@@ -1115,15 +1196,16 @@
     g.kids.forEach(function (a) { if (a.toSchool && a.m <= KID_SCALE && !a.schooled) { a.state = 'grow'; a.growT0 = QT; } });
   }
   function tryAssignIdleKids(g) {
-    // v32 fix 3 (Chris): an idle kid takes a park slot ONLY when a NEW park
-    // item is built. A slot a rider finished and got off is USED — it is
-    // never taken over. One slide means ONE ant to the playground; the other
-    // ant stays at the basket until a new item is built. Only kids who have
-    // NOT yet ridden take a slot — a kid who already rode has had his turn
-    // and moves on to school instead. One kid per slot, per piece.
-    // (parkSlots only lists NEVER-used pieces, so a freed slot is never
-    // offered here at all.)
-    if (!g || g.stage !== 'playground') return;
+    // v39 (Chris's capacity rule): an idle kid takes a park slot whenever
+    // one is FREE — a piece a rider just got off is FREED, not used up, so
+    // the waiting kid takes it the moment it frees, even while a sibling is
+    // at school (the gen may be in 'kidschool' stage). He does NOT wait for
+    // a NEW item. Only kids who have NOT yet ridden take a slot — a kid who
+    // already rode has had his turn and moves on to school instead. One kid
+    // per slot, per piece. (parkSlots lists every BUILT piece; slotTaken is
+    // the occupancy check — a piece is free when no kid is walking to it or
+    // riding it.)
+    if (!g) return;
     var slots = parkSlots();
     for (var i = 0; i < g.kids.length; i++) {
       var a = g.kids[i];
@@ -1138,24 +1220,19 @@
     }
   }
   function deskFree() {
-    // A placed, NEVER-used desk no kid is currently assigned to (toSchool) —
-    // a slot for a leftover kid's school trip. A desk a kid already used is
-    // never offered again (v32 fix 3); only a newly built desk counts.
+    // A built desk no kid is currently assigned to (toSchool) — a slot for
+    // a leftover kid's school trip. (v39: deskSpots already filters out
+    // desks a kid is at school on, so the first spot is a free desk. A desk
+    // frees when its kid grows/leaves — a waiting kid takes a freed desk.)
     var spots = deskSpots();
-    for (var i = 0; i < spots.length; i++) {
-      var busy = false;
-      for (var j = 0; j < ANTS.length; j++) {
-        if (ANTS[j].schoolDesk === spots[i].desk.uid && ANTS[j].toSchool) { busy = true; break; }
-      }
-      if (!busy) return spots[i].desk;
-    }
-    return null;
+    return spots.length ? spots[0].desk : null;
   }
   function tryAssignSchool(g) {
     // v30 fix 4 (Chris): a kid who RODE but never got a desk (too few desks)
-    // gets his school trip when a NEW desk is built. Never interrupts an
-    // active playground stage (move/stall). A used desk is never taken over
-    // (v32 fix 3) — deskFree only returns never-used desks.
+    // gets his school trip when a desk FREES (its kid grew/left) or a new
+    // desk is built. Never interrupts an active playground stage (move/stall).
+    // (v39: deskFree returns a built desk no kid is at school on — a freed
+    // desk counts, not only a newly built one.)
     if (!g || g.stage === 'kidschool' || g.phase === 'move' || g.phase === 'stall') return;
     var left = g.kids.some(function (a) { return a.rode && a.m <= KID_SCALE && !a.schooled; });
     if (!left) return;
@@ -1211,10 +1288,10 @@
       var g = GENS[j];
       if (g.stage === 'playground') checkSlidePass(g); // v30 fix 2: every tick, any phase — the desk unlocks the moment a kid finishes one full slide loop, not only inside the stall
       if (g.stage === 'playground' && g.phase === 'wait') {
-        // v32 fix 3: riders rotate off their pieces after one full play
-        // stage — but the piece they got off is USED, so a waiting kid does
-        // NOT take it. He stays at the basket until a NEW park item is built.
-        // A leftover kid who rode gets his school trip when a NEW desk is built.
+        // v39: riders rotate off their pieces after one full play stage —
+        // the piece they got off is FREED, so a waiting kid takes it (stepKidFlow
+        // runs every tick). A leftover kid who rode gets his school trip when
+        // a desk frees (tryAssignSchool).
         g.kids.forEach(function (a) {
           if (a.state === 'ride' && a.arrT != null && QT - a.arrT >= CYCLE1.PLAY_S) {
             a.slot = null; a.state = 'idle'; // rode is already true (set when he started riding)
@@ -1235,9 +1312,10 @@
           if (g.stage === 'playground') {
             if (deskPlaced()) goToSchool(g);
             else {
-              // v32 fix 3: the riders get off when the stage ends — but the
-              // pieces they got off are USED, so a waiting kid does NOT take
-              // one. He stays at the basket until a NEW park item is built.
+              // v39: the riders get off when the stage ends — the pieces
+              // they got off are FREED, so a waiting kid takes one (the
+              // freed piece, not a new one). He no longer waits at the
+              // basket for a NEW park item to be built.
               g.kids.forEach(function (a) { if (a.state === 'ride') { a.slot = null; a.state = 'idle'; } });
               g.phase = 'wait'; // school next, once the desk is built
               tryAssignIdleKids(g);
@@ -1260,7 +1338,25 @@
           else g.phase = 'done'; // grown ants idle (no job rooms in checkpoint 3)
         }
       }
+      // v39: per-kid capacity flow, every tick, any stage — a rider who has
+      // ridden a full play stage (12s) gets off, and a waiting kid takes a
+      // freed piece the moment it frees, even while a sibling is at school
+      // (the gen may be in 'kidschool' stage). An ant moves on when there
+      // is room for it in the next room. This is what makes the freed slide
+      // get taken the moment its rider leaves for school, instead of waiting
+      // for a NEW item to be built.
+      stepKidFlow(g);
     }
+  }
+  function stepKidFlow(g) {
+    // v39 (Chris's capacity rule): per-kid, every tick, any stage.
+    g.kids.forEach(function (a) {
+      if (a.state === 'ride' && a.arrT != null && QT - a.arrT >= CYCLE1.PLAY_S) {
+        a.slot = null; a.state = 'idle'; // rode is already true — the piece is FREED, not used up
+      }
+    });
+    tryAssignIdleKids(g);
+    tryAssignSchool(g);
   }
   function hatchKids(p) {
     // v1 stepBaskets/onBasketHatched: 2 kids per basket, spawned at the
@@ -1309,7 +1405,7 @@
         }
       }
     }
-    // v32 fix 3: a freed kid who never rode can take another NEVER-USED slot (a new item) — never one a kid already used.
+    // v39: a freed kid who never rode can take a FREED slot (a piece a rider just got off) — not only a newly built item.
     for (var k = 0; k < GENS.length; k++) tryAssignIdleKids(GENS[k]);
   }
 
@@ -1996,6 +2092,10 @@
       placed.forEach(function (p) {
         // v34: a hatching basket draws v1's cracking-egg timeline, not the plain basket.
         if (p.id === 'eggbasket' && p.egg && p.egg.state === 'hatch') { drawHatchBasket(p); return; }
+        // v39 fix 2: a desk with a kid STUDYING at it is hidden — the ksDesk
+        // loop (kid + wooden desk) is drawn instead (drawKid). The blue desk
+        // reappears when the kid leaves / grows.
+        if (p.id === 'desk' && deskOccupied(p.uid)) return;
         var im = IMGS[p.id];
         // The basket shows the empty basket until she lays, then two eggs.
         if (p.id === 'eggbasket' && !p.egg) im = IBASKET_EMPTY;
@@ -2056,7 +2156,7 @@
       // v1: the item is added with t0 = DIG_PEND (not dug yet — no cloud,
       // invisible). The queen walks to the spot first; the cloud starts only
       // when she arrives; the timer starts only after the item is built.
-      placed.push({ uid: uid, id: it.id, cx: pcx, floorY: pfy, w: it.w, building: true, t0: DIG_PEND, cost: cost, used: false }); // v32 fix 3: `used` = a kid has ridden this item (park piece) or gone to school at it (desk). One slide means ONE ant — an idle kid never takes over an item a kid already used; he waits for a newly built item.
+      placed.push({ uid: uid, id: it.id, cx: pcx, floorY: pfy, w: it.w, building: true, t0: DIG_PEND, cost: cost }); // v39: no `used` flag — a park piece / desk is occupied while a kid is on it (slotTaken / toSchool) and FREED when he leaves; a waiting kid takes a freed one (Chris's capacity rule). The v32 "used forever" rule is gone.
       queenFree = true; // the QN system takes over from here; checkpoint 1 is done
       brainReset(); // v1: any build activity distracts the queen
       renderMenu();
