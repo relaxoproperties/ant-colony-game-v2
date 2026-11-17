@@ -459,16 +459,21 @@
   // same "above the item" offset as the fridge/cooler room timers (piece
   // top - 8). It is the kid's 12s ride countdown (arrT + PLAY_S - QT): the
   // first ride AND a later ride (a waiting kid taking a freed piece) both
-  // show it, and when it hits 00:00 the kid gets off (the existing 12s ride
-  // rule). If two kids ride two pieces, each piece shows its own timer above
-  // it. NOT at the hexagon centre, NOT on the slide or the kid — ABOVE the
-  // piece.
+  // show it. v42 (Chris): the timer does NOT disappear at 00:00 — the ant
+  // stays ON the piece after the timer runs out (he only leaves it once a
+  // desk is built and he goes to school), so the timer stays visible above
+  // the piece, clamped at 00:00 (brainMmss clamps at 0), for the whole time
+  // he occupies it — while riding, after the timer runs out, and while the
+  // desk is offered-but-not-built. It vanishes only when he leaves the piece.
+  // If two kids ride two pieces, each piece shows its own timer above it.
+  // NOT at the hexagon centre, NOT on the slide or the kid — ABOVE the piece.
   function drawPlaygroundStageTimer(now) {
     for (var i = 0; i < ANTS.length; i++) {
       var a = ANTS[i];
       if (a.state !== 'ride' || !a.slot || !a.slot.p || a.arrT == null) continue;
       var left = a.arrT + CYCLE1.PLAY_S - QT;
-      if (left <= 0) continue;
+      // v42: no `left <= 0` skip — the timer stays visible (00:00) while the
+      // ant is still riding / occupying the piece after the timer runs out.
       var p = a.slot.p, it = itemById(a.slot.piece);
       var h = it ? itemH(it) : p.w * 0.8;
       drawTag(p.cx, p.floorY - h - 8, brainMmss(left), 1, 0);
@@ -1371,15 +1376,13 @@
       var g = GENS[j];
       if (g.stage === 'playground') checkSlidePass(g); // v30 fix 2: every tick, any phase — the desk unlocks the moment a kid finishes one full slide loop, not only inside the stall
       if (g.stage === 'playground' && g.phase === 'wait') {
-        // v39: riders rotate off their pieces after one full play stage —
-        // the piece they got off is FREED, so a waiting kid takes it (stepKidFlow
-        // runs every tick). A leftover kid who rode gets his school trip when
-        // a desk frees (tryAssignSchool).
-        g.kids.forEach(function (a) {
-          if (a.state === 'ride' && a.arrT != null && QT - a.arrT >= CYCLE1.PLAY_S) {
-            a.slot = null; a.state = 'idle'; // rode is already true (set when he started riding)
-          }
-        });
+        // v42 (Chris's occupancy rule): a rider does NOT get off just
+        // because 12s elapsed. He stays ON his piece — it stays OCCUPIED —
+        // until he actually leaves it for school (goToSchool, once a desk
+        // is built). The timer running out does NOT free the piece, and the
+        // school unlock does not move him off it. A waiting kid takes a
+        // piece only when its rider physically leaves it. A leftover kid
+        // who rode gets his school trip when a desk frees (tryAssignSchool).
         tryAssignIdleKids(g);
         tryAssignSchool(g);
       }
@@ -1395,11 +1398,14 @@
           if (g.stage === 'playground') {
             if (deskPlaced()) goToSchool(g);
             else {
-              // v39: the riders get off when the stage ends — the pieces
-              // they got off are FREED, so a waiting kid takes one (the
-              // freed piece, not a new one). He no longer waits at the
-              // basket for a NEW park item to be built.
-              g.kids.forEach(function (a) { if (a.state === 'ride') { a.slot = null; a.state = 'idle'; } });
+              // v42 (Chris's occupancy rule): the riders do NOT get off
+              // when the stage ends. The timer running out does NOT free a
+              // piece — a rider stays ON it (still occupying it) until he
+              // physically leaves it for school, which only happens once a
+              // desk is built (goToSchool). The slide stays occupied through
+              // the whole window: while riding, after the timer runs out,
+              // and while the desk is offered-but-not-built. A waiting kid
+              // stays at the basket (tryAssignIdleKids finds no free slot).
               g.phase = 'wait'; // school next, once the desk is built
               tryAssignIdleKids(g);
             }
@@ -1432,12 +1438,14 @@
     }
   }
   function stepKidFlow(g) {
-    // v39 (Chris's capacity rule): per-kid, every tick, any stage.
-    g.kids.forEach(function (a) {
-      if (a.state === 'ride' && a.arrT != null && QT - a.arrT >= CYCLE1.PLAY_S) {
-        a.slot = null; a.state = 'idle'; // rode is already true — the piece is FREED, not used up
-      }
-    });
+    // v42 (Chris's occupancy rule): per-kid, every tick, any stage. A rider
+    // stays ON his piece until goToSchool moves him to school — the 12s ride
+    // ending does NOT get him off, and the piece is NOT freed on timer
+    // expiry. The piece frees ONLY when its rider physically leaves it for
+    // school (goToSchool) or the piece is erased/moved (releaseKidsFor). A
+    // waiting kid takes a freed piece the moment its rider leaves, even
+    // while a sibling is at school (the gen may be in 'kidschool' stage).
+    // An ant moves on when there is room for it in the next room.
     tryAssignIdleKids(g);
     tryAssignSchool(g);
   }
