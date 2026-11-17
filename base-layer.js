@@ -36,6 +36,13 @@
 // for school (10s, v1 CYCLE1.SCHOOL_S) and grow to adult size (1.2s).
 // ?checkpoint=2 skips the opening for testing: straight underground, menu open.
 // ?checkpoint=3 does the same for checkpoint 3 testing.
+// CHECKPOINT 4 (Nov 17): skill training / trade school, layered on checkpoint 3.
+// The trade school tab (hammer) opens when the first kid grows up at the desk.
+// Globe (miner, FREE) -> easel (scout, one free at random, the other $10) ->
+// dumbbell (soldier, FREE; treadmill + bench press $10). The miner mines the
+// rock fog one hexagon at a time (frontier rule); cleared hexagons become
+// buildable. ?checkpoint=4 skips to trade school with a grown-up ant at a desk,
+// so checkpoint 4 can be tested WITHOUT playing through checkpoints 1-3.
 (function () {
   'use strict';
   var URLQ = new URLSearchParams(location.search);
@@ -79,7 +86,31 @@
   var SCHOOL_ITEMS = [
     { id: 'desk',          name: 'Desk',           src: 'assets/items/desk.png',            cx: 2790, floorY: 5090, w: 12.5, first: 0 }
   ];
-  var ALL_ITEMS = ITEMS.concat(PARK_ITEMS, SCHOOL_ITEMS);
+  // ---- CHECKPOINT 4: the trade school items (Chris, Nov 17) ----
+  // Trade order: MINER -> SCOUT -> SOLDIER. The globe (miner) is FREE
+  // first; the microscope (miner) is $10, shown but not buildable yet (the
+  // player starts with $0 seed money). The easels (scout): ONE is free,
+  // picked at random below; the other is $10. The dumbbell curls (soldier)
+  // are FREE; the treadmill and the bench press are $10. Widths follow the
+  // training loop's own scale (v1 SC 0.45296 x KW world/px x the frame
+  // width), so the static item matches the furniture in its training loop
+  // and there is no size jump when training starts. The easel furniture is
+  // the same picture for both easels — the board (chalkboard or map) is
+  // what the training loop shows.
+  var TRADE_ITEMS = [
+    { id: 'globe',      name: 'Globe',              src: 'assets/items/globe.png?v=44',                                                 cx: 2812, floorY: 5085, w: 13,   first: 0,  trade: 'miner' },
+    { id: 'microscope', name: 'Microscope',         src: 'assets/items/microscope.png?v=44',                                            cx: 2770, floorY: 5085, w: 14,   first: 10, trade: 'miner' },
+    { id: 'easelchalk', name: 'Easel (chalkboard)', src: 'assets/furniture/kid-school-combined/kid-school-combined-counting-board-leaf-easel.png?v=44', cx: 2812, floorY: 5085, w: 15, first: 10, trade: 'scout' },
+    { id: 'easelmap',   name: 'Easel (map)',        src: 'assets/furniture/kid-school-combined/kid-school-combined-counting-board-leaf-easel.png?v=44', cx: 2860, floorY: 5085, w: 15, first: 10, trade: 'scout' },
+    { id: 'dumbbell',   name: 'Dumbbell curls',     src: 'assets/gym/dumbbell_curls/chris_ant_dumbbell_curls_empty_equipment.png?v=44',     cx: 2812, floorY: 5085, w: 23.5, first: 0,  trade: 'soldier' },
+    { id: 'treadmill',  name: 'Treadmill',          src: 'assets/gym/treadmill_run/chris_ant_treadmill_run_empty_equipment.png?v=44',       cx: 2770, floorY: 5085, w: 34.5, first: 10, trade: 'soldier' },
+    { id: 'benchpress', name: 'Bench press',        src: 'assets/gym/bench_press/chris_ant_bench_press_empty_equipment.png?v=44',          cx: 2860, floorY: 5085, w: 36.8, first: 10, trade: 'soldier' }
+  ];
+  // CHECKPOINT 4: ONE easel is FREE — picked at random (Chris doesn't care
+  // which); the other is $10. Both start at $10 above; the free one is set here.
+  var FREE_EASEL = Math.random() < 0.5 ? 'easelchalk' : 'easelmap';
+  TRADE_ITEMS.forEach(function (it) { if (it.id === FREE_EASEL) it.first = 0; });
+  var ALL_ITEMS = ITEMS.concat(PARK_ITEMS, SCHOOL_ITEMS, TRADE_ITEMS);
   var IMGS = {};
   ALL_ITEMS.forEach(function (it) {
     var im = new Image();
@@ -112,11 +143,18 @@
   // are never shown as "Locked" — they simply are not there yet.
   var parkUnlocked = false; // opens when the first babies hatch
   var firstSlidePass = false; // set when a kid completes one full slide loop
+  var tradeUnlocked = false; // CHECKPOINT 4: opens when the first kid grows up at the desk
   function isVisible(id) {
     if (id === 'leafbed') return true;
     if (id === 'eggbasket') return bedGate && isBuilt('fridge') && isBuilt('watercooler');
     if (id === 'desk') return parkUnlocked && firstSlidePass;
     if (id === 'slide' || id === 'swingset' || id === 'teetertotter' || id === 'spinningcircle') return parkUnlocked;
+    // CHECKPOINT 4: the globe (and the $10 microscope beside it) are offered
+    // once trade school unlocks; the easels once the miner is BUILT; the gym
+    // items once a scout easel is BUILT. Hidden until offered, never "Locked".
+    if (id === 'globe' || id === 'microscope') return tradeUnlocked;
+    if (id === 'easelchalk' || id === 'easelmap') return tradeUnlocked && isBuilt('globe');
+    if (id === 'dumbbell' || id === 'treadmill' || id === 'benchpress') return tradeUnlocked && (isBuilt('easelchalk') || isBuilt('easelmap'));
     return bedGate;
   }
   function openPark() {
@@ -266,6 +304,7 @@
     drawBasketBubbles(now);
     drawPlaygroundStageTimer(now); // v40 fix 2: the slide ride's timer ABOVE the slide
     drawSchoolStageTimer(now); // v40 fix 4: the desk timer ABOVE the desk (grow when it finishes)
+    drawTradeTrainTimer(now); // CHECKPOINT 4: the 8s training countdown ABOVE the trade item being trained at
     if (QN.mode === 'walk') positionTarget();
   }
   window.BASE_QUEEN = {
@@ -1083,7 +1122,9 @@
   function walkAnt(a, p, cb) { a.state = 'walk'; a.path = [{ x: p.x, y: p.y }]; a.cb = cb || null; } // v1 walkAnt
   function stepAnt(a, dt) { // v1 stepAnt (world coords)
     if (a.state !== 'walk') return;
-    var sp = a.m <= KID_SCALE ? KID_SPEED : AD_SPEED * a.m;
+    // CHECKPOINT 4: a miner walks at MINER_SPEED (a.spd) to his hex — 3x
+    // slower than a scout. Every other ant uses the v1 speed below.
+    var sp = (a.spd != null) ? a.spd : (a.m <= KID_SCALE ? KID_SPEED : AD_SPEED * a.m);
     var left = sp * dt;
     while (left > 0 && a.path.length) {
       var p = a.path[0], dx = p.x - a.x, dy = p.y - a.y, d = Math.hypot(dx, dy);
@@ -1107,6 +1148,11 @@
   function drawKid(a) {
     if (a.state === 'gone' || a.hidden) return;
     if (a.state === 'ride') { drawRider(a); return; }
+    // CHECKPOINT 4: a training ant is the training loop (ant + equipment,
+    // like the ksDesk loop), not the idle sprite — and a digging miner is
+    // the dig strip. Both replace the ant's own sprite while they run.
+    if (a.state === 'train') { drawTrainAnt(a); return; }
+    if (a.state === 'dig') { drawMinerDig(a); return; }
     // v39 fix 2: a kid STUDYING at a desk is the ksDesk loop (v1) — the kid
     // at a small wooden desk, baked together — not the idle kid sprite and
     // not the blue desk. The static blue desk is hidden while he studies
@@ -1452,6 +1498,15 @@
             // schoolDesk here and do NOT free the desk when he grows up.
             if (a.state === 'grow') { a.m = 1; a.state = 'idle'; a.schooled = true; a.toSchool = false; }
           });
+          // CHECKPOINT 4 (Chris, Nov 17): the FIRST kid growing up opens
+          // trade school — the trade tab appears (with the globe offered),
+          // and the menu switches to it so he SEES it, like the school tab
+          // on the first slide pass. No switch while he is placing an item.
+          if (!tradeUnlocked) {
+            tradeUnlocked = true;
+            if (mode !== 'carrying') activeTab = 'trade';
+            renderMenu();
+          }
           var left = g.kids.some(function (a) { return a.m <= KID_SCALE && !a.schooled; });
           if (left) { g.stage = 'playground'; g.phase = 'wait'; }
           else g.phase = 'done'; // grown ants idle (no job rooms in checkpoint 3)
@@ -1466,6 +1521,7 @@
       // for a NEW item to be built.
       stepKidFlow(g);
     }
+    stepTrade(); // CHECKPOINT 4: training stalls end, miners dig, scouts come and go, soldiers patrol; idle grown ants take a free trade station
   }
   function stepKidFlow(g) {
     // v42 (Chris's occupancy rule): per-kid, every tick, any stage. A rider
@@ -1538,6 +1594,295 @@
     }
     // v39: a freed kid who never rode can take a FREED slot (a piece a rider just got off) — not only a newly built item.
     for (var k = 0; k < GENS.length; k++) tryAssignIdleKids(GENS[k]);
+  }
+
+  // ---- CHECKPOINT 4: skill training / trade school (Chris, Nov 17) ----
+  // After a kid grows up at the desk he goes to trade school. Trade order:
+  // MINER -> SCOUT -> SOLDIER — get at least to the soldier. The ants move
+  // automatically (born -> park -> school -> trade school -> work); the
+  // player builds the rooms and the ants move on their own. Bottlenecks
+  // (more ants than items) are the fun. The DRAWER rule applies to every
+  // trade item: while an ant is training at it, no other ant can use it;
+  // it frees ONLY when he physically leaves it. A grown-up ant stays at
+  // his desk until the next thing is built — when the globe is built he
+  // leaves the desk for it (the desk frees for the next kid).
+  var TRAIN_S = 8; // v1 CYCLE1.TRAIN_S — the training stall at every trade item
+  var MINER_SPEED = (40 * 69 * 0.175 / 26.1) / 3; // v1's live scoutSpeed (SCOUT_WALK) / 3 = ~6.17 world/s — slow, 3x slower than a scout
+  var MINE_DIG_S = 10; // digging time at one hexagon before its fog clears (pacing; Chris did not specify a duration)
+  var SCOUT_OUT_S = 20; // a scouting trip out of the hole lasts 20 s before he comes back in
+  var GUARD_ARC = [165, 140, 115, 90, 65, 40, 15]; // v1 cp4 GUARD.ARC (degrees, around the hole)
+  var GUARD_RX = 30, GUARD_RY = 16; // v1 cp4 GUARD.RX/RY (world units)
+  var LOOP_S = 0.45296 * KW; // v1 SC (130/287): the training loops are drawn at this scale for a grown ant, as in v1
+  var TRADE_ORDER = ['miner', 'scout', 'soldier'];
+  // ---- the training loops (v1, copied unchanged — never rewritten) ----
+  // ksGlobe / ksChalk / ksMap: port-b.js NP5 loops (anchor = the scene's
+  // floor contact). Gym: cp3's loops (treadmill 16f @ 16 fps, curls and
+  // bench 24f @ 8 fps), with their empty_equipment.png as the static item.
+  function loadLoopFrames(loop) {
+    var frames = [];
+    for (var f = 0; f < loop.n; f++) {
+      var im = new Image();
+      im.src = loop.dir + String(f).padStart(2, '0') + '.png?v=44';
+      frames.push(im);
+    }
+    loop.frames = frames;
+    return loop;
+  }
+  var KS_GLOBE = loadLoopFrames({ dir: 'assets/portb/np5loops/globe/chris_ant_globe_', n: 32, fps: 8, ax: 318, ay: 334 });
+  var KS_CHALK = loadLoopFrames({ dir: 'assets/portb/np5loops/chalk/chris_ant_chalkboard_', n: 32, fps: 8, ax: 150, ay: 413 });
+  var KS_MAP = loadLoopFrames({ dir: 'assets/portb/np5loops/map/chris_ant_point_map_', n: 24, fps: 8, ax: 150, ay: 343 });
+  var KS_GYM = {
+    treadmill: loadLoopFrames({ dir: 'assets/gym/treadmill_run/chris_ant_treadmill_run_', n: 16, fps: 16, ax: 220, ay: 394 }),
+    curls: loadLoopFrames({ dir: 'assets/gym/dumbbell_curls/chris_ant_dumbbell_curls_', n: 24, fps: 8, ax: 150, ay: 334 }),
+    bench: loadLoopFrames({ dir: 'assets/gym/bench_press/chris_ant_bench_press_', n: 24, fps: 8, ax: 230, ay: 308 })
+  };
+  // ---- the microscope training visual (created for checkpoint 4) ----
+  // The microscope picture itself is generated (assets/items/microscope.png
+  // — a microscope on a little counter desk). The training visual is a
+  // second generated picture (an ant looking through the microscope); it is
+  // ONE frame, not a loop — the microscope is not buildable in checkpoint 4,
+  // so no ant ever trains at it yet, and a full multi-frame loop was not
+  // warranted. It is drawn with a gentle idle bob while training, at the
+  // grown ant's size (the ant in the frame is 1133 px tall; the grown ant
+  // is 136*KW ≈ 23.5 world). Anchor = the desk's foot (0.72, 1.0 of the frame).
+  var IMIC_TRAIN = new Image(); IMIC_TRAIN.src = 'assets/items/microscope-train.png?v=44';
+  var MIC_TRAIN_S = 23.5 / 1133;
+  function trainLoopFor(itemId) {
+    if (itemId === 'globe') return KS_GLOBE;
+    if (itemId === 'easelchalk') return KS_CHALK;
+    if (itemId === 'easelmap') return KS_MAP;
+    if (itemId === 'dumbbell') return KS_GYM.curls;
+    if (itemId === 'treadmill') return KS_GYM.treadmill;
+    if (itemId === 'benchpress') return KS_GYM.bench;
+    return null; // microscope: the single-frame visual above, not a loop
+  }
+  function drawTrainLoop(loop, d, t0) {
+    var idx = Math.floor((QT - t0) * loop.fps) % loop.n;
+    if (idx < 0) idx += loop.n;
+    var im = loop.frames[idx];
+    if (!im || !im.complete || !im.naturalWidth) return false;
+    var s = LOOP_S, w = im.naturalWidth * s, h = im.naturalHeight * s;
+    ctx.drawImage(im, d.cx - loop.ax * s, d.floorY - loop.ay * s, w, h);
+    return true;
+  }
+  function drawMicroscopeTrain(d) {
+    if (!IMIC_TRAIN.complete || !IMIC_TRAIN.naturalWidth) return false;
+    var s = MIC_TRAIN_S, w = IMIC_TRAIN.naturalWidth * s, h = IMIC_TRAIN.naturalHeight * s;
+    var bob = Math.sin(QT * 7) * 0.3; // gentle idle bob while he looks through the scope
+    ctx.drawImage(IMIC_TRAIN, d.cx - 0.72 * w, d.floorY - 1.0 * h + bob, w, h);
+    return true;
+  }
+  function drawTrainAnt(a) {
+    // v1 desk-swap pattern: while he trains, the static item is hidden and
+    // the loop (ant + equipment together) plays at the item's spot instead.
+    var tr = a.train;
+    if (!tr) return;
+    var p = placedByUid(tr.uid);
+    if (!p) return;
+    if (tr.itemId === 'microscope') {
+      if (!drawMicroscopeTrain(p)) drawKidSprite('idle_' + pad2n(IDLE_PLAY[Math.floor((QT + a.ph) * IDLE_FPS) % IDLE_PLAY.length]) + '.png', a.x, a.y, false, a.m);
+      return;
+    }
+    var loop = trainLoopFor(tr.itemId);
+    if (loop) {
+      if (!drawTrainLoop(loop, p, tr.t0)) drawKidSprite('idle_' + pad2n(IDLE_PLAY[Math.floor((QT + a.ph) * IDLE_FPS) % IDLE_PLAY.length]) + '.png', a.x, a.y, false, a.m);
+    }
+  }
+  function tradeItemTraining(uid) {
+    // a trade item with an ant TRAINING at it (the loop is drawn instead of
+    // the static item). Walking there does not hide it yet — only training does.
+    for (var i = 0; i < ANTS.length; i++) {
+      var a = ANTS[i];
+      if (a.state === 'train' && a.train && a.train.uid === uid) return true;
+    }
+    return false;
+  }
+  function drawTradeTrainTimer(now) {
+    // v1 cp3: a timer tag over a training ant while his room timer runs.
+    // The 8s training countdown above the trade item, in v1's drawTag style
+    // (zero-padded mmss, white 11px bold, dark outline) — same as the desk timer.
+    for (var i = 0; i < ANTS.length; i++) {
+      var a = ANTS[i];
+      if (a.state !== 'train' || !a.train) continue;
+      var p = placedByUid(a.train.uid);
+      if (!p) continue;
+      var it = itemById(a.train.itemId);
+      var h = it ? itemH(it) : p.w * 0.8;
+      drawTag(p.cx, p.floorY - h - 8, brainMmss(a.train.until - QT), 1, 0);
+    }
+  }
+  // ---- the trade assignment (drawer rule, capacity rule) ----
+  // A grown-up ant (schooled, adult size, no job yet) takes the earliest
+  // trade in order (miner -> scout -> soldier) that has NO worker yet and a
+  // built, free station; if every trade already has a worker, he takes any
+  // free station (a second miner, a second scout...). A station is a BUILT
+  // trade item no ant is training at or walking to — the drawer rule, per
+  // item. If nothing is free he waits where he is (at the desk).
+  function tradeStations(trade) {
+    var out = [];
+    for (var i = 0; i < placed.length; i++) {
+      var p = placed[i], it = itemById(p.id);
+      if (it && it.trade === trade && !p.building) out.push(p);
+    }
+    return out;
+  }
+  function tradeItemBusy(uid) {
+    for (var i = 0; i < ANTS.length; i++) {
+      var a = ANTS[i];
+      if (a.tradeItem === uid && a.state !== 'gone') return true;
+    }
+    return false;
+  }
+  function tradeFreeStation(trade) {
+    var sts = tradeStations(trade);
+    for (var i = 0; i < sts.length; i++) if (!tradeItemBusy(sts[i].uid)) return sts[i];
+    return null;
+  }
+  function tradeHasWorker(trade) {
+    for (var i = 0; i < ANTS.length; i++) {
+      var a = ANTS[i];
+      if (a.job === trade && a.state !== 'gone') return true;
+    }
+    return false;
+  }
+  function goToTrade(a, p, trade) {
+    // Leaving the desk frees it: the drawer rule — he physically leaves the
+    // desk for the next thing (the trade item), so the next kid can use it.
+    a.schoolDesk = null; a.toSchool = false;
+    a.job = trade; a.tradeItem = p.uid;
+    walkAnt(a, { x: p.cx, y: p.floorY }, function () { startTrain(a, p, trade); });
+  }
+  function tryAssignTrade(a) {
+    if (!a || a.job || a.state !== 'idle' || a.m <= KID_SCALE || !a.schooled) return false;
+    for (var t = 0; t < TRADE_ORDER.length; t++) {
+      var trade = TRADE_ORDER[t];
+      if (tradeHasWorker(trade)) continue;
+      var st = tradeFreeStation(trade);
+      if (st) { goToTrade(a, st, trade); return true; }
+    }
+    for (var u = 0; u < TRADE_ORDER.length; u++) {
+      var st2 = tradeFreeStation(TRADE_ORDER[u]);
+      if (st2) { goToTrade(a, st2, TRADE_ORDER[u]); return true; }
+    }
+    return false;
+  }
+  function tryAssignTrades() {
+    for (var i = 0; i < ANTS.length; i++) tryAssignTrade(ANTS[i]);
+  }
+  function startTrain(a, p, trade) {
+    a.state = 'train'; a.arrT = QT;
+    a.train = { uid: p.uid, itemId: p.id, trade: trade, t0: QT, until: QT + TRAIN_S };
+  }
+  function finishTrain(a) {
+    var tr = a.train;
+    a.train = null; a.tradeItem = null; // the drawer frees: he physically leaves the item
+    a.state = 'idle'; a.arrT = QT;
+    if (!tr) return;
+    if (tr.trade === 'miner') startMining(a);
+    else if (tr.trade === 'scout') startScouting(a);
+    else if (tr.trade === 'soldier') startGuarding(a);
+  }
+  // ---- the miner's job (Chris, Nov 17) ----
+  // After training he mines the brown rock fog ONE hexagon at a time, SLOW
+  // (MINER_SPEED). He picks a hexagon AT RANDOM among the frontier — the
+  // fogged cells touching the exposed area — walks to its centre, digs
+  // (MINE_DIG_S), and the hexagon clears (BASE_FOG.clearHex, soft feathered
+  // edge) and joins the exposed area. Then he picks the next one. When no
+  // frontier hexagon is left (all 23 cleared) he idles.
+  function startMining(a) {
+    var cell = pickFrontierCell();
+    if (!cell) { a.state = 'idle'; return; }
+    a.mine = { cell: cell, phase: 'walk' };
+    a.spd = MINER_SPEED;
+    walkAnt(a, { x: cell.x, y: cell.y }, function () {
+      a.spd = null;
+      a.state = 'dig'; a.mine.phase = 'dig'; a.mine.digT0 = QT;
+    });
+  }
+  function finishDig(a) {
+    var cell = a.mine.cell;
+    clearedCells[cell.k] = true;
+    if (window.BASE_FOG) BASE_FOG.clearHex(cell.x, cell.y, HEXW);
+    a.mine = null; a.state = 'idle';
+    startMining(a); // the next frontier hexagon (or idle if none is left)
+  }
+  function drawMinerDig(a) {
+    // v1's queen dig strip (assets/queen-dig.webp: 6 frames @ 8 fps,
+    // 200x170/frame), drawn at the grown ant's width (~25 world). NOT the
+    // side variant: queen-dig-side.webp has red/grey horizontal
+    // registration bars baked into the file (verified Nov 17 — a red bar
+    // across the top and a grey bar along the bottom of every frame).
+    if (!art.dig || !art.dig.complete || !art.dig.naturalWidth) {
+      drawKidSprite('idle_' + pad2n(IDLE_PLAY[Math.floor((QT + a.ph) * IDLE_FPS) % IDLE_PLAY.length]) + '.png', a.x, a.y, false, a.m);
+      return;
+    }
+    var f = Math.floor((QT - (a.mine && a.mine.digT0 != null ? a.mine.digT0 : QT)) * 8) % 6;
+    if (f < 0) f += 6;
+    var w = 25, h = w * 170 / 200;
+    ctx.drawImage(art.dig, f * 200, 0, 200, 170, a.x - w / 2, a.y - h, w, h);
+  }
+  // ---- the scout's job (Chris, Nov 17) ----
+  // After training he goes OUT INTO THE WORLD: he walks up through the
+  // spiral hole, scouts (out of sight for SCOUT_OUT_S), comes back in, and
+  // goes out again. No threat, no seed mechanic in checkpoint 4.
+  function startScouting(a) {
+    walkAnt(a, { x: BC.HOLE_W.x, y: BC.HOLE_W.y }, function () {
+      a.state = 'out'; a.hidden = true; a.scoutBackAt = QT + SCOUT_OUT_S;
+    });
+  }
+  function returnScout(a) {
+    a.hidden = false; a.scoutBackAt = null;
+    walkAnt(a, { x: ENTRANCE.x + 10, y: ENTRANCE.y + 6 }, function () {
+      a.state = 'idle'; a.arrT = QT;
+      a.scoutNextOut = QT + 5; // a short pause at home, then out again
+    });
+  }
+  // ---- the soldier's job (Chris, Nov 17) ----
+  // After training he GUARDS: he patrols the mound on v1 cp4's GUARD arc
+  // around the hole (RX 30, RY 16, angles 165..15, back and forth). NO
+  // THREAT in checkpoint 4 — he patrols only; the attacks come in a future
+  // checkpoint.
+  function guardPoint(k) {
+    var th = GUARD_ARC[k] * Math.PI / 180;
+    return { x: BC.HOLE_W.x + GUARD_RX * Math.cos(th), y: BC.HOLE_W.y - GUARD_RY * Math.sin(th) };
+  }
+  function startGuarding(a) {
+    a.guardIdx = 0; a.guardDir = 1;
+    patrolNext(a);
+  }
+  function patrolNext(a) {
+    walkAnt(a, guardPoint(a.guardIdx), function () {
+      a.guardIdx += a.guardDir;
+      if (a.guardIdx >= GUARD_ARC.length - 1) a.guardDir = -1;
+      else if (a.guardIdx <= 0) a.guardDir = 1;
+      patrolNext(a);
+    });
+  }
+  // ---- the trade driver (runs every tick from stepKids) ----
+  function stepTrade() {
+    for (var i = 0; i < ANTS.length; i++) {
+      var a = ANTS[i];
+      if (a.state === 'train' && a.train && QT >= a.train.until) finishTrain(a);
+      else if (a.state === 'dig' && a.mine && a.mine.phase === 'dig' && QT >= a.mine.digT0 + MINE_DIG_S) finishDig(a);
+      else if (a.job === 'scout' && a.state === 'out' && a.hidden && a.scoutBackAt != null && QT >= a.scoutBackAt) returnScout(a);
+      else if (a.job === 'scout' && a.state === 'idle' && a.scoutNextOut != null && QT >= a.scoutNextOut) { a.scoutNextOut = null; startScouting(a); }
+    }
+    tryAssignTrades();
+  }
+  function releaseTradeFor(p) {
+    // A trade item was erased or picked up to move: an ant walking to train
+    // there, or training there, loses the spot — his job is cancelled (he
+    // never trained) and he idles, so tryAssignTrade can send him elsewhere.
+    // An ant who already finished training keeps his job: his work does not
+    // need the item any more (the miner's hex, the scout's hole, the
+    // soldier's arc are all independent of it).
+    for (var i = 0; i < ANTS.length; i++) {
+      var a = ANTS[i];
+      if (a.tradeItem === p.uid || (a.train && a.train.uid === p.uid)) {
+        a.tradeItem = null; a.train = null; a.job = null;
+        if (a.state === 'train' || a.state === 'walk') { a.path = []; a.state = 'idle'; }
+      }
+    }
   }
 
   // ---- CHECKPOINT 2: the four item reactions (v1 queenScript, at placed positions) ----
@@ -1688,6 +2033,17 @@
           if (g.stage === 'playground' && g.phase === 'wait') goToSchool(g);
         }
       });
+    } else if (id === 'globe' || id === 'microscope' || id === 'easelchalk' || id === 'easelmap' || id === 'dumbbell' || id === 'treadmill' || id === 'benchpress') {
+      // CHECKPOINT 4 (v1): the queen has no reaction to trade school — the
+      // GROWN ANTS go there. She walks to the spot, then returns home; a
+      // grown ant waiting at a desk is sent to the new trade item.
+      QN.busy = true;
+      queenTo(spot.x, spot.y, function () {
+        queenWait(0.5, function () {
+          queenHome(function () { QN.busy = false; runningScriptId = null; runPending(); });
+        });
+        tryAssignTrades();
+      });
     }
   }
   function runPending() {
@@ -1774,6 +2130,7 @@
     if ((id === 'fridge' || id === 'watercooler') && !remaining) clearRoomTimer(id);
     if (id === 'eggbasket' && !remaining) basketJob = null;
     if (id === 'slide' || id === 'swingset' || id === 'teetertotter' || id === 'spinningcircle' || id === 'desk') releaseKidsFor(p); // CHECKPOINT 3: free any kid riding it / at school there
+    if (id === 'globe' || id === 'microscope' || id === 'easelchalk' || id === 'easelmap' || id === 'dumbbell' || id === 'treadmill' || id === 'benchpress') releaseTradeFor(p); // CHECKPOINT 4: free any ant walking to train / training there
     brainReset(); // v1: any build activity distracts the queen
     if (id === 'leafbed') {
       // Her home is the bed she settled on; erasing a different bed leaves it.
@@ -2099,6 +2456,92 @@
     if (separated(-s3, 0.5)) return false;
     return true;
   }
+  // ---- CHECKPOINT 4: the 23-cell underground hex grid (v1 CELLS, index.html:398) ----
+  // Ported as-is: axial coords c in -6..6, r in -4..4, x = c*CS,
+  // y = (r + (c%2 ? 0.5 : 0))*HH, HW = 791, CS = 0.75*HW, HH = HW*sqrt(3)/2,
+  // C0 = (3599, 2142.79) chamber px, the 23 closest by d = (x/1.78)^2 + y^2.
+  // World coords anchor on the entrance hexagon = the home cell (0,-1):
+  // chamber (3599,1452) = world (2812,5039); one chamber px = KW world.
+  // (BC.toW is NOT used: the harness stubs BC without it, and the anchor
+  // below is exact — the home cell lands exactly on the entrance hexagon.)
+  var HEX_GRID = (function () {
+    var HW = 791, CS = 0.75 * HW, HH = HW * Math.sqrt(3) / 2, cells = [];
+    for (var c = -6; c <= 6; c++) for (var r = -4; r <= 4; r++) {
+      var x = c * CS, y = (r + (c % 2 ? 0.5 : 0)) * HH;
+      cells.push({ c: c, r: r, d: (x / 1.78) * (x / 1.78) + y * y });
+    }
+    cells.sort(function (a, b) { return a.d - b.d; });
+    return cells.slice(0, 23).map(function (cell) {
+      return {
+        c: cell.c, r: cell.r, k: cell.c + ',' + cell.r,
+        x: ENTRANCE.x + cell.c * CS * KW,
+        y: ENTRANCE.y + (cell.r + (cell.c % 2 ? 0.5 : 0) + 1) * HH * KW
+      };
+    });
+  })();
+  // Flat-top odd-column offset neighbours of (c,r): odd columns are shifted
+  // down half a row (v1's y = (r + (c%2 ? 0.5 : 0))*HH), so the neighbour
+  // set depends on the column's parity. (c%2 === 0 is false for c = -1, -3...
+  // as well as for odd positives, so the parity test works for negative c too.)
+  function hexNeighbours(c, r) {
+    if (c % 2 === 0) return [[c + 1, r], [c + 1, r - 1], [c, r - 1], [c - 1, r - 1], [c - 1, r], [c, r + 1]];
+    return [[c + 1, r + 1], [c + 1, r], [c, r - 1], [c - 1, r], [c - 1, r + 1], [c, r + 1]];
+  }
+  function hexCellByKey(k) {
+    for (var i = 0; i < HEX_GRID.length; i++) if (HEX_GRID[i].k === k) return HEX_GRID[i];
+    return null;
+  }
+  // The exposed area: the entrance hexagon is exposed from the start; every
+  // hexagon the miner clears joins it. The frontier is the fogged cells
+  // TOUCHING the exposed area (Chris's corrected rule — v1's surface-tile
+  // rule ported to hexagons: a random pick among the tiles touching the
+  // discovered area). A cell far away that touches nothing exposed is never picked.
+  var clearedCells = { '0,-1': true };
+  function frontierCells() {
+    var out = [];
+    HEX_GRID.forEach(function (cell) {
+      if (clearedCells[cell.k]) return;
+      var ns = hexNeighbours(cell.c, cell.r);
+      for (var i = 0; i < ns.length; i++) {
+        if (clearedCells[ns[i][0] + ',' + ns[i][1]]) { out.push(cell); break; }
+      }
+    });
+    return out;
+  }
+  function pickFrontierCell() {
+    var f = frontierCells();
+    return f.length ? f[Math.floor(Math.random() * f.length)] : null;
+  }
+  // CHECKPOINT 4: a placed item only needs to TOUCH a CLEARED hexagon — the
+  // entrance hexagon, or any hexagon the miner has cleared. More cleared
+  // hexagons = more room to build the base. (The entrance-only test below
+  // is kept for the v43 checks; the ghost uses the cleared-hex test.)
+  function rectTouchesHex(cx, floorY, w, h, hx, hy) {
+    var x0 = cx - w / 2, x1 = cx + w / 2, y0 = floorY - h, y1 = floorY;
+    var r = HEXW / 2;
+    var vx = [], vy = [], i, a;
+    for (i = 0; i < 6; i++) { a = i * Math.PI / 3; vx.push(hx + r * Math.cos(a)); vy.push(hy + r * Math.sin(a)); }
+    function separated(ax, ay) {
+      var minR = Infinity, maxR = -Infinity, minH = Infinity, maxH = -Infinity, k, p;
+      var corners = [[x0, y0], [x1, y0], [x0, y1], [x1, y1]];
+      for (k = 0; k < 4; k++) { p = corners[k][0] * ax + corners[k][1] * ay; if (p < minR) minR = p; if (p > maxR) maxR = p; }
+      for (k = 0; k < 6; k++) { p = vx[k] * ax + vy[k] * ay; if (p < minH) minH = p; if (p > maxH) maxH = p; }
+      return maxR < minH || maxH < minR;
+    }
+    var s3 = Math.sqrt(3) / 2;
+    if (separated(1, 0)) return false;
+    if (separated(0, 1)) return false;
+    if (separated(s3, 0.5)) return false;
+    if (separated(-s3, 0.5)) return false;
+    return true;
+  }
+  function rectTouchesClearedHex(cx, floorY, w, h) {
+    for (var i = 0; i < HEX_GRID.length; i++) {
+      var cell = HEX_GRID[i];
+      if (clearedCells[cell.k] && rectTouchesHex(cx, floorY, w, h, cell.x, cell.y)) return true;
+    }
+    return false;
+  }
 
   // ---- CHECKPOINT 2: the build cloud (v1 drawBuildCloud, index.html ~1061-1065) ----
   // v1's build cloud: a cover of radial-gradient blobs (BUILD_FX.COLS) that
@@ -2159,7 +2602,9 @@
     var it = itemById(carryId);
     if (!it) return false;
     var h = itemH(it);
-    return rectTouchesEntranceHex(ghost.cx, ghost.floorY, it.w, h) && !overlapsPlaced(ghost.cx, ghost.floorY, it.w, h);
+    // CHECKPOINT 4: the ghost must touch a CLEARED hexagon — the entrance,
+    // or any hexagon the miner has cleared (more cleared hexagons = more room).
+    return rectTouchesClearedHex(ghost.cx, ghost.floorY, it.w, h) && !overlapsPlaced(ghost.cx, ghost.floorY, it.w, h);
   }
   function setPlacingUI() {
     // While carrying, taps on the queen and the floor arrows must reach the room, not the buttons.
@@ -2187,6 +2632,7 @@
     var p = placed[idx];
     cancelBuild(p.uid); // a build in progress for THIS copy stops with it
     if (p.id === 'slide' || p.id === 'swingset' || p.id === 'teetertotter' || p.id === 'spinningcircle' || p.id === 'desk') releaseKidsFor(p); // CHECKPOINT 3: picking it up frees any kid riding it / at school there
+    if (p.id === 'globe' || p.id === 'microscope' || p.id === 'easelchalk' || p.id === 'easelmap' || p.id === 'dumbbell' || p.id === 'treadmill' || p.id === 'benchpress') releaseTradeFor(p); // CHECKPOINT 4: picking it up frees any ant walking to train / training there
     moveFrom = p; // keep the whole placed object, not just its spot (a moved basket keeps its eggs)
     placed.splice(idx, 1);
     brainReset(); // v1: any build activity distracts the queen
@@ -2215,9 +2661,15 @@
       // building items in it is easy to see). The other game's placing
       // colours: the outline stays green.
       if (mode !== 'idle' && (state === 'underground' || state === 'menu')) {
+        // CHECKPOINT 4: the outline follows the CLEARED hexagons — the
+        // entrance, plus every hexagon the miner has cleared (more cleared
+        // hexagons = more room to build). Green OUTLINE only, never a fill.
         ctx.save();
-        ctx.beginPath(); hexPath(ENTRANCE.x, ENTRANCE.y, HEXW); ctx.closePath();
-        ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(150,255,140,.75)'; ctx.stroke();
+        HEX_GRID.forEach(function (cell) {
+          if (!clearedCells[cell.k]) return;
+          ctx.beginPath(); hexPath(cell.x, cell.y, HEXW); ctx.closePath();
+          ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(150,255,140,.75)'; ctx.stroke();
+        });
         ctx.restore();
       }
       placed.forEach(function (p) {
@@ -2227,6 +2679,9 @@
         // loop (kid + wooden desk) is drawn instead (drawKid). The blue desk
         // reappears when the kid leaves / grows.
         if (p.id === 'desk' && deskOccupied(p.uid)) return;
+        // CHECKPOINT 4: a trade item with an ant TRAINING at it is hidden —
+        // the training loop (ant + equipment) is drawn instead (drawTrainAnt).
+        if (tradeItemTraining(p.uid)) return;
         var im = IMGS[p.id];
         // The basket shows the empty basket until she lays, then two eggs.
         if (p.id === 'eggbasket' && !p.egg) im = IBASKET_EMPTY;
@@ -2337,6 +2792,17 @@
         parkPrices: (function () { var out = {}; PARK_ITEMS.forEach(function (it) { out[it.id] = { count: placedCount(it.id), next: nextPrice(it.id) }; }); return out; })(),
         schoolPrices: (function () { var out = {}; SCHOOL_ITEMS.forEach(function (it) { out[it.id] = { count: placedCount(it.id), next: nextPrice(it.id) }; }); return out; })()
       };
+    },
+    get trade() { // CHECKPOINT 4: trade school state (read-only, for the harness)
+      return {
+        tradeUnlocked: tradeUnlocked, freeEasel: FREE_EASEL,
+        cleared: Object.keys(clearedCells).sort(),
+        frontier: frontierCells().map(function (c) { return c.k; }),
+        grid: HEX_GRID.map(function (c) { return { k: c.k, x: Math.round(c.x * 100) / 100, y: Math.round(c.y * 100) / 100 }; }),
+        tradePrices: (function () { var out = {}; TRADE_ITEMS.forEach(function (it) { out[it.id] = { count: placedCount(it.id), next: nextPrice(it.id), visible: isVisible(it.id) }; }); return out; })(),
+        ants: ANTS.map(function (a) { return { id: a.id, job: a.job || null, state: a.state, tradeItem: a.tradeItem || null, mine: a.mine ? a.mine.cell.k : null, hidden: !!a.hidden }; }),
+        minerSpeed: MINER_SPEED, trainS: TRAIN_S, mineDigS: MINE_DIG_S
+      };
     }
   };
   // Test handle for the timer bubbles (tap entry points, same as the canvas tap).
@@ -2353,6 +2819,15 @@
     get parkUnlocked() { return parkUnlocked; },
     get firstSlidePass() { return firstSlidePass; },
     get schoolUnlocked() { return schoolUnlocked; }, // v32: the school tab is open once the first slide pass is done
+    // CHECKPOINT 4: trade school (read-only, for the harness).
+    get tradeUnlocked() { return tradeUnlocked; },
+    get freeEasel() { return FREE_EASEL; },
+    get hexGrid() { return HEX_GRID.slice(); },
+    get clearedCells() { return Object.keys(clearedCells); },
+    frontierCells: frontierCells,
+    pickFrontierCell: pickFrontierCell,
+    _hexNeighbours: hexNeighbours,
+    _hexCell: hexCellByKey,
     get kids() { return ANTS.slice(); },
     get gens() { return GENS.slice(); },
     get tabs() { return TABS.map(function (t) { return t.id; }); },
@@ -2392,6 +2867,7 @@
     '.bl-tab img{height:25px;width:auto;display:block;clip-path:inset(0 33.2% 0 33%);transform:translateX(-14px)}' +
     '.bl-tab.bl-tab-park img{clip-path:none;transform:translateX(-13px)}' + // v32 fix 1: centre the slide in the park tab — it sat too far right. Same kind of centring as the crown's -14px: the tab's asymmetric shape puts its visual centre at 34.2px (35.2% of 97px), not the geometric 48.5px, and the slide's own ink sits 1.48px left of its image centre at display scale, so the image needs -13px to read centred.
     '.bl-tab.bl-tab-school img{clip-path:none;transform:translateX(-14px)}' + // v32 fix 2: the school tab's picture is the desk (a plain item picture, no clip). Same tab asymmetry as the crown, and the desk's ink sits only 0.29px left of its image centre at display scale, so it needs the same -14px as the crown to read centred.
+    '.bl-tab.bl-tab-trade img{clip-path:none;transform:translateX(-14px)}' + // CHECKPOINT 4: the trade tab's picture is the hammer (a tight crop of Chris's photo, no clip). Same tab asymmetry as the crown/desk, and the hammer's ink is centred in its crop, so it needs the same -14px to read centred.
     '.bl-tab.on{background:linear-gradient(180deg,#5a4128,#38271c 55%,#2e1d12);box-shadow:inset 0 1px 0 rgba(255,220,170,.35),inset 0 -4px 0 rgba(0,0,0,.4);filter:drop-shadow(0 3px 3px rgba(0,0,0,.45))}' +
     '.bvFly{position:absolute;z-index:9461;width:28px;height:auto;margin:-14px 0 0 -14px;pointer-events:none}' +
     // v1's food/water meters (index.html #bvMeters / .bm3-meter): the little
@@ -2428,9 +2904,10 @@
   var CROWN_SRC = 'assets/menu-ant/hat-crown-lowered.webp';
   var SLIDE_SRC = 'assets/items/slide.png'; // CHECKPOINT 3: the park tab's picture is the slide
   var DESK_SRC = 'assets/items/desk.png'; // CHECKPOINT 3, v32: the school tab's picture is the desk
+  var HAMMER_SRC = 'assets/items/hammer-tab.png?v=44'; // CHECKPOINT 4: the trade school tab's picture is the HAMMER, cropped from Chris's photo (the blue "x3" cut out, background made transparent)
   var schoolUnlocked = false; // v32: opens when a kid completes the first slide pass (the school tab appears, with the desk on it)
   var BULLDOZER_SRC = 'assets/items/bulldozer.png?v=32'; // v32 fix 4: the CARTOON bulldozer from the other game Chris likes better (side view, facing left, big front blade) — cut from his reference screenshot, button background removed, edges decontaminated. Replaces the v31 photo cut-out. Never the tractor emoji.
-  var TABS = [{ id: 'queen', icon: CROWN_SRC, items: ITEMS }, { id: 'park', icon: SLIDE_SRC, items: PARK_ITEMS }, { id: 'school', icon: DESK_SRC, items: SCHOOL_ITEMS }];
+  var TABS = [{ id: 'queen', icon: CROWN_SRC, items: ITEMS }, { id: 'park', icon: SLIDE_SRC, items: PARK_ITEMS }, { id: 'school', icon: DESK_SRC, items: SCHOOL_ITEMS }, { id: 'trade', icon: HAMMER_SRC, items: TRADE_ITEMS }];
   var activeTab = 'queen';
   function tabOf(id) { for (var i = 0; i < TABS.length; i++) if (TABS[i].id === id) return TABS[i]; return TABS[0]; }
 
@@ -2497,12 +2974,14 @@
     if (!tray) return;
     if (activeTab === 'park' && !parkUnlocked) activeTab = 'queen'; // the park tab cannot be active before the first hatch
     if (activeTab === 'school' && !schoolUnlocked) activeTab = 'queen'; // v32: the school tab cannot be active before the first slide pass
+    if (activeTab === 'trade' && !tradeUnlocked) activeTab = 'queen'; // CHECKPOINT 4: the trade tab cannot be active before the first kid grows up
     var html = '<div class="bl-head">' +
       '<div class="bl-tabs">' +
       TABS.map(function (t) {
         if (t.id === 'park' && !parkUnlocked) return ''; // the park tab is hidden until the first hatch (no "Locked" tab)
         if (t.id === 'school' && !schoolUnlocked) return ''; // v32: the school tab is hidden until the first slide pass (no "Locked" tab)
-        return '<button type="button" class="bl-tab' + (t.id === 'park' ? ' bl-tab-park' : t.id === 'school' ? ' bl-tab-school' : '') + (t.id === activeTab ? ' on' : '') + '" data-tab="' + t.id + '" aria-label="' + t.id + '"><img alt="" draggable="false" src="' + t.icon + '"></button>';
+        if (t.id === 'trade' && !tradeUnlocked) return ''; // CHECKPOINT 4: the trade tab is hidden until the first kid grows up (no "Locked" tab)
+        return '<button type="button" class="bl-tab' + (t.id === 'park' ? ' bl-tab-park' : t.id === 'school' ? ' bl-tab-school' : t.id === 'trade' ? ' bl-tab-trade' : '') + (t.id === activeTab ? ' on' : '') + '" data-tab="' + t.id + '" aria-label="' + t.id + '"><img alt="" draggable="false" src="' + t.icon + '"></button>';
       }).join('') +
       '</div>' +
       '<button type="button" class="bl-dozer' + (eraseMode ? ' on' : '') + '" id="blDozer" aria-label="Bulldozer: remove a placed item"><img alt="" draggable="false" src="' + BULLDOZER_SRC + '"></button></div>' +
@@ -2747,16 +3226,42 @@
 
   renderMenu();
 
-  // TEST-ONLY ?start=downstairs / ?checkpoint=2 / ?checkpoint=3: skip the (LOCKED) opening to the exact real arrival state.
+  // TEST-ONLY ?start=downstairs / ?checkpoint=2 / ?checkpoint=3 / ?checkpoint=4: skip the (LOCKED) opening to the exact real arrival state.
   // ?checkpoint=2 is Chris's Checkpoint 2 test link: straight underground, menu open, ready to place.
   // ?checkpoint=3 is the same for checkpoint 3 testing.
-  if (URLQ.get('start') === 'downstairs' || URLQ.get('checkpoint') === '2' || URLQ.get('checkpoint') === '3') {
+  // ?checkpoint=4 is the same for checkpoint 4 testing, PLUS the trade-school
+  // prerequisites (setupTradeTest): a grown-up ant at a desk, the trade tab open.
+  function setupTradeTest() {
+    // CHECKPOINT 4 test shortcut (Chris, Nov 17): start with the
+    // prerequisites already met, so checkpoint 4 can be tested WITHOUT
+    // playing through checkpoints 1-3. The bed is built (the queen's home,
+    // so she walks to the globe and builds it); the desk is built and
+    // occupied by the grown ant (the drawer rule: he leaves it for the
+    // globe once the globe is built). Nothing here touches checkpoints 1-3.
+    bedGate = true; // she is settled on the bed
+    parkUnlocked = true; schoolUnlocked = true; firstSlidePass = true; // the park and school tabs are open already
+    tradeUnlocked = true;
+    var bed = { uid: nextUid++, id: 'leafbed', cx: 2790, floorY: 5050, w: 27.34, building: false, t0: 0, cost: 0 };
+    placed.push(bed);
+    QN.home = { x: 2790, y: 5050 - itemH(itemById('leafbed')) * 0.175 }; QN.homeUid = bed.uid; QN.settled = true;
+    var desk = { uid: nextUid++, id: 'desk', cx: 2835, floorY: 5060, w: 12.5, building: false, t0: 0, cost: 0 };
+    placed.push(desk);
+    genN++;
+    var g = { id: genN, stage: 'kidschool', phase: 'done', kids: [], until: 0, growEnd: 0, bx: desk.cx, by: desk.floorY };
+    GENS.push(g);
+    var a = newKid(g, desk.cx, desk.floorY);
+    a.m = 1; a.state = 'idle'; a.schooled = true; a.rode = true; a.toSchool = false; a.schoolDesk = desk.uid;
+    activeTab = 'trade';
+    renderMenu();
+  }
+  if (URLQ.get('start') === 'downstairs' || URLQ.get('checkpoint') === '2' || URLQ.get('checkpoint') === '3' || URLQ.get('checkpoint') === '4') {
     var go = function () {
       if (typeof ready !== 'undefined' && !ready) { setTimeout(go, 40); return; }
       loadBasement();
       if (!basementReady) { setTimeout(go, 40); return; }
       emergeT0 = performance.now() - BC.EMERGE_SECONDS * 1000 - 1; emerged = true; // she already walked out in checkpoint 1; never replay on later descents
       begin('underground');
+      if (URLQ.get('checkpoint') === '4') setupTradeTest(); // CHECKPOINT 4: the trade-school prerequisites, ready to test
       // Snap the camera to the real arrival view. The descending transition
       // does this in the real flow; the hook skips it, so without this the
       // camera stays at the start view and placed items sit off-screen.
