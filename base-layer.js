@@ -533,6 +533,7 @@
     LAY_WAIT_S: 2, TEND_LOOK_S: 2, SPOIL_REMOVE_S: 2
   };
   var IEGG = new Image(); IEGG.src = 'assets/items/egg-cutout.png';
+  var IPAC = new Image(); IPAC.src = 'assets/job-icons/256/job-pacifier.png?v=41'; // v41: v1 lay bubble icon (job-pacifier, md5 2db59444 — already in the base layer, same file as v1)
   var IBASKET_EMPTY = new Image(); IBASKET_EMPTY.src = 'assets/items/egg-basket-empty.png';
   // ---- CHECKPOINT 3, v34: v1's egg-cracking hatch (index.html, hatch-timeline.json, 12 fps) ----
   // Ported as-is from v1, not invented. The eggs CRACK and the little ants
@@ -578,7 +579,7 @@
     for (var x = -80; x <= 200; x += 2) { var t = clamp((x - 58) / 45, -1, 1), ry = 40 + 32 * Math.sqrt(1 - t * t); ctx.lineTo(x + off.x, Math.min(ry, HATCH.NEST_Y) + off.y); }
     ctx.lineTo(200 + off.x, -300); ctx.closePath(); ctx.clip();
   }
-  var basketJob = null; // 'tend' | 'remove' while she is doing a basket job
+  var basketJob = null; // 'tend' | 'remove' | 'lay' while she is doing a basket job
   var basketQueue = []; // kinds waiting while she is busy
   function basketPlaced() {
     for (var i = 0; i < placed.length; i++) if (placed[i].id === 'eggbasket') return placed[i];
@@ -776,7 +777,28 @@
   }
   function runBasketJob(kind) {
     var p = basketPlaced();
-    if (!p || !p.egg) return;
+    if (!p) return;
+    if (kind === 'lay') {
+      // v41: re-lay (v1 doLay interact path, index.html:623) — no gate, no
+      // cost. The basket must be empty and the queen free; a busy queen
+      // queues it like any other basket job. armFirstPlayHatch is a no-op
+      // after the first lay, so a re-lay runs the normal cycle.
+      if (p.egg) return;
+      if (QN.busy) { if (basketQueue.indexOf(kind) < 0) basketQueue.push(kind); return; }
+      basketJob = kind;
+      runningScriptId = p.uid;
+      var spot = itemSpot('eggbasket', p.cx, p.floorY);
+      QN.busy = true;
+      queenTo(spot.x, spot.y, function () {
+        queenWait(LAY_WAIT_S, function () {
+          layEggs();
+          basketJob = null; runningScriptId = null;
+          queenHome(function () { QN.busy = false; armFirstPlayHatch(); runBasketPending(); });
+        });
+      });
+      return;
+    }
+    if (!p.egg) return;
     if (QN.busy) { if (basketQueue.indexOf(kind) < 0) basketQueue.push(kind); return; }
     basketJob = kind;
     runningScriptId = p.uid; // the basket she is working on (for multiples)
@@ -811,11 +833,20 @@
   }
   function basketBubbles() {
     var p = basketPlaced();
-    if (!p || !p.egg || mode === 'carrying') return [];
-    var e = p.egg, out = [], r = bubbleR();
+    if (!p || mode === 'carrying') return [];
+    var r = bubbleR();
     var im = IMGS[p.id];
     var h = (im && im.naturalWidth) ? p.w * im.naturalHeight / im.naturalWidth : p.w * 0.8;
     var bx = p.cx, by = p.floorY - h - r;
+    var out = [];
+    if (!p.egg) {
+      // v41: the basket is EMPTY — v1 lay bubble (pacifier), the re-lay
+      // trigger (v1 index.html:851). A spoiled basket still has p.egg, so it
+      // shows the spoil bubble below, never this one.
+      out.push({ kind: 'lay', x: bx, y: by, r: r });
+      return out;
+    }
+    var e = p.egg;
     if (e.state === 'two' && e.tendAppearedAt != null && !e.tapped) {
       out.push({ kind: 'tend', x: bx, y: by, r: r });
     }
@@ -858,6 +889,13 @@
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
         ctx.fillStyle = '#000';
         ctx.fillText('\uD83C\uDF73', b.x, b.y + Rr * .08);
+      } else if (b.kind === 'lay') {
+        // v41: v1 lay bubble — the pacifier (job-pacifier.png), drawn at
+        // Rr*1.36 like v1 index.html:869.
+        if (IPAC.complete && IPAC.naturalWidth) {
+          var q = Rr * 1.36;
+          ctx.drawImage(IPAC, b.x - q / 2, b.y - q / 2, q, q);
+        }
       }
       ctx.restore();
     }
@@ -875,7 +913,9 @@
   }
   function tapBasketBubble(b) {
     var p = basketPlaced();
-    if (!p || !p.egg) return;
+    if (!p) return;
+    if (b.kind === 'lay') { runBasketJob('lay'); return; } // v41: re-lay from the empty basket's pacifier bubble
+    if (!p.egg) return;
     if (b.kind === 'tend') {
       p.egg.tapped = true; // v1: the tap counts as the tend in time (spoil clock stops)
       runBasketJob('tend');
@@ -2636,7 +2676,7 @@
         if (tb) {
           if (tb.kind === 'brain') tapBrainBubble(tb);
           else if (tb.kind === 'eat' || tb.kind === 'drink') tapRoomTimerBubble(tb);
-          else if (tb.kind === 'tend' || tb.kind === 'spoil') tapBasketBubble(tb);
+          else if (tb.kind === 'tend' || tb.kind === 'spoil' || tb.kind === 'lay') tapBasketBubble(tb);
           return;
         }
         var hit = placedItemAt(w.x, w.y);
