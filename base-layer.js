@@ -305,6 +305,7 @@
     drawPlaygroundStageTimer(now); // v40 fix 2: the slide ride's timer ABOVE the slide
     drawSchoolStageTimer(now); // v40 fix 4: the desk timer ABOVE the desk (grow when it finishes)
     drawTradeTrainTimer(now); // CHECKPOINT 4: the 8s training countdown ABOVE the trade item being trained at
+    drawMinerDigTimer(now); // v47 fix 1: the discovery countdown ABOVE the digging miner (Chris, Nov 18)
     if (QN.mode === 'walk') positionTarget();
   }
   window.BASE_QUEEN = {
@@ -1743,6 +1744,26 @@
       drawTag(p.cx, p.floorY - h - 8, brainMmss(a.train.until - QT), 1, 0);
     }
   }
+  function drawMinerDigTimer(now) {
+    // v47 fix 1 (Chris, Nov 18): "You're missing the timer on top of the
+    // ant that is digging." The discovery countdown (MINE_DISCOVER_S =
+    // 2352 s per hexagon) is drawn ABOVE the digging miner, in v1's drawTag
+    // style (zero-padded mmss, white 11px bold, dark outline) — the same
+    // "above the ant" offset as the other stage timers (top - 8). His feet
+    // are at a.y and his head is 41*PW_S above it (the grown-ant height the
+    // plain-work strip is drawn at, same formula as drawMinerDig), so the
+    // timer sits at a.y - 41*PW_S - 8. It counts down from the full
+    // discovery time and stays visible (brainMmss clamps at 00:00) for the
+    // whole time he digs that hexagon; it vanishes when he finishes it
+    // (finishDig clears a.mine) and reappears over the next one.
+    for (var i = 0; i < ANTS.length; i++) {
+      var a = ANTS[i];
+      if (a.state !== 'dig' || !a.mine || a.mine.digT0 == null) continue;
+      var left = MINE_DISCOVER_S - (QT - a.mine.digT0);
+      var PW_S = (2 * 68 * KW) / 41; // grown-ant scale, same as drawMinerDig
+      drawTag(a.x, a.y - 41 * PW_S - 8, brainMmss(left), 1, 0);
+    }
+  }
   // ---- the trade assignment (drawer rule, capacity rule) ----
   // A grown-up ant (schooled, adult size, no job yet) takes the earliest
   // trade in order (miner -> scout -> soldier) that has NO worker yet and a
@@ -1777,6 +1798,13 @@
     }
     return false;
   }
+  // v47 (Chris, Nov 18): how many ants already work a trade. A second
+  // worker for a trade needs a SECOND station (more miners = more globes).
+  function tradeWorkerCount(trade) {
+    var n = 0;
+    for (var i = 0; i < ANTS.length; i++) { var a = ANTS[i]; if (a.job === trade && a.state !== 'gone') n++; }
+    return n;
+  }
   function goToTrade(a, p, trade) {
     // Leaving the desk frees it: the drawer rule — he physically leaves the
     // desk for the next thing (the trade item), so the next kid can use it.
@@ -1792,9 +1820,18 @@
       var st = tradeFreeStation(trade);
       if (st) { goToTrade(a, st, trade); return true; }
     }
+    // v47 (Chris, Nov 18): the fallback only sends a SECOND worker to a
+    // trade when there is a SECOND station for it. Without this guard it
+    // sent a second ant to the SAME globe once the first miner finished
+    // training and left it (the globe looked free — finishTrain clears
+    // tradeItem — so the station was free but the trade already had its
+    // miner): three miners from one globe, and the ?checkpoint=4 shortcut
+    // (three ants, one per trade) broke. One station = one worker.
     for (var u = 0; u < TRADE_ORDER.length; u++) {
-      var st2 = tradeFreeStation(TRADE_ORDER[u]);
-      if (st2) { goToTrade(a, st2, TRADE_ORDER[u]); return true; }
+      var tradeU = TRADE_ORDER[u];
+      if (tradeWorkerCount(tradeU) >= tradeStations(tradeU).length) continue;
+      var st2 = tradeFreeStation(tradeU);
+      if (st2) { goToTrade(a, st2, tradeU); return true; }
     }
     return false;
   }
@@ -1900,11 +1937,20 @@
     var PW_VIS_H = 41; // max visible ant height in the strip, px (rows 0..40, alpha>=32)
     var PW_S = (2 * 68 * KW) / PW_VIS_H; // grown-ant height (23.53 world) / 41 px
     var W = 64 * PW_S, H = 61 * PW_S;
-    // Face the hexagon he is digging (the strip faces left by default).
+    // Face the hexagon he is digging. v47 fix 2 (Chris, Nov 18): he was
+    // digging BACKWARDS — the flip was inverted. The plain-work strip
+    // faces RIGHT by default (verified by looking at the frames: the ant's
+    // head, eye and antennae are on the RIGHT, the abdomen on the LEFT,
+    // the baked-in dirt dots behind him to the LEFT). So when the hexagon
+    // is to his right he needs NO flip, and when it is to his left he is
+    // flipped. The old code did the opposite (flipped when the hex was
+    // right), so he faced AWAY from the hexagon in both directions. The
+    // dust below is unchanged: it was already placed behind him relative
+    // to the hexagon direction (away from the hexagon), which is correct.
     var faceRight = !!(a.mine && a.mine.cell && a.mine.cell.x > a.x);
     ctx.save();
     ctx.translate(a.x, a.y);
-    ctx.scale(faceRight ? -1 : 1, 1);
+    ctx.scale(faceRight ? 1 : -1, 1);
     // Feet (frame row 40, bottom edge row 41) land on a.y; frame centred on a.x.
     ctx.drawImage(strip, f * 64, 0, 64, 61, -W / 2, -PW_VIS_H * PW_S, W, H);
     ctx.restore();
@@ -2993,7 +3039,7 @@
   style.textContent =
     '.bl-head{display:flex;justify-content:space-between;align-items:flex-end;padding:2px 6px 0}' +
     '.bl-title{color:#f3e6c8;font-size:17px;font-weight:700;letter-spacing:.5px}' +
-    '.bl-dozer{border:2px solid #82562f;border-radius:12px;background:rgba(255,244,220,.14);color:#f3e6c8;font-size:22px;line-height:1;padding:6px 12px;cursor:pointer}' +
+    '.bl-dozer{flex:none;border:2px solid #82562f;border-radius:12px;background:rgba(255,244,220,.14);color:#f3e6c8;font-size:22px;line-height:1;padding:6px 12px;cursor:pointer}' +
     '.bl-dozer.on{background:#a93226;border-color:#e74c3c}' +
     '.bl-dozer img{height:22px;width:auto;display:block}' + // v31: the bulldozer picture (cut from Chris's photo), same height as the old emoji so the button stays the same size
     '.bl-cards{display:flex;gap:10px;justify-content:flex-start;border-top:2px solid #82562f}' +
@@ -3005,7 +3051,7 @@
     '.bl-build.bl-cant{background:linear-gradient(180deg,#e74c3c,#c0392b);cursor:not-allowed}' +
     '.bl-build:disabled{background:#5a5148;cursor:default}' +
     '.bl-cancel{background:linear-gradient(180deg,#a93226,#7e241b)}' +
-    '.bl-tabs{display:flex;gap:8px;padding:0;align-items:flex-end}' +
+    '.bl-tabs{display:flex;gap:8px;padding:0;align-items:flex-end;flex:1 1 auto;min-width:0}' +
     // folder tab: a real file-folder tab, not a button. Raised flat top with
     // a sloped right side (clip-path), in the menu's own dark brown (no paper
     // colour), a lighter top for depth, a darker bottom edge for thickness,
@@ -3014,7 +3060,7 @@
     // border-top), so the outline flows continuously from the tab into the
     // menu's top edge as one folder outline. The tab's flat bottom meets
     // the menu body below with no gap, so it reads as part of the folder.
-    '.bl-tab{border:0;width:97px;box-sizing:border-box;padding:5px 20px 4px;margin-bottom:-1px;cursor:pointer;line-height:0;display:flex;justify-content:center;align-items:center;background:linear-gradient(180deg,#3d2c1d,#2a1c11 60%,#20140c);clip-path:polygon(0 100%,0 0,60% 0,80% 100%,100% 100%);box-shadow:inset 0 1px 0 rgba(255,214,160,.18),inset 0 -4px 0 rgba(0,0,0,.35)}' + // v30 fix 1: FIXED width so the park tab is the SAME SIZE as the crown tab — the slide picture (124x112) is narrower than the crown (255x112), so an auto-width park tab came out ~29px narrower. 97px = the crown tab's width (25px-high crown image ~57px + 40px padding).
+    '.bl-tab{border:0;width:97px;flex:0 1 97px;min-width:0;box-sizing:border-box;padding:5px 20px 4px;margin-bottom:-1px;cursor:pointer;line-height:0;display:flex;justify-content:center;align-items:center;background:linear-gradient(180deg,#3d2c1d,#2a1c11 60%,#20140c);clip-path:polygon(0 100%,0 0,60% 0,80% 100%,100% 100%);box-shadow:inset 0 1px 0 rgba(255,214,160,.18),inset 0 -4px 0 rgba(0,0,0,.35)}' + // v30 fix 1: FIXED width so the park tab is the SAME SIZE as the crown tab — the slide picture (124x112) is narrower than the crown (255x112), so an auto-width park tab came out ~29px narrower. 97px = the crown tab's width (25px-high crown image ~57px + 40px padding). v47 fix 3: the tabs SHRINK (flex:0 1 97px; min-width:0) when all four are visible — v44's 4th (trade) tab made the head row 473px wide on a ~366px phone menu, pushing the bulldozer off the right edge (clipped by the tray). With 1-3 tabs they stay 97px; with 4 they share the space (~73px each) and the bulldozer stays put (flex:none).
     '.bl-tab img{height:25px;width:auto;display:block;clip-path:inset(0 33.2% 0 33%);transform:translateX(-14px)}' +
     '.bl-tab.bl-tab-park img{clip-path:none;transform:translateX(-13px)}' + // v32 fix 1: centre the slide in the park tab — it sat too far right. Same kind of centring as the crown's -14px: the tab's asymmetric shape puts its visual centre at 34.2px (35.2% of 97px), not the geometric 48.5px, and the slide's own ink sits 1.48px left of its image centre at display scale, so the image needs -13px to read centred.
     '.bl-tab.bl-tab-school img{clip-path:none;transform:translateX(-14px)}' + // v32 fix 2: the school tab's picture is the desk (a plain item picture, no clip). Same tab asymmetry as the crown, and the desk's ink sits only 0.29px left of its image centre at display scale, so it needs the same -14px as the crown to read centred.
@@ -3386,22 +3432,36 @@
     // CHECKPOINT 4 test shortcut (Chris, Nov 17): start with the
     // prerequisites already met, so checkpoint 4 can be tested WITHOUT
     // playing through checkpoints 1-3. The bed is built (the queen's home,
-    // so she walks to the globe and builds it); the desk is built and
-    // occupied by the grown ant (the drawer rule: he leaves it for the
-    // globe once the globe is built). Nothing here touches checkpoints 1-3.
+    // so she walks to the globe and builds it); the desks are built and
+    // each is occupied by a grown ant (the drawer rule: he leaves it for
+    // the next thing once it is built). Nothing here touches checkpoints 1-3.
+    // v47 (Chris, Nov 18): the shortcut covers the WHOLE trade school
+    // section — THREE grown ants, one per trade (miner -> scout ->
+    // soldier), each waiting at his own desk, so Chris can build the globe,
+    // then the easel, then the dumbbell in one test session, without laying
+    // eggs or waiting for kids to grow up. The unlock order is unchanged
+    // (globe -> easel -> dumbbell, each offered after the previous is
+    // built); tryAssignTrade sends the first waiting ant to the first free
+    // trade with no worker yet, so the ants go off in order.
     bedGate = true; // she is settled on the bed
     parkUnlocked = true; schoolUnlocked = true; firstSlidePass = true; // the park and school tabs are open already
     tradeUnlocked = true;
     var bed = { uid: nextUid++, id: 'leafbed', cx: 2790, floorY: 5050, w: 27.34, building: false, t0: 0, cost: 0 };
     placed.push(bed);
     QN.home = { x: 2790, y: 5050 - itemH(itemById('leafbed')) * 0.175 }; QN.homeUid = bed.uid; QN.settled = true;
-    var desk = { uid: nextUid++, id: 'desk', cx: 2835, floorY: 5060, w: 12.5, building: false, t0: 0, cost: 0 };
-    placed.push(desk);
     genN++;
-    var g = { id: genN, stage: 'kidschool', phase: 'done', kids: [], until: 0, growEnd: 0, bx: desk.cx, by: desk.floorY };
+    var g = { id: genN, stage: 'kidschool', phase: 'done', kids: [], until: 0, growEnd: 0, bx: 2835, by: 5060 };
     GENS.push(g);
-    var a = newKid(g, desk.cx, desk.floorY);
-    a.m = 1; a.state = 'idle'; a.schooled = true; a.rode = true; a.toSchool = false; a.schoolDesk = desk.uid;
+    // Three desks inside the entrance hexagon (centre 2812,5039, w 136.86):
+    // bottom-right, left-middle, top-right — spread out, none overlapping
+    // the bed (2790,5050) or each other.
+    var deskSpots = [[2835, 5060], [2770, 5020], [2840, 5000]];
+    for (var di = 0; di < deskSpots.length; di++) {
+      var desk = { uid: nextUid++, id: 'desk', cx: deskSpots[di][0], floorY: deskSpots[di][1], w: 12.5, building: false, t0: 0, cost: 0 };
+      placed.push(desk);
+      var a = newKid(g, desk.cx, desk.floorY);
+      a.m = 1; a.state = 'idle'; a.schooled = true; a.rode = true; a.toSchool = false; a.schoolDesk = desk.uid;
+    }
     activeTab = 'trade';
     renderMenu();
   }
