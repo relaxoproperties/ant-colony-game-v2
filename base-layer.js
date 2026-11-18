@@ -102,8 +102,8 @@
   var TRADE_ITEMS = [
     { id: 'globe',      name: 'Globe',              src: 'assets/items/globe.png?v=44',                                                 cx: 2812, floorY: 5085, w: 13,   first: 0,  trade: 'miner' },
     { id: 'microscope', name: 'Microscope',         src: 'assets/items/microscope.png?v=44',                                            cx: 2770, floorY: 5085, w: 14,   first: 10, trade: 'miner' },
-    { id: 'easelchalk', name: 'Easel (chalkboard)', src: 'assets/items/easel-chalkboard.png?v=48', cx: 2812, floorY: 5085, w: 15, first: 10, trade: 'scout' },
-    { id: 'easelmap',   name: 'Easel (map)',        src: 'assets/items/easel-map.png?v=48', cx: 2860, floorY: 5085, w: 15, first: 10, trade: 'scout' },
+    { id: 'easelchalk', name: 'Easel (chalkboard)', src: 'assets/items/easel-chalkboard.png?v=49', cx: 2812, floorY: 5085, w: 15, first: 10, trade: 'scout' },
+    { id: 'easelmap',   name: 'Easel (map)',        src: 'assets/items/easel-map.png?v=49', cx: 2860, floorY: 5085, w: 15, first: 10, trade: 'scout' },
     { id: 'dumbbell',   name: 'Dumbbell curls',     src: 'assets/gym/dumbbell_curls/chris_ant_dumbbell_curls_empty_equipment.png?v=44',     cx: 2812, floorY: 5085, w: 23.5, first: 0,  trade: 'soldier' },
     { id: 'treadmill',  name: 'Treadmill',          src: 'assets/gym/treadmill_run/chris_ant_treadmill_run_empty_equipment.png?v=44',       cx: 2770, floorY: 5085, w: 34.5, first: 10, trade: 'soldier' },
     { id: 'benchpress', name: 'Bench press',        src: 'assets/gym/bench_press/chris_ant_bench_press_empty_equipment.png?v=44',          cx: 2860, floorY: 5085, w: 36.8, first: 10, trade: 'soldier' }
@@ -283,8 +283,14 @@
     if (QN.mode === 'walk') sprite(art.walk, Math.floor(QN.wf) % 16, 16, queen.x, queen.y, QUEEN_UNDER_W, 1, QN.flip);
     else drawQueenFront(queen.x, queen.y, QUEEN_UNDER_W, 1, now);
   }
-  // Called from drawUnderground (index.html) once per frame while she is free.
-  function queenFrame(now) {
+  // Advance the game clock and step all the game logic (queen, timers,
+  // eggs, kids, trades) WITHOUT drawing. queenFrame (underground) and the
+  // upstairs step (v49) both use this — the game keeps running while Chris
+  // is upstairs, so the scout keeps scouting and the miner keeps digging.
+  // Called at most once per unique `now` (qLastNow): a second call with the
+  // same `now` gets dt = 0 and steps nothing, so calling it from both the
+  // underground draw and the upstairs draw in one frame is safe.
+  function stepFrame(now) {
     var dt = qLastNow ? Math.min(0.1, (now - qLastNow) / 1000) : 0;
     qLastNow = now;
     QT += dt;
@@ -300,6 +306,10 @@
     stepRoomTimers();
     stepEggs();
     stepKids(dt); // CHECKPOINT 3: the kids walk, ride, go to school, grow
+  }
+  // Called from drawUnderground (index.html) once per frame while she is free.
+  function queenFrame(now) {
+    stepFrame(now);
     drawQueen(now);
     drawBrainBubble(now);
     drawRoomTimerBubbles(now);
@@ -312,7 +322,9 @@
   }
   window.BASE_QUEEN = {
     get free() { return queenFree; },
-    draw: queenFrame
+    draw: queenFrame,
+    step: stepFrame, // v49: advance the clock + step the logic without drawing (upstairs — the game keeps running while Chris is up there)
+    drawUp: drawUpScout, // v49: draw the scout(s) on the surface while they are out (upstairs)
   };
 
   // ---- CHECKPOINT 2: the brain timer (v1 CHAMBER_BUB / BRAIN_BED_ONLY) ----
@@ -1541,7 +1553,7 @@
       // for a NEW item to be built.
       stepKidFlow(g);
     }
-    stepTrade(); // CHECKPOINT 4: training stalls end, miners dig, scouts come and go, soldiers patrol; idle grown ants take a free trade station
+    stepTrade(dt); // CHECKPOINT 4: training stalls end, miners dig, scouts come and go, soldiers patrol; idle grown ants take a free trade station
   }
   function stepKidFlow(g) {
     // v42 (Chris's occupancy rule): per-kid, every tick, any stage. A rider
@@ -1645,7 +1657,20 @@
   var MINE_DISCOVER_S = 2352; // seconds to fully discover ONE hexagon (10x the scout's ~235 s per tile)
   var FIRST_MINE_S = 120; // v48 (Chris, Nov 18): the FIRST hexagon the miner discovers takes only 2 minutes — so Chris can see a hexagon finish in one test session. Every hexagon after that takes the full MINE_DISCOVER_S.
   var minedCount = 0; // v48: how many hexagons the miner has fully cleared (0 = the next dig is the first one, 120 s)
-  var REVEAL_STEP_S = 5; // the fog mask is updated every 5 s of digging (the reveal moves ~0.33 world per step — sub-cell, so the feather stays smooth)
+  // v49 (Chris, Nov 18): the miner WALKS through the hexagon, carving a
+  // path like the scout — the fog clears WHERE HE GOES (v1's nearestFog +
+  // clearFogIn, ported from a surface tile to a hexagon). MINE_CLEAR_R is
+  // the rock-fog clear radius around him as he walks (world units, like
+  // v1's SCOUT_R ~55 — smaller, because a hexagon is 13.5x smaller than a
+  // tile). MINE_PATH_PER_HEX is the expected path length (world units) he
+  // walks to clear one hexagon — measured by simulation (greedy nearest-fog
+  // walk, clear radius 20: 528-637 world depending on entry edge, mean ~580).
+  // His dig speed is PATH/duration, so a hexagon takes ~its duration
+  // (120 s first, 2352 s after). MINE_FOG_CLEAR is v1's FOG_CLEAR (a
+  // fog-mask cell counts as fogged while above it).
+  var MINE_CLEAR_R = 20;
+  var MINE_FOG_CLEAR = 24;
+  var MINE_PATH_PER_HEX = 580;
   var SCOUT_OUT_S = 20; // a scouting trip out of the hole lasts 20 s before he comes back in
   var GUARD_ARC = [165, 140, 115, 90, 65, 40, 15]; // v1 cp4 GUARD.ARC (degrees, around the hole)
   var GUARD_RX = 30, GUARD_RY = 16; // v1 cp4 GUARD.RX/RY (world units)
@@ -1659,15 +1684,22 @@
     var frames = [];
     for (var f = 0; f < loop.n; f++) {
       var im = new Image();
-      im.src = loop.dir + String(f).padStart(2, '0') + '.png?v=44';
+      im.src = loop.dir + String(f).padStart(2, '0') + '.png?v=49';
       frames.push(im);
     }
     loop.frames = frames;
     return loop;
   }
   var KS_GLOBE = loadLoopFrames({ dir: 'assets/portb/np5loops/globe/chris_ant_globe_', n: 32, fps: 8, ax: 318, ay: 334 });
-  var KS_CHALK = loadLoopFrames({ dir: 'assets/portb/np5loops/chalk/chris_ant_chalkboard_', n: 32, fps: 8, ax: 150, ay: 413 });
-  var KS_MAP = loadLoopFrames({ dir: 'assets/portb/np5loops/map/chris_ant_point_map_', n: 24, fps: 8, ax: 150, ay: 343 });
+  // v49 (Chris, Nov 18): the chalk and map training loops are the NEW
+  // no-step composites (assets/items/ks-chalk-nostep, ks-map-nostep) — the
+  // ant from v1's loops, composited onto the new square-chalkboard /
+  // world-map easel, standing on the GROUND. v1's chalk loop had the ant on
+  // a step (kept in assets/portb/np5loops/chalk, untouched); the map loop
+  // was already step-free but had no map visible. Same frame counts, sizes
+  // and anchors, so the training (8 s, desk-swap) is unchanged.
+  var KS_CHALK = loadLoopFrames({ dir: 'assets/items/ks-chalk-nostep/chris_ant_chalkboard_', n: 32, fps: 8, ax: 150, ay: 413 });
+  var KS_MAP = loadLoopFrames({ dir: 'assets/items/ks-map-nostep/chris_ant_point_map_', n: 24, fps: 8, ax: 150, ay: 343 });
   var KS_GYM = {
     treadmill: loadLoopFrames({ dir: 'assets/gym/treadmill_run/chris_ant_treadmill_run_', n: 16, fps: 16, ax: 220, ay: 394 }),
     curls: loadLoopFrames({ dir: 'assets/gym/dumbbell_curls/chris_ant_dumbbell_curls_', n: 24, fps: 8, ax: 150, ay: 334 }),
@@ -1765,7 +1797,13 @@
       var a = ANTS[i];
       if (a.state !== 'dig' || !a.mine || a.mine.digT0 == null) continue;
       var dur = (a.mine.dur != null) ? a.mine.dur : MINE_DISCOVER_S; // v48: the first hexagon is 120 s, later ones 2352 s
-      var left = dur - (QT - a.mine.digT0);
+      // v49: the timer is the FOG FRACTION — it hits 00:00 exactly when the
+      // hexagon finishes (the miner clears the fog by walking, so the time
+      // left is the fog left, not a fixed clock). Falls back to the clock
+      // when the fog mask is empty (fogTotal 0 — no fog to clear).
+      var left;
+      if (a.mine.fogTotal > 0) left = dur * Math.max(0, (a.mine.fogLeft != null ? a.mine.fogLeft : a.mine.fogTotal)) / a.mine.fogTotal;
+      else left = dur - (QT - a.mine.digT0);
       var PW_S = (2 * 68 * KW) / 41; // grown-ant scale, same as drawMinerDig
       drawTag(a.x, a.y - 41 * PW_S - 8, brainMmss(left), 1, 0);
     }
@@ -1858,15 +1896,13 @@
     else if (tr.trade === 'soldier') startGuarding(a);
   }
   // ---- the miner's job (Chris, Nov 17) ----
-  // After training he mines the brown rock fog ONE hexagon at a time, SLOW
-  // (MINER_SPEED). He picks a hexagon AT RANDOM among the frontier — the
-  // fogged cells touching the exposed area — walks to its EDGE, digs
-  // (120 s for the first hexagon, MINE_DISCOVER_S = 2352 s after that —
-  // v48), and the hexagon is discovered progressively: the fog
-  // clears from his edge dig point across the hexagon (BASE_FOG
-  // .clearHexPartial, soft feathered edge) until it is fully discovered,
-  // then it joins the exposed area (BASE_FOG.clearHex) and he picks the
-  // next one. When no frontier hexagon is left (all 23 cleared) he idles.
+  // After training he mines the brown rock fog ONE hexagon at a time, SLOW.
+  // He picks a hexagon AT RANDOM among the frontier — the fogged cells
+  // touching the exposed area — walks to its EDGE, digs (120 s for the
+  // first hexagon, MINE_DISCOVER_S = 2352 s after that — v48), and the
+  // hexagon is discovered progressively until it is fully discovered, then
+  // it joins the exposed area (BASE_FOG.clearHex) and he picks the next
+  // one. When no frontier hexagon is left (all 23 cleared) he idles.
   // v45 (Chris): he digs from the EDGE, never the centre. He stops the
   // moment he TOUCHES the edge — the point where the straight line from the
   // hexagon's centre to where he is coming from crosses the boundary — and
@@ -1877,6 +1913,13 @@
   // the digging animation + rocks flying play the WHOLE time, and the fog
   // is revealed gradually, not all at once. v48: the FIRST hexagon takes
   // only 120 s (FIRST_MINE_S), so Chris can see one finish in a test session.
+  // v49 (Chris, Nov 18): he WALKS through the hexagon, carving a path like
+  // the scout — he targets the nearest fogged spot inside the hexagon,
+  // walks to it, and the rock fog clears in a radius around him as he moves
+  // (v1's nearestFog + clearFogIn, ported from a surface tile to a hexagon).
+  // The fog clears WHERE HE GOES, so the cleared area is a path he carves
+  // — not a circle growing from a fixed point (v46-v48). His walk speed is
+  // set at dig start (PATH/duration) so the hexagon takes ~its duration.
   function hexEdgePoint(cx, cy, w, fromX, fromY) {
     // Point on the hexagon's boundary closest to (fromX, fromY): the
     // intersection of the ray from the centre toward (fromX, fromY) with
@@ -1896,16 +1939,64 @@
     var t = a / m; // distance from the centre to the boundary along the ray
     return { x: cx + ux * t, y: cy + uy * t };
   }
+  // v49: the fog inside one hexagon, counted and targeted (v1's nearestFog
+  // + FOG_CLEAR, ported from a surface tile to a hexagon). A fog-mask cell
+  // counts as fogged while it is WELL INSIDE the hexagon (past the soft
+  // feather at the edge — the feather is cosmetic, not fog to clear) and its
+  // mask value is above MINE_FOG_CLEAR. The mask is only ever lowered, so
+  // these counts only ever fall.
+  function countFogInHex(cell) {
+    var R = HEXW / 2 + FOG_FEATHER, f2 = FOG_FEATHER / 2;
+    var i0 = Math.max(0, Math.floor((cell.x - R) / FOG_FC)), i1 = Math.min(FOG_FW - 1, Math.ceil((cell.x + R) / FOG_FC));
+    var j0 = Math.max(0, Math.floor((cell.y - R) / FOG_FC)), j1 = Math.min(FOG_FH - 1, Math.ceil((cell.y + R) / FOG_FC));
+    var n = 0, i, j, k, px, py;
+    for (j = j0; j <= j1; j++) {
+      for (i = i0; i <= i1; i++) {
+        px = i * FOG_FC + FOG_FC / 2; py = j * FOG_FC + FOG_FC / 2;
+        if (hexDist(px, py, cell.x, cell.y, HEXW) >= -f2) continue;
+        k = j * FOG_FW + i;
+        if (fogMask[k] > MINE_FOG_CLEAR) n++;
+      }
+    }
+    return n;
+  }
+  function nearestFogHex(cell, x, y) {
+    // The nearest still-fogged fog-mask cell centre inside hexagon cell
+    // (v1's nearestFog). Returns null when the hexagon's interior is fully
+    // revealed — that is the dig's completion, not a timer.
+    var R = HEXW / 2 + FOG_FEATHER, f2 = FOG_FEATHER / 2;
+    var i0 = Math.max(0, Math.floor((cell.x - R) / FOG_FC)), i1 = Math.min(FOG_FW - 1, Math.ceil((cell.x + R) / FOG_FC));
+    var j0 = Math.max(0, Math.floor((cell.y - R) / FOG_FC)), j1 = Math.min(FOG_FH - 1, Math.ceil((cell.y + R) / FOG_FC));
+    var best = null, bd = Infinity, i, j, k, px, py, dd;
+    for (j = j0; j <= j1; j++) {
+      for (i = i0; i <= i1; i++) {
+        px = i * FOG_FC + FOG_FC / 2; py = j * FOG_FC + FOG_FC / 2;
+        if (hexDist(px, py, cell.x, cell.y, HEXW) >= -f2) continue;
+        k = j * FOG_FW + i;
+        if (fogMask[k] <= MINE_FOG_CLEAR) continue;
+        dd = (px - x) * (px - x) + (py - y) * (py - y);
+        if (dd < bd) { bd = dd; best = { x: px, y: py }; }
+      }
+    }
+    return best;
+  }
   function startMining(a) {
     var cell = pickFrontierCell();
     if (!cell) { a.state = 'idle'; return; }
     var edge = hexEdgePoint(cell.x, cell.y, HEXW, a.x, a.y);
-    a.mine = { cell: cell, phase: 'walk', edge: edge, lastReveal: 0 };
+    a.mine = { cell: cell, phase: 'walk', edge: edge };
     a.spd = MINER_SPEED;
     walkAnt(a, edge, function () {
       a.spd = null;
       a.state = 'dig'; a.mine.phase = 'dig'; a.mine.digT0 = QT;
-      a.mine.dur = (minedCount === 0) ? FIRST_MINE_S : MINE_DISCOVER_S; // v48: the first hexagon takes 120 s, later ones 2352 s (fixed at dig start, so the timer and the reveal use one duration)
+      a.mine.dur = (minedCount === 0) ? FIRST_MINE_S : MINE_DISCOVER_S; // v48: the first hexagon takes 120 s, later ones 2352 s (fixed at dig start, so the timer and the walk use one duration)
+      // v49: his dig-walk speed is set so the hexagon takes ~its duration
+      // (PATH/duration), and the fog to clear is counted now (for the timer).
+      a.mine.spd = MINE_PATH_PER_HEX / a.mine.dur;
+      a.mine.fogTotal = countFogInHex(cell);
+      a.mine.fogLeft = a.mine.fogTotal;
+      a.mine.target = null;
+      a.mine.lastSync = QT;
     });
   }
   function finishDig(a) {
@@ -1959,7 +2050,14 @@
     // right), so he faced AWAY from the hexagon in both directions.
     // (v48: the dustAt puffs that used to sit behind him are gone — the
     // strip's own baked-in dirt dots are the whole effect now.)
-    var faceRight = !!(a.mine && a.mine.cell && a.mine.cell.x > a.x);
+    // v49: he faces the fogged spot he is digging toward (his target), so he
+    // digs INTO the fog as he walks — not just the hexagon's centre. (The
+    // v47 fix still holds: plain-work faces RIGHT by default, so no flip
+    // when the target is right, flip when it is left.)
+    var m = a.mine;
+    var faceRight;
+    if (m && m.target && Math.abs(m.target.x - a.x) > 1) faceRight = m.target.x > a.x;
+    else faceRight = !!(m && m.cell && m.cell.x > a.x);
     ctx.save();
     ctx.translate(a.x, a.y);
     ctx.scale(faceRight ? 1 : -1, 1);
@@ -1977,13 +2075,47 @@
   // After training he goes OUT INTO THE WORLD: he walks up through the
   // spiral hole, scouts (out of sight for SCOUT_OUT_S), comes back in, and
   // goes out again. No threat, no seed mechanic in checkpoint 4.
+  // v49 (Chris, Nov 18): while he is out he is VISIBLE upstairs, wandering
+  // the surface around the mound hole doing his job — so Chris can SEE him
+  // when he goes up. (Before v49 he was hidden everywhere while out, so
+  // upstairs there was no scout to find.) The surface hole is the mound at
+  // the entrance hexagon's grid centre (HEX.cx, HEX.cy) — the surface is
+  // directly above the basement. There is no surface-fog system in the base
+  // layer yet, so he walks/explores; he does not clear surface fog (v1's
+  // surface fog + seeds are a later checkpoint's system — NOT invented here).
+  var SURFACE_HOLE = { x: HEX.cx, y: HEX.cy }; // the mound hole, upstairs (world coords)
+  var SCOUT_UP_SPEED = 40 * 69 * 0.175 / 26.1; // v1's scout walk speed on the surface (~18.5 world/s)
+  function pickScoutUpTarget(a) {
+    // a random spot near the mound hole to wander to (v1's scout wanders
+    // the surface). Close enough to the hole that Chris can always find him.
+    var ang = Math.random() * Math.PI * 2, r = 30 + Math.random() * 110;
+    a.scoutUp.tx = SURFACE_HOLE.x + Math.cos(ang) * r;
+    a.scoutUp.ty = SURFACE_HOLE.y + Math.sin(ang) * r * 0.7; // slightly squashed vertically (the mound reads wider than tall on screen)
+  }
+  function drawUpScout(now) {
+    // v49: draw every scout who is OUT, on the surface (drawSurface calls
+    // this inside applyWorld, so these are world coords). Grown-ant size,
+    // walking sprite while he wanders the mound. The basement draw skips
+    // him (he is hidden downstairs while out) — this is the only place he
+    // is drawn while out.
+    for (var i = 0; i < ANTS.length; i++) {
+      var a = ANTS[i];
+      if (a.job !== 'scout' || a.state !== 'out' || !a.scoutUp) continue;
+      var su = a.scoutUp;
+      drawKidSprite('side_' + pad2n(Math.floor(su.wf) % 16) + '.png', su.x, su.y, su.flip, 1); // grown ant (m = 1)
+    }
+  }
   function startScouting(a) {
     walkAnt(a, { x: BC.HOLE_W.x, y: BC.HOLE_W.y }, function () {
       a.state = 'out'; a.hidden = true; a.scoutBackAt = QT + SCOUT_OUT_S;
+      // v49: he is OUT on the surface now — give him a surface position at
+      // the mound hole so he can be drawn (and wander) upstairs.
+      a.scoutUp = { x: SURFACE_HOLE.x, y: SURFACE_HOLE.y, tx: null, ty: null, flip: false, wf: 0 };
+      pickScoutUpTarget(a);
     });
   }
   function returnScout(a) {
-    a.hidden = false; a.scoutBackAt = null;
+    a.hidden = false; a.scoutBackAt = null; a.scoutUp = null; // v49: he is back downstairs — no surface position any more
     walkAnt(a, { x: ENTRANCE.x + 10, y: ENTRANCE.y + 6 }, function () {
       a.state = 'idle'; a.arrT = QT;
       a.scoutNextOut = QT + 5; // a short pause at home, then out again
@@ -2011,28 +2143,65 @@
     });
   }
   // ---- the trade driver (runs every tick from stepKids) ----
-  function stepTrade() {
+  function stepTrade(dt) {
     for (var i = 0; i < ANTS.length; i++) {
       var a = ANTS[i];
       if (a.state === 'train' && a.train && QT >= a.train.until) finishTrain(a);
       else if (a.state === 'dig' && a.mine && a.mine.phase === 'dig') {
-        // v46 (Chris): the fog is revealed PROGRESSIVELY while he digs — a
-        // soft front spreads from his edge dig point across the hexagon
-        // over the dig's duration (120 s first, 2352 s after — v48). The
-        // hexagon becomes buildable only when it is FULLY discovered
-        // (finishDig). The reveal radius is a pure function of elapsed
-        // time, so big QT jumps (harness fast-forward) land on the correct
-        // radius.
-        var el = QT - a.mine.digT0;
-        var dur = (a.mine.dur != null) ? a.mine.dur : MINE_DISCOVER_S; // v48: the first hexagon is 120 s, later ones 2352 s
-        if (el >= dur) finishDig(a);
-        else if (el >= (a.mine.lastReveal || 0) + REVEAL_STEP_S) {
-          a.mine.lastReveal = el;
-          var rr = (HEXW + 20) * (el / dur); // 20 = the fog feather; HEXW + 20 covers the whole hexagon from an edge point
-          if (window.BASE_FOG) BASE_FOG.clearHexPartial(a.mine.cell.x, a.mine.cell.y, HEXW, a.mine.edge.x, a.mine.edge.y, rr);
+        // v49 (Chris): the miner WALKS through the hexagon, carving a path
+        // like the scout (v1's search loop: target the nearest fogged spot,
+        // walk to it, clear the fog in a radius around himself as he moves).
+        // The fog clears WHERE HE GOES — the cleared area is a path he
+        // carves, not a circle growing from a fixed point (v46-v48). When
+        // no fogged cell is left inside the hexagon, finishDig runs (it
+        // joins the exposed area, buildable). The durations stay (120 s
+        // first, 2352 s after — v48); his walk speed is set at dig start so
+        // the hexagon takes ~its duration.
+        var m = a.mine, cell = m.cell;
+        if (!m.target) {
+          var n = nearestFogHex(cell, a.x, a.y);
+          if (!n) { finishDig(a); }
+          else m.target = n;
         }
+        if (a.state === 'dig' && m.target) {
+          // walk toward the nearest fogged spot at the miner's dig speed
+          var dx = m.target.x - a.x, dy = m.target.y - a.y, d = Math.hypot(dx, dy);
+          var step = Math.min((m.spd || MINER_SPEED) * dt, d);
+          if (d > 1e-6) {
+            a.x += dx / d * step; a.y += dy / d * step;
+            if (Math.abs(dx) > 0.3) a.flip = dx < 0;
+            a.wf += step / (KSTEP * K_SIDE_AD * a.m * KW);
+          }
+          // the rock fog clears in a radius around him as he moves (v1
+          // clearFogIn, clamped to the hexagon — never outside it). The
+          // mask edit is cheap; the full fog-canvas redraw is not, so it is
+          // synced every 0.5 s, not every tick.
+          clearFogHexPartialMask(cell.x, cell.y, HEXW, a.x, a.y, MINE_CLEAR_R);
+          if (QT - (m.lastSync || 0) >= 0.5) { m.lastSync = QT; fogMaskToCanvas(); }
+          if (step >= d - 1e-6) m.target = null; // reached the fogged spot; pick the next one
+          m.fogLeft = countFogInHex(cell); // for the timer (fog fraction)
+        }
+        // safety net (fog mask empty/broken, v48 behaviour): if there was
+        // no fog to clear at dig start, finish on the clock instead.
+        if (a.state === 'dig' && a.mine && (a.mine.fogTotal || 0) <= 0 && (QT - a.mine.digT0) >= ((a.mine.dur != null) ? a.mine.dur : MINE_DISCOVER_S)) finishDig(a);
       }
       else if (a.job === 'scout' && a.state === 'out' && a.hidden && a.scoutBackAt != null && QT >= a.scoutBackAt) returnScout(a);
+      else if (a.job === 'scout' && a.state === 'out' && a.hidden && a.scoutUp) {
+        // v49 (Chris, Nov 18): while he is out, he wanders the surface
+        // around the mound hole doing his job — so Chris can SEE him
+        // upstairs. (The return branch above runs first when his 20 s are
+        // up; this branch runs on every other tick while he is out.)
+        var su = a.scoutUp;
+        if (su.tx == null) pickScoutUpTarget(a);
+        var sdx = su.tx - su.x, sdy = su.ty - su.y, sd = Math.hypot(sdx, sdy);
+        var sstep = Math.min(SCOUT_UP_SPEED * dt, sd);
+        if (sd > 1e-6) {
+          su.x += sdx / sd * sstep; su.y += sdy / sd * sstep;
+          if (Math.abs(sdx) > 0.3) su.flip = sdx < 0;
+          su.wf += sstep / (KSTEP * K_SIDE_AD * 1 * KW); // grown ant (m = 1)
+        }
+        if (sstep >= sd - 1e-6) pickScoutUpTarget(a); // reached the spot; wander to a new one
+      }
       else if (a.job === 'scout' && a.state === 'idle' && a.scoutNextOut != null && QT >= a.scoutNextOut) { a.scoutNextOut = null; startScouting(a); }
     }
     tryAssignTrades();
