@@ -731,7 +731,16 @@
     var g = p.egg.gen;
     p.egg = null;
     if (!parkUnlocked) openPark();
-    if (g && parkPiecesBuilt()) goToPlayground(g);
+    // v45: only send the gen to the playground if it is STILL in the
+    // nursery. The kids are created (and sent to play) in hatchKids, but
+    // this runs later, when the cracking timeline finishes — by then a
+    // quick kid may already have ridden and been sent to school
+    // (goToSchool via tryAssignSchool), so the gen may already be in
+    // kidschool. Yanking it back to playground here would strand that
+    // kid's desk assignment (he keeps schoolDesk while the gen is back in
+    // the playground) and leave the gen stuck in the playground stall
+    // with no free desk. hatchKids already sends a fresh gen to play.
+    if (g && parkPiecesBuilt() && g.stage === 'nursery') goToPlayground(g);
   }
   // ---- v34: drawing the cracking hatch (v1 drawBasket / drawEgg) ----
   // Everything is drawn in v1's room-px space, translated to the placed
@@ -1464,7 +1473,15 @@
       } else if (g.phase === 'stall') {
         if (QT >= g.until) {
           if (g.stage === 'playground') {
-            if (deskPlaced()) goToSchool(g);
+            if (deskPlaced()) {
+              goToSchool(g);
+              // v45: goToSchool returns early (no free desk spot, or nobody
+              // rode yet) WITHOUT moving the gen — do not leave it stuck in
+              // 'stall' with until in the past, or tryAssignSchool (which
+              // returns early for 'stall') can never retry when a desk
+              // frees. Park it in 'wait' like the no-desk case below.
+              if (g.stage === 'playground' && g.phase === 'stall') { g.phase = 'wait'; tryAssignIdleKids(g); }
+            }
             else {
               // v42 (Chris's occupancy rule): the riders do NOT get off
               // when the stage ends. The timer running out does NOT free a
@@ -1785,16 +1802,41 @@
   // ---- the miner's job (Chris, Nov 17) ----
   // After training he mines the brown rock fog ONE hexagon at a time, SLOW
   // (MINER_SPEED). He picks a hexagon AT RANDOM among the frontier — the
-  // fogged cells touching the exposed area — walks to its centre, digs
+  // fogged cells touching the exposed area — walks to its EDGE, digs
   // (MINE_DIG_S), and the hexagon clears (BASE_FOG.clearHex, soft feathered
   // edge) and joins the exposed area. Then he picks the next one. When no
   // frontier hexagon is left (all 23 cleared) he idles.
+  // v45 (Chris): he digs from the EDGE, never the centre. He stops the
+  // moment he TOUCHES the edge — the point where the straight line from the
+  // hexagon's centre to where he is coming from crosses the boundary — and
+  // the digging animation begins there. (The old code walked him to the
+  // hexagon's centre.)
+  function hexEdgePoint(cx, cy, w, fromX, fromY) {
+    // Point on the hexagon's boundary closest to (fromX, fromY): the
+    // intersection of the ray from the centre toward (fromX, fromY) with
+    // the hexagon's edge. The six edge normals are the same ones hexDist
+    // uses (30, 90, 150, 210, 270, 330 deg); the ray exits through the
+    // edge whose normal has the largest dot product with the ray, at
+    // distance apothem / cos(angle-to-that-normal) from the centre.
+    var dx = fromX - cx, dy = fromY - cy;
+    var L = Math.sqrt(dx * dx + dy * dy);
+    if (L < 1e-6) return { x: cx + w / 2, y: cy }; // degenerate: standing on the centre already
+    var ux = dx / L, uy = dy / L;
+    var a = w * Math.sqrt(3) / 4; // apothem (see hexDist)
+    var s3 = Math.sqrt(3) / 2;
+    var ns = [[s3, 0.5], [0, 1], [-s3, 0.5], [-s3, -0.5], [0, -1], [s3, -0.5]];
+    var m = -Infinity, i, d;
+    for (i = 0; i < 6; i++) { d = ux * ns[i][0] + uy * ns[i][1]; if (d > m) m = d; }
+    var t = a / m; // distance from the centre to the boundary along the ray
+    return { x: cx + ux * t, y: cy + uy * t };
+  }
   function startMining(a) {
     var cell = pickFrontierCell();
     if (!cell) { a.state = 'idle'; return; }
     a.mine = { cell: cell, phase: 'walk' };
     a.spd = MINER_SPEED;
-    walkAnt(a, { x: cell.x, y: cell.y }, function () {
+    var edge = hexEdgePoint(cell.x, cell.y, HEXW, a.x, a.y);
+    walkAnt(a, edge, function () {
       a.spd = null;
       a.state = 'dig'; a.mine.phase = 'dig'; a.mine.digT0 = QT;
     });
@@ -1807,19 +1849,43 @@
     startMining(a); // the next frontier hexagon (or idle if none is left)
   }
   function drawMinerDig(a) {
-    // v1's queen dig strip (assets/queen-dig.webp: 6 frames @ 8 fps,
-    // 200x170/frame), drawn at the grown ant's width (~25 world). NOT the
-    // side variant: queen-dig-side.webp has red/grey horizontal
-    // registration bars baked into the file (verified Nov 17 — a red bar
-    // across the top and a grey bar along the bottom of every frame).
-    if (!art.dig || !art.dig.complete || !art.dig.naturalWidth) {
+    // v45: the miner digs with v1's SIDE dig strip
+    // (assets/queen-dig-side.webp: 6 frames @ 8 fps, 200x170/frame) — the
+    // queen in side profile facing left, front hands reaching forward and
+    // back: the actual digging MOTION (Chris, Nov 17: hands moving, dirt
+    // kicked up behind him; no hard hat). The front strip (queen-dig.webp,
+    // art.dig) is nearly static — its 6 frames are almost identical — so
+    // it does not show the motion; it stays the QUEEN's dig (room builds).
+    // The side strip has NO baked-in bars: pixel-checked Nov 17 (content
+    // only in rows 25..119, gaps fully transparent, enlarged frame clean
+    // on white) — the v44 "red/grey bars" note was a misread of the
+    // transparent-image view. No hard hat on either strip (the queen wears
+    // her crown); the miner digs bare-headed, as Chris directed. Dirt
+    // kicked up behind him: v1's entrance dig pairs the strip with dust
+    // puffs, so the miner gets the same dustAt puffs behind him (behind =
+    // away from the hexagon he faces).
+    var strip = art.digSide;
+    if (!strip || !strip.complete || !strip.naturalWidth) {
       drawKidSprite('idle_' + pad2n(IDLE_PLAY[Math.floor((QT + a.ph) * IDLE_FPS) % IDLE_PLAY.length]) + '.png', a.x, a.y, false, a.m);
       return;
     }
-    var f = Math.floor((QT - (a.mine && a.mine.digT0 != null ? a.mine.digT0 : QT)) * 8) % 6;
+    var t0 = (a.mine && a.mine.digT0 != null) ? a.mine.digT0 : QT;
+    var f = Math.floor((QT - t0) * 8) % 6;
     if (f < 0) f += 6;
     var w = 25, h = w * 170 / 200;
-    ctx.drawImage(art.dig, f * 200, 0, 200, 170, a.x - w / 2, a.y - h, w, h);
+    // Face the hexagon he is digging (the strip faces left by default).
+    var faceRight = !!(a.mine && a.mine.cell && a.mine.cell.x > a.x);
+    ctx.save();
+    ctx.translate(a.x, a.y);
+    ctx.scale(faceRight ? -1 : 1, 1);
+    ctx.drawImage(strip, f * 200, 0, 200, 170, -w / 2, -h, w, h);
+    ctx.restore();
+    // Dirt kicked up behind him (v1's dustAt, as in the entrance dig).
+    var dt = QT - t0;
+    if (dt >= 0 && dt <= MINE_DIG_S) {
+      var bx = a.x + (faceRight ? -w * 0.55 : w * 0.55);
+      dustAt(dt, bx, a.y - h * 0.35, MINE_DIG_S, w / 200);
+    }
   }
   // ---- the scout's job (Chris, Nov 17) ----
   // After training he goes OUT INTO THE WORLD: he walks up through the
