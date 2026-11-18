@@ -1625,7 +1625,22 @@
   // leaves the desk for it (the desk frees for the next kid).
   var TRAIN_S = 8; // v1 CYCLE1.TRAIN_S — the training stall at every trade item
   var MINER_SPEED = (40 * 69 * 0.175 / 26.1) / 3; // v1's live scoutSpeed (SCOUT_WALK) / 3 = ~6.17 world/s — slow, 3x slower than a scout
-  var MINE_DIG_S = 10; // digging time at one hexagon before its fog clears (pacing; Chris did not specify a duration)
+  // v46 (Chris, Nov 17): the miner discovers a hexagon the way the scout
+  // discovers a tile — GRADUALLY revealing the fog — but 10x SLOWER. The
+  // fixed 10 s dig + instant clear is GONE. He digs at the edge (plain-work
+  // animation + rocks flying) for the whole discovery, and the fog clears
+  // progressively from his dig point across the hexagon until it is fully
+  // discovered. Only then does it become buildable and does he pick the
+  // next frontier hexagon. The discovery must be PRETTY SLOW to look cool.
+  // The 10x rate, derived from v1 (simulated, Nov 17): the scout clears one
+  // surface tile (311.67 x 526.53) in ~235.2 s — greedy nearest-fog walk at
+  // SCOUT_WALK 18.5 world/s, clear radius SCOUT_R ~55, 4251 world units of
+  // walking. 10x slower = 2352 s per hexagon (39.2 min). A hexagon is
+  // 13.5x smaller than a tile, so this is deliberately very slow — the fog
+  // visibly recedes over minutes while he digs, and the base grows over
+  // hours. (If Chris wants it faster, this one number is the dial.)
+  var MINE_DISCOVER_S = 2352; // seconds to fully discover ONE hexagon (10x the scout's ~235 s per tile)
+  var REVEAL_STEP_S = 5; // the fog mask is updated every 5 s of digging (the reveal moves ~0.33 world per step — sub-cell, so the feather stays smooth)
   var SCOUT_OUT_S = 20; // a scouting trip out of the hole lasts 20 s before he comes back in
   var GUARD_ARC = [165, 140, 115, 90, 65, 40, 15]; // v1 cp4 GUARD.ARC (degrees, around the hole)
   var GUARD_RX = 30, GUARD_RY = 16; // v1 cp4 GUARD.RX/RY (world units)
@@ -1803,14 +1818,20 @@
   // After training he mines the brown rock fog ONE hexagon at a time, SLOW
   // (MINER_SPEED). He picks a hexagon AT RANDOM among the frontier — the
   // fogged cells touching the exposed area — walks to its EDGE, digs
-  // (MINE_DIG_S), and the hexagon clears (BASE_FOG.clearHex, soft feathered
-  // edge) and joins the exposed area. Then he picks the next one. When no
-  // frontier hexagon is left (all 23 cleared) he idles.
+  // (MINE_DISCOVER_S), and the hexagon is discovered progressively: the fog
+  // clears from his edge dig point across the hexagon (BASE_FOG
+  // .clearHexPartial, soft feathered edge) until it is fully discovered,
+  // then it joins the exposed area (BASE_FOG.clearHex) and he picks the
+  // next one. When no frontier hexagon is left (all 23 cleared) he idles.
   // v45 (Chris): he digs from the EDGE, never the centre. He stops the
   // moment he TOUCHES the edge — the point where the straight line from the
   // hexagon's centre to where he is coming from crosses the boundary — and
   // the digging animation begins there. (The old code walked him to the
   // hexagon's centre.)
+  // v46 (Chris): the discovery is 10x SLOWER than the scout's tile
+  // discovery (MINE_DISCOVER_S = 2352 s per hexagon) — the digging
+  // animation + rocks flying play the WHOLE time, and the fog is revealed
+  // gradually, not all at once.
   function hexEdgePoint(cx, cy, w, fromX, fromY) {
     // Point on the hexagon's boundary closest to (fromX, fromY): the
     // intersection of the ray from the centre toward (fromX, fromY) with
@@ -1833,9 +1854,9 @@
   function startMining(a) {
     var cell = pickFrontierCell();
     if (!cell) { a.state = 'idle'; return; }
-    a.mine = { cell: cell, phase: 'walk' };
-    a.spd = MINER_SPEED;
     var edge = hexEdgePoint(cell.x, cell.y, HEXW, a.x, a.y);
+    a.mine = { cell: cell, phase: 'walk', edge: edge, lastReveal: 0 };
+    a.spd = MINER_SPEED;
     walkAnt(a, edge, function () {
       a.spd = null;
       a.state = 'dig'; a.mine.phase = 'dig'; a.mine.digT0 = QT;
@@ -1849,22 +1870,26 @@
     startMining(a); // the next frontier hexagon (or idle if none is left)
   }
   function drawMinerDig(a) {
-    // v45: the miner digs with v1's SIDE dig strip
-    // (assets/queen-dig-side.webp: 6 frames @ 8 fps, 200x170/frame) — the
-    // queen in side profile facing left, front hands reaching forward and
-    // back: the actual digging MOTION (Chris, Nov 17: hands moving, dirt
-    // kicked up behind him; no hard hat). The front strip (queen-dig.webp,
-    // art.dig) is nearly static — its 6 frames are almost identical — so
-    // it does not show the motion; it stays the QUEEN's dig (room builds).
-    // The side strip has NO baked-in bars: pixel-checked Nov 17 (content
-    // only in rows 25..119, gaps fully transparent, enlarged frame clean
-    // on white) — the v44 "red/grey bars" note was a misread of the
-    // transparent-image view. No hard hat on either strip (the queen wears
-    // her crown); the miner digs bare-headed, as Chris directed. Dirt
-    // kicked up behind him: v1's entrance dig pairs the strip with dust
-    // puffs, so the miner gets the same dustAt puffs behind him (behind =
-    // away from the hexagon he faces).
-    var strip = art.digSide;
+    // v46: the miner digs with ALBERT's digging animation — v1's adult-ant
+    // "work" strip (assets/plain-work.webp: 6 frames @ 8 fps, 64x61/frame).
+    // Side profile facing left, hands moving, dirt dots kicked up behind
+    // him to the left. NO hard hat, NO crown — bare-headed (Chris, Nov 17:
+    // the hard hat in his screenshot is a separate overlay strip,
+    // hatM-work.webp — the digging itself has no hat). The v45 side strip
+    // (queen-dig-side.webp, the queen WITH A CROWN) is no longer the
+    // miner's dig; the front strip (queen-dig.webp, art.dig) stays the
+    // QUEEN's dig (room builds).
+    // SIZE (Chris: "you know what size to make it"): the miner is a GROWN
+    // ant (Albert size). Measured (PIL, alpha>=32): the ant's visible
+    // height is 41 px at most (rows 0..40; the head bobs 0..8 as he digs),
+    // feet at row 40. A grown ant is drawn 23.53 world tall (kid visible
+    // 68 px x 2 x KW), so the strip is drawn at PW_S = 23.53/41 world per
+    // frame px — the digging ant is exactly Albert size, not kid size.
+    // The digging animation plays the WHOLE discovery (MINE_DISCOVER_S),
+    // with dust/rocks kicked up behind him the whole time (v46: the slow
+    // progressive reveal — the animation never stops until the hexagon is
+    // fully discovered).
+    var strip = art.plainWork;
     if (!strip || !strip.complete || !strip.naturalWidth) {
       drawKidSprite('idle_' + pad2n(IDLE_PLAY[Math.floor((QT + a.ph) * IDLE_FPS) % IDLE_PLAY.length]) + '.png', a.x, a.y, false, a.m);
       return;
@@ -1872,19 +1897,25 @@
     var t0 = (a.mine && a.mine.digT0 != null) ? a.mine.digT0 : QT;
     var f = Math.floor((QT - t0) * 8) % 6;
     if (f < 0) f += 6;
-    var w = 25, h = w * 170 / 200;
+    var PW_VIS_H = 41; // max visible ant height in the strip, px (rows 0..40, alpha>=32)
+    var PW_S = (2 * 68 * KW) / PW_VIS_H; // grown-ant height (23.53 world) / 41 px
+    var W = 64 * PW_S, H = 61 * PW_S;
     // Face the hexagon he is digging (the strip faces left by default).
     var faceRight = !!(a.mine && a.mine.cell && a.mine.cell.x > a.x);
     ctx.save();
     ctx.translate(a.x, a.y);
     ctx.scale(faceRight ? -1 : 1, 1);
-    ctx.drawImage(strip, f * 200, 0, 200, 170, -w / 2, -h, w, h);
+    // Feet (frame row 40, bottom edge row 41) land on a.y; frame centred on a.x.
+    ctx.drawImage(strip, f * 64, 0, 64, 61, -W / 2, -PW_VIS_H * PW_S, W, H);
     ctx.restore();
-    // Dirt kicked up behind him (v1's dustAt, as in the entrance dig).
+    // Dirt/rocks kicked up behind him (v1's dustAt, as in the entrance dig).
+    // The dust plays for the WHOLE discovery (dur = MINE_DISCOVER_S), not
+    // just 10 s — it fades in over the first 0.3 s and out over the last
+    // 0.45 s of the discovery, and stays at full strength in between.
     var dt = QT - t0;
-    if (dt >= 0 && dt <= MINE_DIG_S) {
-      var bx = a.x + (faceRight ? -w * 0.55 : w * 0.55);
-      dustAt(dt, bx, a.y - h * 0.35, MINE_DIG_S, w / 200);
+    if (dt >= 0 && dt <= MINE_DISCOVER_S) {
+      var bx = a.x + (faceRight ? -W * 0.55 : W * 0.55);
+      dustAt(dt, bx, a.y - H * 0.35, MINE_DISCOVER_S, W / 200);
     }
   }
   // ---- the scout's job (Chris, Nov 17) ----
@@ -1929,7 +1960,21 @@
     for (var i = 0; i < ANTS.length; i++) {
       var a = ANTS[i];
       if (a.state === 'train' && a.train && QT >= a.train.until) finishTrain(a);
-      else if (a.state === 'dig' && a.mine && a.mine.phase === 'dig' && QT >= a.mine.digT0 + MINE_DIG_S) finishDig(a);
+      else if (a.state === 'dig' && a.mine && a.mine.phase === 'dig') {
+        // v46 (Chris): the fog is revealed PROGRESSIVELY while he digs — a
+        // soft front spreads from his edge dig point across the hexagon
+        // over MINE_DISCOVER_S. The hexagon becomes buildable only when it
+        // is FULLY discovered (finishDig). The reveal radius is a pure
+        // function of elapsed time, so big QT jumps (harness fast-forward)
+        // land on the correct radius.
+        var el = QT - a.mine.digT0;
+        if (el >= MINE_DISCOVER_S) finishDig(a);
+        else if (el >= (a.mine.lastReveal || 0) + REVEAL_STEP_S) {
+          a.mine.lastReveal = el;
+          var rr = (HEXW + 20) * (el / MINE_DISCOVER_S); // 20 = the fog feather; HEXW + 20 covers the whole hexagon from an edge point
+          if (window.BASE_FOG) BASE_FOG.clearHexPartial(a.mine.cell.x, a.mine.cell.y, HEXW, a.mine.edge.x, a.mine.edge.y, rr);
+        }
+      }
       else if (a.job === 'scout' && a.state === 'out' && a.hidden && a.scoutBackAt != null && QT >= a.scoutBackAt) returnScout(a);
       else if (a.job === 'scout' && a.state === 'idle' && a.scoutNextOut != null && QT >= a.scoutNextOut) { a.scoutNextOut = null; startScouting(a); }
     }
@@ -2293,6 +2338,36 @@
       }
     }
   }
+  // v46 (Chris): PROGRESSIVE reveal of one hexagon — the miner discovers
+  // it the way the scout discovers a tile, but 10x slower. Clears the fog
+  // inside hexagon (cx,cy,w) only up to a soft circular front of radius r
+  // around the dig point (fx,fy): the reveal starts at the edge where he
+  // digs and spreads across the hexagon as r grows. A cell is clear only
+  // when BOTH the hexagon feather AND the reveal front say clear (the mask
+  // value is the max of the two), so the reveal never clears fog outside
+  // the hexagon. Only clears (never re-fogs), same feather as
+  // clearFogHexMask. Only cells in the hexagon's bounding box are touched.
+  function clearFogHexPartialMask(cx, cy, w, fx, fy, r) {
+    var R = w / 2 + FOG_FEATHER, f2 = FOG_FEATHER / 2;
+    var i0 = Math.max(0, Math.floor((cx - R) / FOG_FC)), i1 = Math.min(FOG_FW - 1, Math.ceil((cx + R) / FOG_FC));
+    var j0 = Math.max(0, Math.floor((cy - R) / FOG_FC)), j1 = Math.min(FOG_FH - 1, Math.ceil((cy + R) / FOG_FC));
+    var i, j, k, px, py, d, t, target, dr, tr, reveal;
+    for (j = j0; j <= j1; j++) {
+      for (i = i0; i <= i1; i++) {
+        px = i * FOG_FC + FOG_FC / 2; py = j * FOG_FC + FOG_FC / 2;
+        d = hexDist(px, py, cx, cy, w);
+        t = (d + f2) / FOG_FEATHER; if (t < 0) t = 0; else if (t > 1) t = 1;
+        target = Math.round(255 * t);
+        // Reveal front: soft circle of radius r around the dig point.
+        dr = Math.hypot(px - fx, py - fy);
+        tr = (dr - r + f2) / FOG_FEATHER; if (tr < 0) tr = 0; else if (tr > 1) tr = 1;
+        reveal = Math.round(255 * tr);
+        if (reveal > target) target = reveal;
+        k = j * FOG_FW + i;
+        if (target < fogMask[k]) fogMask[k] = target;
+      }
+    }
+  }
   // ---- v38 rock texture (procedural, single continuous field, no tiling) ----
   // A deterministic seeded value-noise fBm. The hash mixes absolute integer
   // grid coordinates (never wrapped), so the field is one continuous random
@@ -2470,6 +2545,14 @@
     fogMaskToCanvas();
     return true;
   }
+  // Public (v46): progressively reveal one hexagon from a dig point — the
+  // miner's slow discovery. r grows from 0 to HEXW + 20 over the discovery.
+  function clearFogHexPartial(cx, cy, w, fx, fy, r) {
+    if (!fogReady) return false;
+    clearFogHexPartialMask(cx, cy, w, fx, fy, r);
+    fogMaskToCanvas();
+    return true;
+  }
   function drawFog() {
     if (typeof ctx === 'undefined') return;
     if (!fogReady) { if (!initFog()) return; }
@@ -2483,6 +2566,7 @@
     draw: drawFog,
     init: initFog,
     clearHex: clearFogHex,
+    clearHexPartial: clearFogHexPartial,
     get ready() { return fogReady; },
     get cell() { return FOG_FC; },
     get size() { return { w: FOG_FW, h: FOG_FH }; },
@@ -2492,6 +2576,7 @@
     _hexDist: hexDist,
     _threshold: fogThreshold,
     _clearMask: clearFogHexMask,
+    _clearHexPartial: clearFogHexPartialMask,
     _genRock: genRock,
     _rockAt: rockAt,
     _rockRGBA: rockRGBA,
@@ -2867,7 +2952,7 @@
         grid: HEX_GRID.map(function (c) { return { k: c.k, x: Math.round(c.x * 100) / 100, y: Math.round(c.y * 100) / 100 }; }),
         tradePrices: (function () { var out = {}; TRADE_ITEMS.forEach(function (it) { out[it.id] = { count: placedCount(it.id), next: nextPrice(it.id), visible: isVisible(it.id) }; }); return out; })(),
         ants: ANTS.map(function (a) { return { id: a.id, job: a.job || null, state: a.state, tradeItem: a.tradeItem || null, mine: a.mine ? a.mine.cell.k : null, hidden: !!a.hidden }; }),
-        minerSpeed: MINER_SPEED, trainS: TRAIN_S, mineDigS: MINE_DIG_S
+        minerSpeed: MINER_SPEED, trainS: TRAIN_S, mineDiscoverS: MINE_DISCOVER_S
       };
     }
   };
