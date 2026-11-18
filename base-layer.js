@@ -94,14 +94,16 @@
   // are FREE; the treadmill and the bench press are $10. Widths follow the
   // training loop's own scale (v1 SC 0.45296 x KW world/px x the frame
   // width), so the static item matches the furniture in its training loop
-  // and there is no size jump when training starts. The easel furniture is
-  // the same picture for both easels — the board (chalkboard or map) is
-  // what the training loop shows.
+  // and there is no size jump when training starts. v48 (Chris, Nov 18):
+  // the two easels have DIFFERENT pictures now — each shows its own board
+  // (a dark chalkboard with chalk marks, a map with landmasses). Before,
+  // both used the same counting-board easel, so neither showed a chalkboard
+  // or a map. The easel itself is unchanged; only the board is different.
   var TRADE_ITEMS = [
     { id: 'globe',      name: 'Globe',              src: 'assets/items/globe.png?v=44',                                                 cx: 2812, floorY: 5085, w: 13,   first: 0,  trade: 'miner' },
     { id: 'microscope', name: 'Microscope',         src: 'assets/items/microscope.png?v=44',                                            cx: 2770, floorY: 5085, w: 14,   first: 10, trade: 'miner' },
-    { id: 'easelchalk', name: 'Easel (chalkboard)', src: 'assets/furniture/kid-school-combined/kid-school-combined-counting-board-leaf-easel.png?v=44', cx: 2812, floorY: 5085, w: 15, first: 10, trade: 'scout' },
-    { id: 'easelmap',   name: 'Easel (map)',        src: 'assets/furniture/kid-school-combined/kid-school-combined-counting-board-leaf-easel.png?v=44', cx: 2860, floorY: 5085, w: 15, first: 10, trade: 'scout' },
+    { id: 'easelchalk', name: 'Easel (chalkboard)', src: 'assets/items/easel-chalkboard.png?v=48', cx: 2812, floorY: 5085, w: 15, first: 10, trade: 'scout' },
+    { id: 'easelmap',   name: 'Easel (map)',        src: 'assets/items/easel-map.png?v=48', cx: 2860, floorY: 5085, w: 15, first: 10, trade: 'scout' },
     { id: 'dumbbell',   name: 'Dumbbell curls',     src: 'assets/gym/dumbbell_curls/chris_ant_dumbbell_curls_empty_equipment.png?v=44',     cx: 2812, floorY: 5085, w: 23.5, first: 0,  trade: 'soldier' },
     { id: 'treadmill',  name: 'Treadmill',          src: 'assets/gym/treadmill_run/chris_ant_treadmill_run_empty_equipment.png?v=44',       cx: 2770, floorY: 5085, w: 34.5, first: 10, trade: 'soldier' },
     { id: 'benchpress', name: 'Bench press',        src: 'assets/gym/bench_press/chris_ant_bench_press_empty_equipment.png?v=44',          cx: 2860, floorY: 5085, w: 36.8, first: 10, trade: 'soldier' }
@@ -1641,6 +1643,8 @@
   // visibly recedes over minutes while he digs, and the base grows over
   // hours. (If Chris wants it faster, this one number is the dial.)
   var MINE_DISCOVER_S = 2352; // seconds to fully discover ONE hexagon (10x the scout's ~235 s per tile)
+  var FIRST_MINE_S = 120; // v48 (Chris, Nov 18): the FIRST hexagon the miner discovers takes only 2 minutes — so Chris can see a hexagon finish in one test session. Every hexagon after that takes the full MINE_DISCOVER_S.
+  var minedCount = 0; // v48: how many hexagons the miner has fully cleared (0 = the next dig is the first one, 120 s)
   var REVEAL_STEP_S = 5; // the fog mask is updated every 5 s of digging (the reveal moves ~0.33 world per step — sub-cell, so the feather stays smooth)
   var SCOUT_OUT_S = 20; // a scouting trip out of the hole lasts 20 s before he comes back in
   var GUARD_ARC = [165, 140, 115, 90, 65, 40, 15]; // v1 cp4 GUARD.ARC (degrees, around the hole)
@@ -1746,8 +1750,9 @@
   }
   function drawMinerDigTimer(now) {
     // v47 fix 1 (Chris, Nov 18): "You're missing the timer on top of the
-    // ant that is digging." The discovery countdown (MINE_DISCOVER_S =
-    // 2352 s per hexagon) is drawn ABOVE the digging miner, in v1's drawTag
+    // ant that is digging." The discovery countdown (the dig's duration —
+    // 120 s for the first hexagon, MINE_DISCOVER_S = 2352 s after that,
+    // v48) is drawn ABOVE the digging miner, in v1's drawTag
     // style (zero-padded mmss, white 11px bold, dark outline) — the same
     // "above the ant" offset as the other stage timers (top - 8). His feet
     // are at a.y and his head is 41*PW_S above it (the grown-ant height the
@@ -1759,7 +1764,8 @@
     for (var i = 0; i < ANTS.length; i++) {
       var a = ANTS[i];
       if (a.state !== 'dig' || !a.mine || a.mine.digT0 == null) continue;
-      var left = MINE_DISCOVER_S - (QT - a.mine.digT0);
+      var dur = (a.mine.dur != null) ? a.mine.dur : MINE_DISCOVER_S; // v48: the first hexagon is 120 s, later ones 2352 s
+      var left = dur - (QT - a.mine.digT0);
       var PW_S = (2 * 68 * KW) / 41; // grown-ant scale, same as drawMinerDig
       drawTag(a.x, a.y - 41 * PW_S - 8, brainMmss(left), 1, 0);
     }
@@ -1855,7 +1861,8 @@
   // After training he mines the brown rock fog ONE hexagon at a time, SLOW
   // (MINER_SPEED). He picks a hexagon AT RANDOM among the frontier — the
   // fogged cells touching the exposed area — walks to its EDGE, digs
-  // (MINE_DISCOVER_S), and the hexagon is discovered progressively: the fog
+  // (120 s for the first hexagon, MINE_DISCOVER_S = 2352 s after that —
+  // v48), and the hexagon is discovered progressively: the fog
   // clears from his edge dig point across the hexagon (BASE_FOG
   // .clearHexPartial, soft feathered edge) until it is fully discovered,
   // then it joins the exposed area (BASE_FOG.clearHex) and he picks the
@@ -1866,9 +1873,10 @@
   // the digging animation begins there. (The old code walked him to the
   // hexagon's centre.)
   // v46 (Chris): the discovery is 10x SLOWER than the scout's tile
-  // discovery (MINE_DISCOVER_S = 2352 s per hexagon) — the digging
-  // animation + rocks flying play the WHOLE time, and the fog is revealed
-  // gradually, not all at once.
+  // discovery (MINE_DISCOVER_S = 2352 s per hexagon after the first) —
+  // the digging animation + rocks flying play the WHOLE time, and the fog
+  // is revealed gradually, not all at once. v48: the FIRST hexagon takes
+  // only 120 s (FIRST_MINE_S), so Chris can see one finish in a test session.
   function hexEdgePoint(cx, cy, w, fromX, fromY) {
     // Point on the hexagon's boundary closest to (fromX, fromY): the
     // intersection of the ray from the centre toward (fromX, fromY) with
@@ -1897,11 +1905,13 @@
     walkAnt(a, edge, function () {
       a.spd = null;
       a.state = 'dig'; a.mine.phase = 'dig'; a.mine.digT0 = QT;
+      a.mine.dur = (minedCount === 0) ? FIRST_MINE_S : MINE_DISCOVER_S; // v48: the first hexagon takes 120 s, later ones 2352 s (fixed at dig start, so the timer and the reveal use one duration)
     });
   }
   function finishDig(a) {
     var cell = a.mine.cell;
     clearedCells[cell.k] = true;
+    minedCount++; // v48: this hexagon is done — the next dig is a later one (2352 s)
     if (window.BASE_FOG) BASE_FOG.clearHex(cell.x, cell.y, HEXW);
     a.mine = null; a.state = 'idle';
     startMining(a); // the next frontier hexagon (or idle if none is left)
@@ -1922,10 +1932,12 @@
     // feet at row 40. A grown ant is drawn 23.53 world tall (kid visible
     // 68 px x 2 x KW), so the strip is drawn at PW_S = 23.53/41 world per
     // frame px — the digging ant is exactly Albert size, not kid size.
-    // The digging animation plays the WHOLE discovery (MINE_DISCOVER_S),
-    // with dust/rocks kicked up behind him the whole time (v46: the slow
+    // The digging animation plays the WHOLE discovery, with the dirt dots
+    // baked into the strip flying behind him the whole time (v46: the slow
     // progressive reveal — the animation never stops until the hexagon is
-    // fully discovered).
+    // fully discovered). v48: no dustAt cloud (Chris — it looked like a
+    // little tornado); the strip's own dirt dots are the whole effect.
+    // The discovery is 120 s for the first hexagon, 2352 s after that (v48).
     var strip = art.plainWork;
     if (!strip || !strip.complete || !strip.naturalWidth) {
       drawKidSprite('idle_' + pad2n(IDLE_PLAY[Math.floor((QT + a.ph) * IDLE_FPS) % IDLE_PLAY.length]) + '.png', a.x, a.y, false, a.m);
@@ -1944,9 +1956,9 @@
     // the baked-in dirt dots behind him to the LEFT). So when the hexagon
     // is to his right he needs NO flip, and when it is to his left he is
     // flipped. The old code did the opposite (flipped when the hex was
-    // right), so he faced AWAY from the hexagon in both directions. The
-    // dust below is unchanged: it was already placed behind him relative
-    // to the hexagon direction (away from the hexagon), which is correct.
+    // right), so he faced AWAY from the hexagon in both directions.
+    // (v48: the dustAt puffs that used to sit behind him are gone — the
+    // strip's own baked-in dirt dots are the whole effect now.)
     var faceRight = !!(a.mine && a.mine.cell && a.mine.cell.x > a.x);
     ctx.save();
     ctx.translate(a.x, a.y);
@@ -1954,15 +1966,12 @@
     // Feet (frame row 40, bottom edge row 41) land on a.y; frame centred on a.x.
     ctx.drawImage(strip, f * 64, 0, 64, 61, -W / 2, -PW_VIS_H * PW_S, W, H);
     ctx.restore();
-    // Dirt/rocks kicked up behind him (v1's dustAt, as in the entrance dig).
-    // The dust plays for the WHOLE discovery (dur = MINE_DISCOVER_S), not
-    // just 10 s — it fades in over the first 0.3 s and out over the last
-    // 0.45 s of the discovery, and stays at full strength in between.
-    var dt = QT - t0;
-    if (dt >= 0 && dt <= MINE_DISCOVER_S) {
-      var bx = a.x + (faceRight ? -W * 0.55 : W * 0.55);
-      dustAt(dt, bx, a.y - H * 0.35, MINE_DISCOVER_S, W / 200);
-    }
+    // v48 (Chris, Nov 18): NO dust cloud on the digging miner — the v1
+    // dustAt puffs here looked like "a little tornado cloud" and he
+    // doesn't want it. The dirt kicked up behind him is the dirt dots
+    // BAKED INTO the plain-work strip itself (he likes those), so the
+    // strip alone is the whole effect. dustAt itself stays (the build
+    // cloud still uses it) — only the miner's call is gone.
   }
   // ---- the scout's job (Chris, Nov 17) ----
   // After training he goes OUT INTO THE WORLD: he walks up through the
@@ -2009,15 +2018,17 @@
       else if (a.state === 'dig' && a.mine && a.mine.phase === 'dig') {
         // v46 (Chris): the fog is revealed PROGRESSIVELY while he digs — a
         // soft front spreads from his edge dig point across the hexagon
-        // over MINE_DISCOVER_S. The hexagon becomes buildable only when it
-        // is FULLY discovered (finishDig). The reveal radius is a pure
-        // function of elapsed time, so big QT jumps (harness fast-forward)
-        // land on the correct radius.
+        // over the dig's duration (120 s first, 2352 s after — v48). The
+        // hexagon becomes buildable only when it is FULLY discovered
+        // (finishDig). The reveal radius is a pure function of elapsed
+        // time, so big QT jumps (harness fast-forward) land on the correct
+        // radius.
         var el = QT - a.mine.digT0;
-        if (el >= MINE_DISCOVER_S) finishDig(a);
+        var dur = (a.mine.dur != null) ? a.mine.dur : MINE_DISCOVER_S; // v48: the first hexagon is 120 s, later ones 2352 s
+        if (el >= dur) finishDig(a);
         else if (el >= (a.mine.lastReveal || 0) + REVEAL_STEP_S) {
           a.mine.lastReveal = el;
-          var rr = (HEXW + 20) * (el / MINE_DISCOVER_S); // 20 = the fog feather; HEXW + 20 covers the whole hexagon from an edge point
+          var rr = (HEXW + 20) * (el / dur); // 20 = the fog feather; HEXW + 20 covers the whole hexagon from an edge point
           if (window.BASE_FOG) BASE_FOG.clearHexPartial(a.mine.cell.x, a.mine.cell.y, HEXW, a.mine.edge.x, a.mine.edge.y, rr);
         }
       }
@@ -2254,7 +2265,11 @@
         pp.building = false;
         // The basket unlocks when BOTH the fridge and the cooler are built:
         // re-render the menu so it appears the moment the second one is revealed.
-        if (job.id === 'fridge' || job.id === 'watercooler') renderMenu();
+        // v48 (Chris, Nov 18): the same for the trade chain — the easels
+        // must appear the MOMENT the globe is built, and the gym items the
+        // moment an easel is built, so the player can build the next trade
+        // right away (not when the ant finishes training or goes off to work).
+        if (job.id === 'fridge' || job.id === 'watercooler' || job.id === 'globe' || job.id === 'easelchalk' || job.id === 'easelmap') renderMenu();
         // The timer starts ONLY after the item is built (cloud gone), never
         // while the cloud is still going.
         if (job.id === 'fridge' || job.id === 'watercooler') startRoomTimer(job.id);
@@ -2997,8 +3012,8 @@
         frontier: frontierCells().map(function (c) { return c.k; }),
         grid: HEX_GRID.map(function (c) { return { k: c.k, x: Math.round(c.x * 100) / 100, y: Math.round(c.y * 100) / 100 }; }),
         tradePrices: (function () { var out = {}; TRADE_ITEMS.forEach(function (it) { out[it.id] = { count: placedCount(it.id), next: nextPrice(it.id), visible: isVisible(it.id) }; }); return out; })(),
-        ants: ANTS.map(function (a) { return { id: a.id, job: a.job || null, state: a.state, tradeItem: a.tradeItem || null, mine: a.mine ? a.mine.cell.k : null, hidden: !!a.hidden }; }),
-        minerSpeed: MINER_SPEED, trainS: TRAIN_S, mineDiscoverS: MINE_DISCOVER_S
+        ants: ANTS.map(function (a) { return { id: a.id, job: a.job || null, state: a.state, tradeItem: a.tradeItem || null, mine: a.mine ? a.mine.cell.k : null, mineDur: a.mine ? (a.mine.dur != null ? a.mine.dur : null) : null, hidden: !!a.hidden }; }),
+        minerSpeed: MINER_SPEED, trainS: TRAIN_S, mineDiscoverS: MINE_DISCOVER_S, firstMineS: FIRST_MINE_S, minedCount: minedCount
       };
     }
   };
