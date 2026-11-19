@@ -103,7 +103,7 @@
     { id: 'globe',      name: 'Globe',              src: 'assets/items/globe.png?v=44',                                                 cx: 2812, floorY: 5085, w: 13,   first: 0,  trade: 'miner' },
     { id: 'microscope', name: 'Microscope',         src: 'assets/items/microscope.png?v=44',                                            cx: 2770, floorY: 5085, w: 14,   first: 10, trade: 'miner' },
     { id: 'easelchalk', name: 'Easel (chalkboard)', src: 'assets/items/easel-chalkboard.png?v=49', cx: 2812, floorY: 5085, w: 15, first: 10, trade: 'scout' },
-    { id: 'easelmap',   name: 'Easel (map)',        src: 'assets/items/easel-map.png?v=49', cx: 2860, floorY: 5085, w: 15, first: 10, trade: 'scout' },
+    { id: 'easelmap',   name: 'Easel (map)',        src: 'assets/items/easel-map.png?v=50', cx: 2860, floorY: 5085, w: 15, first: 10, trade: 'scout' },
     { id: 'dumbbell',   name: 'Dumbbell curls',     src: 'assets/gym/dumbbell_curls/chris_ant_dumbbell_curls_empty_equipment.png?v=44',     cx: 2812, floorY: 5085, w: 23.5, first: 0,  trade: 'soldier' },
     { id: 'treadmill',  name: 'Treadmill',          src: 'assets/gym/treadmill_run/chris_ant_treadmill_run_empty_equipment.png?v=44',       cx: 2770, floorY: 5085, w: 34.5, first: 10, trade: 'soldier' },
     { id: 'benchpress', name: 'Bench press',        src: 'assets/gym/bench_press/chris_ant_bench_press_empty_equipment.png?v=44',          cx: 2860, floorY: 5085, w: 36.8, first: 10, trade: 'soldier' }
