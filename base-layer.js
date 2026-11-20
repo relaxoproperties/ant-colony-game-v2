@@ -104,7 +104,7 @@
     { id: 'microscope', name: 'Microscope',         src: 'assets/items/microscope.png?v=44',                                            cx: 2770, floorY: 5085, w: 14,   first: 10, trade: 'miner' },
     { id: 'easelchalk', name: 'Easel (chalkboard)', src: 'assets/items/easel-chalkboard.png?v=49', cx: 2812, floorY: 5085, w: 15, first: 10, trade: 'scout' },
     { id: 'easelmap',   name: 'Easel (map)',        src: 'assets/items/easel-map.png?v=50', cx: 2860, floorY: 5085, w: 15, first: 10, trade: 'scout' },
-    { id: 'dumbbell',   name: 'Dumbbell curls',     src: 'assets/gym/dumbbell_curls/chris_ant_dumbbell_curls_empty_equipment.png?v=44',     cx: 2812, floorY: 5085, w: 23.5, first: 0,  trade: 'soldier' },
+    { id: 'dumbbell',   name: 'Dumbbell curls',     src: 'assets/gym/dumbbell_curls/chris_ant_dumbbell_curls_empty_equipment.png?v=44',     cx: 2812, floorY: 5085, w: 23.5, first: 0,  trade: 'soldier', thumb: 'background-image:url(assets/gym/dumbbell_curls/chris_ant_dumbbell_curls_empty_equipment_thumb.png?v=51);' }, // v51 fix 2: the empty-equipment picture is two tiny dumbbells at the bottom of a 300x395 transparent frame (ink 133x30 px at y318-348), so at 104px contain it read as a ~46x10 black bar. The card thumbnail is a tight CROP of the same picture (173x66, ink fills it) — the in-game item is unchanged. Treadmill (423x230 ink) and bench (452x305 ink) already read large; left alone.
     { id: 'treadmill',  name: 'Treadmill',          src: 'assets/gym/treadmill_run/chris_ant_treadmill_run_empty_equipment.png?v=44',       cx: 2770, floorY: 5085, w: 34.5, first: 10, trade: 'soldier' },
     { id: 'benchpress', name: 'Bench press',        src: 'assets/gym/bench_press/chris_ant_bench_press_empty_equipment.png?v=44',          cx: 2860, floorY: 5085, w: 36.8, first: 10, trade: 'soldier' }
   ];
@@ -1177,6 +1177,15 @@
     // the dig strip. Both replace the ant's own sprite while they run.
     if (a.state === 'train') { drawTrainAnt(a); return; }
     if (a.state === 'dig') { drawMinerDig(a); return; }
+    // v51: a scout carrying/delivering downstairs (v1 'down' / 'rest' /
+    // 'downOut') is drawn underground at his under position, walking or
+    // idle there — not at his (stale) surface spot, and not hidden.
+    if (a.job === 'scout' && a.scout && a.scout.under && (a.scout.state === 'down' || a.scout.state === 'rest' || a.scout.state === 'downOut')) {
+      var U = a.scout.under;
+      if (U.path.length) drawKidSprite('side_' + pad2n(Math.floor(U.wf) % 16) + '.png', U.x, U.y, U.flip, a.m);
+      else drawKidSprite('idle_' + pad2n(IDLE_PLAY[Math.floor((QT + a.ph) * IDLE_FPS) % IDLE_PLAY.length]) + '.png', U.x, U.y, false, a.m);
+      return;
+    }
     // v39 fix 2: a kid STUDYING at a desk is the ksDesk loop (v1) — the kid
     // at a small wooden desk, baked together — not the idle kid sprite and
     // not the blue desk. The static blue desk is hidden while he studies
@@ -1671,7 +1680,9 @@
   var MINE_CLEAR_R = 20;
   var MINE_FOG_CLEAR = 24;
   var MINE_PATH_PER_HEX = 580;
-  var SCOUT_OUT_S = 20; // a scouting trip out of the hole lasts 20 s before he comes back in
+  // v51: the 20 s wander-and-return timer (SCOUT_OUT_S, returnScout,
+  // scoutNextOut) is GONE — it was invented in v49/v50; v1 has no such
+  // timer. The scout below is the v1 tile machine (see the scout section).
   var GUARD_ARC = [165, 140, 115, 90, 65, 40, 15]; // v1 cp4 GUARD.ARC (degrees, around the hole)
   var GUARD_RX = 30, GUARD_RY = 16; // v1 cp4 GUARD.RX/RY (world units)
   var LOOP_S = 0.45296 * KW; // v1 SC (130/287): the training loops are drawn at this scale for a grown ant, as in v1
@@ -1698,8 +1709,25 @@
   // a step (kept in assets/portb/np5loops/chalk, untouched); the map loop
   // was already step-free but had no map visible. Same frame counts, sizes
   // and anchors, so the training (8 s, desk-swap) is unchanged.
-  var KS_CHALK = loadLoopFrames({ dir: 'assets/items/ks-chalk-nostep/chris_ant_chalkboard_', n: 32, fps: 8, ax: 150, ay: 413 });
-  var KS_MAP = loadLoopFrames({ dir: 'assets/items/ks-map-nostep/chris_ant_point_map_', n: 24, fps: 8, ax: 150, ay: 343 });
+  // v51 fix 3 (Chris, Nov 19): the chalk/map training loops are drawn at
+  // their OWN scale, not LOOP_S — the easel in the loop must match the
+  // static easel item on the floor. Measured: the static easel image is
+  // 244x420, ink 205 px wide, drawn at w=15 -> easel ink 12.60 world wide.
+  // At LOOP_S (0.07837) the loop easels were 258 px (chalk) / 256 px (map)
+  // of ink -> 20.2 / 20.1 world wide, ~1.6x the static easel — that is why
+  // the training easel read "much larger" in his screenshot. The loop
+  // scale is static-ink-width / loop-ink-width: 12.60/258 = 0.0488 (chalk),
+  // 12.60/256 = 0.0492 (map). Same desk-swap idea as KSDESK_W (v40 fix 3):
+  // the loop is sized by what it has to match, not by the generic loop
+  // scale. TRADE-OFF, stated plainly: the loop easels are WIDE boards on
+  // short legs while the static easel is NARROW and TALL, so no one uniform
+  // scale matches both dimensions — width-matched, the loop easel stands
+  // shorter than the static one (chalk frame 21.0 tall vs static 25.8),
+  // and the ant in the loop shrinks with it (~15.8 world vs a grown ant's
+  // 23.5). The globe/microscope loops are untouched (not part of this fix).
+  var KS_CHALK_S = 0.0488, KS_MAP_S = 0.0492;
+  var KS_CHALK = loadLoopFrames({ dir: 'assets/items/ks-chalk-nostep/chris_ant_chalkboard_', n: 32, fps: 8, ax: 150, ay: 413, s: KS_CHALK_S });
+  var KS_MAP = loadLoopFrames({ dir: 'assets/items/ks-map-nostep/chris_ant_point_map_', n: 24, fps: 8, ax: 150, ay: 343, s: KS_MAP_S });
   var KS_GYM = {
     treadmill: loadLoopFrames({ dir: 'assets/gym/treadmill_run/chris_ant_treadmill_run_', n: 16, fps: 16, ax: 220, ay: 394 }),
     curls: loadLoopFrames({ dir: 'assets/gym/dumbbell_curls/chris_ant_dumbbell_curls_', n: 24, fps: 8, ax: 150, ay: 334 }),
@@ -1730,7 +1758,7 @@
     if (idx < 0) idx += loop.n;
     var im = loop.frames[idx];
     if (!im || !im.complete || !im.naturalWidth) return false;
-    var s = LOOP_S, w = im.naturalWidth * s, h = im.naturalHeight * s;
+    var s = loop.s || LOOP_S, w = im.naturalWidth * s, h = im.naturalHeight * s; // v51 fix 3: chalk/map loops carry their own scale (loop.s) so the easel matches the static item; every other loop uses LOOP_S
     ctx.drawImage(im, d.cx - loop.ax * s, d.floorY - loop.ay * s, w, h);
     return true;
   }
@@ -2071,55 +2099,417 @@
     // strip alone is the whole effect. dustAt itself stays (the build
     // cloud still uses it) — only the miner's call is gone.
   }
-  // ---- the scout's job (Chris, Nov 17) ----
-  // After training he goes OUT INTO THE WORLD: he walks up through the
-  // spiral hole, scouts (out of sight for SCOUT_OUT_S), comes back in, and
-  // goes out again. No threat, no seed mechanic in checkpoint 4.
-  // v49 (Chris, Nov 18): while he is out he is VISIBLE upstairs, wandering
-  // the surface around the mound hole doing his job — so Chris can SEE him
-  // when he goes up. (Before v49 he was hidden everywhere while out, so
-  // upstairs there was no scout to find.) The surface hole is the mound at
-  // the entrance hexagon's grid centre (HEX.cx, HEX.cy) — the surface is
-  // directly above the basement. There is no surface-fog system in the base
-  // layer yet, so he walks/explores; he does not clear surface fog (v1's
-  // surface fog + seeds are a later checkpoint's system — NOT invented here).
-  var SURFACE_HOLE = { x: HEX.cx, y: HEX.cy }; // the mound hole, upstairs (world coords)
-  var SCOUT_UP_SPEED = 40 * 69 * 0.175 / 26.1; // v1's scout walk speed on the surface (~18.5 world/s)
-  function pickScoutUpTarget(a) {
-    // a random spot near the mound hole to wander to (v1's scout wanders
-    // the surface). Close enough to the hole that Chris can always find him.
-    var ang = Math.random() * Math.PI * 2, r = 30 + Math.random() * 110;
-    a.scoutUp.tx = SURFACE_HOLE.x + Math.cos(ang) * r;
-    a.scoutUp.ty = SURFACE_HOLE.y + Math.sin(ang) * r * 0.7; // slightly squashed vertically (the mound reads wider than tall on screen)
+  // ---- the scout's job (Chris, Nov 17; v51 port from v1, Nov 19) ----
+  // v51: the scout is v1's scout, ported faithfully from the old game
+  // (index.html scout section + cp4 followers/solo). The v49/v50 scout —
+  // a 20 s wander near the hole with no tile, no fog, no seeds, returning
+  // on a clock (SCOUT_OUT_S, returnScout, scoutNextOut) — is GONE; that
+  // whole timer loop was invented, v1 has no 20-second return timer.
+  // v1's scout, in full:
+  //  * TILE SYSTEM: the surface is tiles (TILE_MAP 311.67 x 526.53 world,
+  //    centred on the mound). Home tile (0,0) first; then a tile picked at
+  //    RANDOM from the 3x3 around his own tile (scoutChoices) that touches
+  //    the discovered area (selectableTile). He finishes the tile, then
+  //    picks the next one straight away.
+  //  * SURFACE FOG: a fog mask (FM, 10-world cells, FOG_ALPHA 0.5) covers
+  //    the map; the home tile is cleared at the start (clearHomeTile). He
+  //    walks to the NEAREST fogged cell in his tile (nearestFog) and clears
+  //    fog in a ~55-world radius only inside that tile (clearFogIn). When
+  //    no fog is left in the tile, the tile is done (tileDone — cleared
+  //    whole, soft edge) and joins the discovered area.
+  //  * SMALL SEEDS: picked up ON THE MOVE at tile completion — never
+  //    stopped for (+1 seed, +2-3 coins; the first one unlocks the farm
+  //    in v1). Counted here (scoutSeedsFound / scoutCoinsEarned); this
+  //    build has no seed inventory, no coins/wallet and no farm yet, so
+  //    there is nothing to unlock or pay into — the counts are kept for
+  //    checkpoint 6 (seed money bank), and the farm unlock is NOT claimed.
+  //  * GIANT SEEDS: only after a tile is fully revealed, if a giant seed
+  //    is on it (giantOnTile — the bird-feeder seed patches, coords copied
+  //    verbatim from cp4's SEED_EXACT/SEED_XFORM; map-hd.jpg is exactly
+  //    5625x10000 = WORLD, so those coords are world coords): he carries
+  //    it home (toHole -> goneDown -> down to the classroom drop -> rest
+  //    3 s -> downOut -> emerge) and picks the next tile. That is v1's
+  //    carry-home path (index.html:758) — cp4's holdFinder (parking him
+  //    idle at the found seed, finderHeld, never released in the code
+  //    read) is NOT ported, per the task: no invented release.
+  //  * MAP DONE: when no selectable tile is left anywhere, he comes home
+  //    and STAYS home (cp4 scoutsStep: waiting -> toHole, rest held).
+  //  * FOLLOWERS / SOLO (cp4): a second scout graduate FOLLOWS the lead
+  //    at FOLLOW_OFF offsets while the lead is still scouting; once the
+  //    lead has already found a seed, the second graduate scouts ALONE
+  //    (solo — same tile machine, his own tile, starting where the lead
+  //    stopped). Ported; the lead's speed stays the first-scout pace
+  //    (cp4: joining must not bump SCOUT_LADDER).
+  // Per-ant state: a.scout (lead or solo machine) or a.follow (follower).
+  // a.state stays 'out' + a.hidden while he is on the surface; while he
+  // is downstairs carrying/delivering (down/rest/downOut) he is drawn
+  // underground at S.under (drawKid branch) and a.hidden is false.
+  var SCOUT_TILE_W = 311.6667, SCOUT_TILE_H = 526.5278;
+  var SCOUT_GX = HEX.cx, SCOUT_GY = HEX.cy;
+  var SCOUT_ORIG = SCOUT_TILE_W / 499; // v1 ORIG_TO_MAP
+  var SCOUT_R = 88 * SCOUT_ORIG; // ~55 world — fog clear radius around him
+  var SCOUT_FOG_CLEAR = 24, SCOUT_FC = 10, SCOUT_TILE_MARGIN = 14 * SCOUT_ORIG;
+  var SCOUT_FOG_ALPHA = 0.5, SCOUT_TILE_F = 70; // tileDone soft edge
+  var SCOUT_WALK = 40 * 69 * 0.175 / 26.1; // v1 SCOUT_WALK (~18.5 world/s)
+  // v1 HOLE_UP / EMERGE_UP, from the opening's own numbers (the mound door
+  // and the spot just out of it). Falls back to the mound hex centre when
+  // the opening's consts are not in scope (harness).
+  var SCOUT_HOLE_UP = (function () {
+    try {
+      if (typeof MAP_RECT !== 'undefined' && typeof START_SPP !== 'undefined' && typeof FAR !== 'undefined' && typeof Q !== 'undefined' && typeof D !== 'undefined')
+        return { x: MAP_RECT.x + (FAR.ox + D.x * FAR.s) / START_SPP, y: MAP_RECT.y + (FAR.oy + (D.bottom - 28) * FAR.s) / START_SPP };
+    } catch (e) {}
+    return { x: HEX.cx, y: HEX.cy };
+  })();
+  var SCOUT_EMERGE_UP = (function () {
+    try {
+      if (typeof MAP_RECT !== 'undefined' && typeof START_SPP !== 'undefined' && typeof FAR !== 'undefined' && typeof Q !== 'undefined' && typeof D !== 'undefined')
+        return { x: MAP_RECT.x + (FAR.ox + (2 * Q.x - D.x) * FAR.s) / START_SPP, y: MAP_RECT.y + (FAR.oy + (2 * Q.y - (D.bottom - 28)) * FAR.s) / START_SPP };
+    } catch (e) {}
+    return { x: HEX.cx + 12, y: HEX.cy + 22 };
+  })();
+  // ---- surface fog (v1 FM / fogCanvas, black at FOG_ALPHA) ----
+  var SF_FW = Math.ceil(WORLD.w / SCOUT_FC), SF_FH = Math.ceil(WORLD.h / SCOUT_FC);
+  var SFM = new Uint8Array(SF_FW * SF_FH).fill(255);
+  var sfC = null, sfX = null, sfID = null, sfDirty = true, sfPutAt = -1e9, sfOn = false, sfCanvasOk = false;
+  var scoutDiscovered = new Set(['0,0']);
+  var scoutScoutsHome = false; // map fully explored: scouts come home and stay home
+  var scoutSeedsFound = 0, scoutCoinsEarned = 0, scoutFirstSeed = false;
+  var SCOUT_SMALL = []; // {x,y,taken}
+  var SCOUT_LEAD = null; // the ant running the lead scout machine
+  function sfInitCanvas() {
+    if (sfC) return sfCanvasOk;
+    try {
+      sfC = document.createElement('canvas'); sfC.width = SF_FW; sfC.height = SF_FH;
+      sfX = sfC.getContext('2d');
+      if (!sfX || typeof sfX.createImageData !== 'function' || typeof sfX.putImageData !== 'function') { sfCanvasOk = false; return false; }
+      sfID = sfX.createImageData(SF_FW, SF_FH);
+      sfCanvasOk = true; return true;
+    } catch (e) { sfCanvasOk = false; return false; }
   }
-  function drawUpScout(now) {
-    // v49: draw every scout who is OUT, on the surface (drawSurface calls
-    // this inside applyWorld, so these are world coords). Grown-ant size,
-    // walking sprite while he wanders the mound. The basement draw skips
-    // him (he is hidden downstairs while out) — this is the only place he
-    // is drawn while out.
-    for (var i = 0; i < ANTS.length; i++) {
-      var a = ANTS[i];
-      if (a.job !== 'scout' || a.state !== 'out' || !a.scoutUp) continue;
-      var su = a.scoutUp;
-      drawKidSprite('side_' + pad2n(Math.floor(su.wf) % 16) + '.png', su.x, su.y, su.flip, 1); // grown ant (m = 1)
+  function sfFogCanvas(now) { // v1 fogCanvas: putImageData at most every 90 ms; alpha = mask, RGB black
+    if (!sfInitCanvas()) return null;
+    if (sfDirty && now - sfPutAt > 90) {
+      var d = sfID.data, k;
+      for (k = 0; k < SFM.length; k++) d[k * 4 + 3] = SFM[k];
+      try { sfX.putImageData(sfID, 0, 0); } catch (e) { return null; }
+      sfDirty = false; sfPutAt = now;
+    }
+    return sfC;
+  }
+  function scoutFogAt(x, y) { var i = Math.floor(x / SCOUT_FC), j = Math.floor(y / SCOUT_FC); if (i < 0 || j < 0 || i >= SF_FW || j >= SF_FH) return 255; return SFM[j * SF_FW + i]; }
+  function scoutTileRect(c, r) { var cx = SCOUT_GX + c * SCOUT_TILE_W, cy = SCOUT_GY + r * SCOUT_TILE_H; return { x0: cx - SCOUT_TILE_W / 2, y0: cy - SCOUT_TILE_H / 2, x1: cx + SCOUT_TILE_W / 2, y1: cy + SCOUT_TILE_H / 2, cx: cx, cy: cy }; }
+  function scoutTileValid(c, r) { var t = scoutTileRect(c, r); return t.cx >= 0 && t.cx <= WORLD.w && t.cy >= 0 && t.cy <= WORLD.h; }
+  function scoutTileCells(c, r) { var t = scoutTileRect(c, r); return { i0: Math.max(0, Math.ceil(t.x0 / SCOUT_FC)), i1: Math.min(SF_FW, Math.floor(t.x1 / SCOUT_FC)), j0: Math.max(0, Math.ceil(t.y0 / SCOUT_FC)), j1: Math.min(SF_FH, Math.floor(t.y1 / SCOUT_FC)), t: t }; }
+  function scoutTileOfPt(x, y) { return [Math.round((x - SCOUT_GX) / SCOUT_TILE_W), Math.round((y - SCOUT_GY) / SCOUT_TILE_H)]; }
+  function scoutTileBusy(k) { // a tile is busy while the lead or a solo scout is working it
+    for (var i = 0; i < ANTS.length; i++) { var a = ANTS[i]; if (a.scout && a.scout.tile && !a.scout.tileDone && a.scout.tile.join(',') === k) return true; }
+    return false;
+  }
+  function scoutSelectableTile(c, r) { // v1 selectableTile: home first, then an unexplored tile touching the scouted area
+    var k = c + ',' + r;
+    if (!scoutTileValid(c, r) || scoutTileBusy(k)) return false;
+    var lead = SCOUT_LEAD && SCOUT_LEAD.scout;
+    if (!c && !r) return !(lead && lead.homeDone);
+    if (!(lead && lead.homeDone)) return false;
+    if (scoutDiscovered.has(k)) return false;
+    for (var dc = -1; dc <= 1; dc++) for (var dr = -1; dr <= 1; dr++) if ((dc || dr) && scoutDiscovered.has((c + dc) + ',' + (r + dr))) return true;
+    return false;
+  }
+  function scoutChoices(x, y) { // v1 scoutChoices: the 3x3 around the ant's own tile, else the nearest open tiles on the scouted edge
+    var c0r0 = scoutTileOfPt(x, y), c0 = c0r0[0], r0 = c0r0[1], out = [], p, c, r;
+    for (p = 1; p <= 9; p++) { c = c0 + (p - 1) % 3 - 1; r = r0 + Math.floor((p - 1) / 3) - 1; if (scoutSelectableTile(c, r)) out.push(c + ',' + r); }
+    if (out.length) return out;
+    var all = [];
+    scoutDiscovered.forEach(function (kk) { var pp = kk.split(','), cc = +pp[0], rr = +pp[1]; for (var dc = -1; dc <= 1; dc++) for (var dr = -1; dr <= 1; dr++) { var n = (cc + dc) + ',' + (rr + dr); if ((dc || dr) && all.indexOf(n) < 0 && scoutSelectableTile(cc + dc, rr + dr)) all.push(n); } });
+    if (!all.length) return all;
+    var d = function (kk) { var pp = kk.split(','); return Math.max(Math.abs(+pp[0] - c0), Math.abs(+pp[1] - r0)); };
+    var b = Math.min.apply(null, all.map(d));
+    return all.filter(function (kk) { return d(kk) === b; });
+  }
+  function scoutNearestFog(c, r, x, y) { // v1 nearestFog: the nearest still-fogged cell in the tile
+    var q = scoutTileCells(c, r), t = q.t, best = null, bd = 1e18, i, j, px, py, dd;
+    for (j = q.j0; j < q.j1; j++) for (i = q.i0; i < q.i1; i++) {
+      if (SFM[j * SF_FW + i] <= SCOUT_FOG_CLEAR) continue;
+      px = clamp(i * SCOUT_FC + SCOUT_FC / 2, t.x0 + SCOUT_TILE_MARGIN, t.x1 - SCOUT_TILE_MARGIN);
+      py = clamp(j * SCOUT_FC + SCOUT_FC / 2, t.y0 + SCOUT_TILE_MARGIN, t.y1 - SCOUT_TILE_MARGIN);
+      dd = (px - x) * (px - x) + (py - y) * (py - y);
+      if (dd < bd) { bd = dd; best = { x: px, y: py }; }
+    }
+    return best;
+  }
+  function scoutClearFogIn(x, y, rad, c, rr) { // v1 clearFogIn: clears only inside his chosen tile
+    var t = scoutTileRect(c, rr);
+    if (x < t.x0 || x > t.x1 || y < t.y0 || y > t.y1) return;
+    var i0 = Math.max(0, Math.floor((Math.max(x - rad, t.x0)) / SCOUT_FC)), i1 = Math.min(SF_FW - 1, Math.floor((Math.min(x + rad, t.x1)) / SCOUT_FC));
+    var j0 = Math.max(0, Math.floor((Math.max(y - rad, t.y0)) / SCOUT_FC)), j1 = Math.min(SF_FH - 1, Math.floor((Math.min(y + rad, t.y1)) / SCOUT_FC));
+    for (var j = j0; j <= j1; j++) for (var i = i0; i <= i1; i++) {
+      var d = Math.hypot(i * SCOUT_FC + SCOUT_FC / 2 - x, j * SCOUT_FC + SCOUT_FC / 2 - y) / rad;
+      if (d >= 1) continue;
+      var q = Math.max(0, (d - 0.55) / 0.45), v = Math.round(255 * q * q * (3 - 2 * q)), k = j * SF_FW + i;
+      if (v < SFM[k]) { SFM[k] = v; sfDirty = true; }
     }
   }
-  function startScouting(a) {
+  function scoutTileDone(c, r) { // v1 tileDone: the finished tile clears whole, soft edge outside it
+    var t = scoutTileRect(c, r), F = SCOUT_TILE_F;
+    var i0 = Math.max(0, Math.floor((t.x0 - F) / SCOUT_FC)), i1 = Math.min(SF_FW - 1, Math.ceil((t.x1 + F) / SCOUT_FC));
+    var j0 = Math.max(0, Math.floor((t.y0 - F) / SCOUT_FC)), j1 = Math.min(SF_FH - 1, Math.ceil((t.y1 + F) / SCOUT_FC));
+    for (var j = j0; j <= j1; j++) for (var i = i0; i <= i1; i++) {
+      var x = i * SCOUT_FC + SCOUT_FC / 2, y = j * SCOUT_FC + SCOUT_FC / 2;
+      var dx = Math.max(t.x0 - x, 0, x - t.x1), dy = Math.max(t.y0 - y, 0, y - t.y1);
+      var u = clamp(Math.hypot(dx, dy) / F, 0, 1), v = Math.round(255 * u * u * (3 - 2 * u)), k = j * SF_FW + i;
+      if (v < SFM[k]) { SFM[k] = v; sfDirty = true; }
+    }
+    scoutDiscovered.add(c + ',' + r);
+  }
+  function scoutClearHomeTile() { // v1 clearHomeTile: one fog, soft oval = the feathered close-up (or the home tile, fallback)
+    if (typeof MAP_RECT !== 'undefined' && typeof START_SPP !== 'undefined') {
+      var rx = 360 / START_SPP, ry = 640 / START_SPP, cx = MAP_RECT.x + rx, cy = MAP_RECT.y + ry, i, j, x, y, e, u, v;
+      for (j = Math.max(0, Math.floor((cy - ry) / SCOUT_FC)); j < Math.min(SF_FH, Math.ceil((cy + ry) / SCOUT_FC)); j++)
+        for (i = Math.max(0, Math.floor((cx - rx) / SCOUT_FC)); i < Math.min(SF_FW, Math.ceil((cx + rx) / SCOUT_FC)); i++) {
+          x = i * SCOUT_FC + SCOUT_FC / 2; y = j * SCOUT_FC + SCOUT_FC / 2;
+          e = Math.hypot((x - cx) / rx, (y - cy) / ry); u = clamp((e - 0.55) / 0.45, 0, 1); v = Math.round(255 * u * u * (3 - 2 * u));
+          if (v < SFM[j * SF_FW + i]) SFM[j * SF_FW + i] = v;
+        }
+      sfDirty = true; return;
+    }
+    var q = scoutTileCells(0, 0), F = 24, i2, j2, x2, y2, d, u2, v2;
+    for (j2 = q.j0; j2 < q.j1; j2++) for (i2 = q.i0; i2 < q.i1; i2++) {
+      x2 = i2 * SCOUT_FC + SCOUT_FC / 2; y2 = j2 * SCOUT_FC + SCOUT_FC / 2;
+      d = Math.min(x2 - q.t.x0, q.t.x1 - x2, y2 - q.t.y0, q.t.y1 - y2); u2 = clamp(d / F, 0, 1); v2 = Math.round(255 * (1 - u2 * u2 * (3 - 2 * u2)));
+      if (v2 < SFM[j2 * SF_FW + i2]) SFM[j2 * SF_FW + i2] = v2;
+    }
+    sfDirty = true;
+  }
+  // ---- small + giant seeds (v1 placeSmallSeeds / cp4 giantList) ----
+  // The big-seed exclusion list is v1's (world coords); the giant list is
+  // cp4's SEED_EXACT/SEED_XFORM verbatim (map-hd.jpg is 5625x10000, so
+  // those coords are world coords). The giant seed patches themselves are
+  // baked into map-hd.jpg — nothing is drawn for them here; the fog
+  // lifting reveals them, as in v1.
+  var SCOUT_BIG_SEEDS = [[1824.2, 426.7], [2782.9, 1309.9], [2405.3, 3320.3], [1986.9, 3994.3], [3753.3, 4226.7], [3398.9, 4854.2], [1690.6, 4987.9], [1928.8, 5324.9], [3410.5, 6167.4], [2655.1, 7730.4], [1894.0, 8741.4], [2302, 2559], [4121, 3341]];
+  var SCOUT_GIANTS = [
+    { id: 's01', kind: 'safflower', x: 1739 + 175 / 2, y: 348 + 175 / 2 },
+    { id: 's10', kind: 'corn', x: 4222 + 209 / 2, y: 4031 + 209 / 2 },
+    { id: 's12', kind: 'sunflower', x: 3294 + 219 / 2, y: 4751 + 219 / 2 },
+    { id: 's02', kind: 'sunflower', x: 2790, y: 1314 },
+    { id: 's09', kind: 'sunflower', x: 1992, y: 4001 },
+    { id: 's11', kind: 'sunflower', x: 3751, y: 4236 },
+    { id: 's14', kind: 'sunflower', x: 1928, y: 5333 },
+    { id: 's15', kind: 'sunflower', x: 3408, y: 6177 },
+    { id: 's18', kind: 'sunflower', x: 1896, y: 8751 },
+    { id: 's05', kind: 'corn', x: 2302, y: 2559 },
+    { id: 's08', kind: 'corn', x: 4121, y: 3341 }
+  ];
+  function scoutGiantOnTile(c, r) { var t = scoutTileRect(c, r); return SCOUT_GIANTS.filter(function (s) { return s.x >= t.x0 && s.x <= t.x1 && s.y >= t.y0 && s.y <= t.y1; }); }
+  function scoutPlaceSmallSeeds() {
+    var c, r, ring, t, tries, x, y, ok, b;
+    for (c = -3; c <= 3; c++) for (r = -3; r <= 3; r++) {
+      if (!c && !r || !scoutTileValid(c, r)) continue;
+      ring = Math.max(Math.abs(c), Math.abs(r));
+      if (Math.random() > (ring === 1 ? 0.5 : 0.35)) continue;
+      t = scoutTileRect(c, r);
+      for (tries = 0; tries < 20; tries++) {
+        x = t.x0 + SCOUT_TILE_MARGIN + Math.random() * (SCOUT_TILE_W - 2 * SCOUT_TILE_MARGIN);
+        y = t.y0 + SCOUT_TILE_MARGIN + Math.random() * (SCOUT_TILE_H - 2 * SCOUT_TILE_MARGIN);
+        ok = true;
+        for (b = 0; b < SCOUT_BIG_SEEDS.length; b++) if (Math.hypot(SCOUT_BIG_SEEDS[b][0] - x, SCOUT_BIG_SEEDS[b][1] - y) < 60) { ok = false; break; }
+        if (!ok) continue;
+        SCOUT_SMALL.push({ x: x, y: y, taken: false }); break;
+      }
+    }
+    if (SCOUT_SMALL.length < 2) { var t2 = scoutTileRect(1, 0); SCOUT_SMALL.push({ x: t2.cx, y: t2.cy - 40, taken: false }); }
+  }
+  function scoutSmallSeedFound() { for (var i = 0; i < SCOUT_SMALL.length; i++) if (!SCOUT_SMALL[i].taken && scoutFogAt(SCOUT_SMALL[i].x, SCOUT_SMALL[i].y) <= SCOUT_FOG_CLEAR) return i; return -1; }
+  // ---- the walk helpers (v1 walkSimple / trail) ----
+  function scoutTrail(S, d) { S.wf += d / (KSTEP * K_SIDE_AD * KW); var L = S.trail, p = L[L.length - 1]; if (!p || Math.hypot(p.x - S.x, p.y - S.y) > 1.5) { L.push({ x: S.x, y: S.y }); if (L.length > 600) L.shift(); } }
+  function scoutWalkSimple(S, dt, speed, done) {
+    var left = speed * dt;
+    while (left > 1e-9 && S.path.length) {
+      var p = S.path[0], dx = p.x - S.x, dy = p.y - S.y, dd = Math.hypot(dx, dy);
+      if (dd > 1e-6) S.dir = Math.atan2(dy, dx);
+      var st = Math.min(left, dd);
+      S.x += dx / (dd || 1) * st; S.y += dy / (dd || 1) * st; left -= st;
+      scoutTrail(S, st);
+      if (st >= dd - 1e-6) S.path.shift();
+    }
+    if (!S.path.length) done();
+  }
+  function scoutWalkUnder(U, dt) { // the downstairs leg (v1 'down'/'downOut'): walk a path at grown-ant speed
+    var left = AD_SPEED * dt;
+    while (left > 0 && U.path.length) {
+      var p = U.path[0], dx = p.x - U.x, dy = p.y - U.y, d = Math.hypot(dx, dy);
+      if (Math.abs(dx) > 0.3) U.flip = dx < 0;
+      var s = Math.min(left, d);
+      U.x += dx / (d || 1) * s; U.y += dy / (d || 1) * s; left -= s;
+      U.wf += s / (KSTEP * K_SIDE_AD * KW);
+      var L = U.trail, q = L[L.length - 1];
+      if (!q || Math.hypot(q.x - U.x, q.y - U.y) > 6) { L.push({ x: U.x, y: U.y }); if (L.length > 300) L.shift(); }
+      if (s >= d - 1e-6) U.path.shift();
+    }
+  }
+  function scoutPick(a) { // v1 scoutPick: one tile at random from the choices; no choices = map done -> come home and stay (cp4 scoutsStep)
+    var S = a.scout, f = scoutChoices(S.x, S.y);
+    if (!f.length) {
+      S.state = 'toHole'; S.carry = false; S.target = null;
+      S.path = [{ x: SCOUT_EMERGE_UP.x, y: SCOUT_EMERGE_UP.y }, { x: SCOUT_HOLE_UP.x, y: SCOUT_HOLE_UP.y }];
+      scoutScoutsHome = true;
+      return;
+    }
+    var k = f[Math.floor(Math.random() * f.length)], parts = k.split(','), c = +parts[0], r = +parts[1];
+    S.tile = [c, r]; S.tileDone = false; S.tiles.push(k);
+    var t = scoutTileRect(c, r);
+    S.target = { x: t.cx, y: t.cy }; S.state = 'out';
+  }
+  function scoutLeadScouting(lead) { var S = lead && lead.scout; return !!(S && !scoutLeadFound(lead) && ['emerge', 'out', 'scouting'].indexOf(S.state) >= 0); } // cp4 albertScouting
+  function scoutLeadFound(lead) { var S = lead && lead.scout; return !!(S && (S.carry || ['toHole', 'goneDown', 'down', 'rest', 'downOut'].indexOf(S.state) >= 0)); } // cp4 albertFound (no finderHeld: v1's carry-home is the rule)
+  function stepScoutAnt(a, dt) { // v1 stepScout, per ant (lead or solo)
+    var S = a.scout;
+    if (!S) return;
+    if (S.state === 'emerge') {
+      S.alpha = clamp(S.alpha + dt / 0.4, 0, 1);
+      scoutWalkSimple(S, dt, SCOUT_WALK, function () { S.alpha = 1; scoutPick(a); });
+      return;
+    }
+    if (S.state === 'toHole') {
+      scoutWalkSimple(S, dt, SCOUT_WALK, function () { S.state = 'goneDown'; S.ph = 0; });
+      S.alpha = clamp(Math.hypot(S.x - SCOUT_HOLE_UP.x, S.y - SCOUT_HOLE_UP.y) / 12, 0, 1);
+      return;
+    }
+    if (S.state === 'goneDown') {
+      S.ph += dt;
+      if (S.ph >= 0.6) {
+        var drop = { x: BC.HOLE_W.x, y: BC.HOLE_W.y + 120 };
+        S.state = 'down';
+        S.under = { x: BC.HOLE_W.x, y: BC.HOLE_W.y + 30, path: [drop], wf: 0, flip: false, trail: [] };
+        a.hidden = false; // drawn underground from here (drawKid, under pos)
+      }
+      return;
+    }
+    if (S.state === 'down') {
+      scoutWalkUnder(S.under, dt);
+      if (!S.under.path.length) {
+        if (S.carry) { S.carry = false; scoutSeedsFound++; if (!scoutFirstSeed) scoutFirstSeed = true; } // v1: the giant seed delivered (meterFill seeds + farm unlock — counted; no farm/inventory in cp4)
+        S.state = 'rest'; S.ph = 0;
+        a.state = 'idle'; // home underground, drawn at the drop
+      }
+      return;
+    }
+    if (S.state === 'rest') {
+      if (scoutScoutsHome) { S.ph = 0; return; } // cp4: map done — he stays home for good (rest held)
+      S.ph += dt;
+      if (S.ph >= 3) { S.state = 'downOut'; S.under.path = [{ x: BC.HOLE_W.x, y: BC.HOLE_W.y + 30 }]; }
+      return;
+    }
+    if (S.state === 'downOut') {
+      scoutWalkUnder(S.under, dt);
+      if (!S.under.path.length) {
+        S.state = 'emerge'; S.x = SCOUT_HOLE_UP.x; S.y = SCOUT_HOLE_UP.y;
+        S.path = [{ x: SCOUT_EMERGE_UP.x, y: SCOUT_EMERGE_UP.y }]; S.alpha = 0; S.under = null;
+        a.hidden = true; a.state = 'out';
+      }
+      return;
+    }
+    if (S.state === 'waiting') return; // unreachable: scoutPick sends map-done scouts home; kept for safety
+    // --- v1 NP5 search loop (unchanged): nearest fog in the tile, clear as he walks, tile done -> seeds -> giant or next tile ---
+    var left = SCOUT_WALK * dt, guard;
+    for (guard = 0; guard < 6 && left > 0 && S.state !== 'toHole'; guard++) {
+      if (!S.tile) { scoutPick(a); if (S.state === 'toHole') break; continue; }
+      if (!S.target) {
+        var cr = S.tile, n = scoutNearestFog(cr[0], cr[1], S.x, S.y);
+        if (!n) {
+          if (!S.tileDone) { S.tileDone = true; scoutTileDone(cr[0], cr[1]); if (!cr[0] && !cr[1]) S.homeDone = true; }
+          // v1 R3-13: a scout NEVER stops for a small seed — picked up on the move at tile completion.
+          var sIdx;
+          for (sIdx = scoutSmallSeedFound(); sIdx >= 0; sIdx = scoutSmallSeedFound()) {
+            SCOUT_SMALL[sIdx].taken = true; S.seen.push(sIdx);
+            scoutSeedsFound++; scoutCoinsEarned += 2 + Math.floor(Math.random() * 2); // v1: +1 seed, +2-3 coins (counted here for the later bank)
+            if (!scoutFirstSeed) scoutFirstSeed = true; // v1: first seed unlocks the farm — no farm in this build
+          }
+          if (scoutGiantOnTile(cr[0], cr[1]).length) { S.carry = true; S.state = 'toHole'; S.path = [{ x: SCOUT_EMERGE_UP.x, y: SCOUT_EMERGE_UP.y }, { x: SCOUT_HOLE_UP.x, y: SCOUT_HOLE_UP.y }]; S.target = null; break; } // giant only after this tile is fully revealed
+          scoutPick(a);
+          if (S.state === 'toHole') break;
+          continue;
+        }
+        S.target = n; S.state = 'scouting';
+      }
+      var dx = S.target.x - S.x, dy = S.target.y - S.y, dd = Math.hypot(dx, dy);
+      if (dd > 1e-6) S.dir = Math.atan2(dy, dx);
+      var st = Math.min(left, dd);
+      S.x += dx / (dd || 1) * st; S.y += dy / (dd || 1) * st; left -= st;
+      S.wf += st / (KSTEP * K_SIDE_AD * KW);
+      if (S.tile) scoutClearFogIn(S.x, S.y, SCOUT_R, S.tile[0], S.tile[1]);
+      if (st >= dd - 1e-6) S.target = null;
+    }
+  }
+  // ---- followers / solo (cp4) ----
+  var FOLLOW_OFF = [{ dx: 16, dy: 10 }, { dx: -14, dy: 12 }, { dx: 18, dy: -8 }, { dx: -16, dy: -10 }, { dx: 12, dy: 16 }, { dx: -12, dy: 14 }];
+  function stepFollower(a, dt) { // cp4 stepFollowers: walk to the lead's side and stay with him
+    var lead = SCOUT_LEAD, f = a.follow;
+    if (!lead || !lead.scout || !f) return;
+    var target = { x: lead.scout.x + f.off.dx, y: lead.scout.y + f.off.dy };
+    if (f.state === 'wait' && scoutLeadScouting(lead)) f.state = 'toAlbert';
+    f.alpha = clamp((f.alpha || 0) + dt / 0.4, 0, 1);
+    var dx = target.x - f.x, dy = target.y - f.y, d = Math.hypot(dx, dy);
+    if (d > 1e-6) f.dir = Math.atan2(dy, dx);
+    var st = Math.min(d, SCOUT_WALK * dt);
+    f.x += dx / (d || 1) * st; f.y += dy / (d || 1) * st;
+    if (st > 0.15) f.wf += st / (KSTEP * K_SIDE_AD * KW);
+    if (d <= 5) { f.state = 'together'; f.alpha = 1; }
+  }
+  function startScouting(a) { // v1 joinScouts + cp4 spawnFollower/startSolo, by what the lead is doing
     walkAnt(a, { x: BC.HOLE_W.x, y: BC.HOLE_W.y }, function () {
-      a.state = 'out'; a.hidden = true; a.scoutBackAt = QT + SCOUT_OUT_S;
-      // v49: he is OUT on the surface now — give him a surface position at
-      // the mound hole so he can be drawn (and wander) upstairs.
-      a.scoutUp = { x: SURFACE_HOLE.x, y: SURFACE_HOLE.y, tx: null, ty: null, flip: false, wf: 0 };
-      pickScoutUpTarget(a);
+      a.state = 'out'; a.hidden = true;
+      var lead = SCOUT_LEAD, k, fi;
+      if (lead && lead !== a && lead.job === 'scout' && lead.scout && scoutLeadScouting(lead)) {
+        fi = 0;
+        for (k = 0; k < ANTS.length; k++) if (ANTS[k].follow) fi++;
+        a.follow = { off: FOLLOW_OFF[fi % FOLLOW_OFF.length], state: 'toAlbert', alpha: 0, wf: 0, x: SCOUT_HOLE_UP.x, y: SCOUT_HOLE_UP.y, dir: 0 };
+        return;
+      }
+      if (lead && lead !== a && lead.job === 'scout' && lead.scout && scoutLeadFound(lead)) {
+        a.scout = { role: 'solo', state: 'out', x: lead.scout.x, y: lead.scout.y, dir: lead.scout.dir || 0, path: [], tile: lead.scout.tile ? lead.scout.tile.slice() : null, target: null, tileDone: false, tiles: (lead.scout.tiles || []).slice(), seen: [], alpha: 1, wf: 0, trail: [], carry: false, under: null, ph: 0, homeDone: false };
+        if (a.scout.tile) { var nn = scoutNearestFog(a.scout.tile[0], a.scout.tile[1], a.scout.x, a.scout.y); if (nn) { a.scout.target = nn; a.scout.state = 'scouting'; } else scoutPick(a); }
+        else scoutPick(a);
+        return;
+      }
+      SCOUT_LEAD = a; // the first scout graduate is the lead (v1 joinScouts)
+      a.scout = { role: 'lead', state: 'emerge', x: SCOUT_HOLE_UP.x, y: SCOUT_HOLE_UP.y, dir: 0, path: [{ x: SCOUT_EMERGE_UP.x, y: SCOUT_EMERGE_UP.y }], tile: null, target: null, tileDone: false, tiles: [], seen: [], scoutPts: 1, alpha: 0, wf: 0, trail: [], carry: false, under: null, ph: 0, homeDone: false };
+      if (!sfOn) { sfOn = true; scoutClearHomeTile(); scoutPlaceSmallSeeds(); }
     });
   }
-  function returnScout(a) {
-    a.hidden = false; a.scoutBackAt = null; a.scoutUp = null; // v49: he is back downstairs — no surface position any more
-    walkAnt(a, { x: ENTRANCE.x + 10, y: ENTRANCE.y + 6 }, function () {
-      a.state = 'idle'; a.arrT = QT;
-      a.scoutNextOut = QT + 5; // a short pause at home, then out again
-    });
+  function drawUpScout(now) { // v1 drawUp: small seeds, then the scouts, then the surface fog over the map
+    if (!sfOn) return;
+    var i, j, a;
+    ctx.save(); ctx.fillStyle = '#8a5a2b'; ctx.strokeStyle = '#3b2410'; ctx.lineWidth = 0.4; // v1 drawUpSeeds (placeholder seed shape)
+    for (i = 0; i < SCOUT_SMALL.length; i++) {
+      var sm = SCOUT_SMALL[i];
+      if (sm.taken || scoutFogAt(sm.x, sm.y) > 128) continue;
+      ctx.beginPath(); ctx.ellipse(sm.x, sm.y, 2.2, 1.5, 0.4, 0, 7); ctx.fill(); ctx.stroke();
+    }
+    ctx.restore();
+    for (j = 0; j < ANTS.length; j++) { // v1 drawUpScouts + cp4 followers/solo, grown-ant size
+      a = ANTS[j];
+      if (a.job !== 'scout') continue;
+      if (a.scout) {
+        var S = a.scout;
+        if (['emerge', 'out', 'scouting', 'waiting', 'toHole'].indexOf(S.state) < 0) continue;
+        var walking = S.state !== 'waiting';
+        var frame = walking ? 'side_' + pad2n(Math.floor(S.wf) % 16) + '.png' : 'idle_' + pad2n(IDLE_PLAY[Math.floor((QT + a.ph) * IDLE_FPS) % IDLE_PLAY.length]) + '.png';
+        ctx.save(); ctx.globalAlpha *= (S.alpha == null ? 1 : S.alpha);
+        drawKidSprite(frame, S.x, S.y, Math.cos(S.dir || 0) < 0, 1);
+        ctx.restore();
+        if (S.carry) { ctx.save(); ctx.fillStyle = '#8a5a2b'; ctx.strokeStyle = '#3b2410'; ctx.lineWidth = 0.4; ctx.beginPath(); ctx.ellipse(S.x, S.y - 12, 2.2, 1.5, 0.4, 0, 7); ctx.fill(); ctx.stroke(); ctx.restore(); } // v1: the carried seed over him
+      } else if (a.follow) {
+        var f = a.follow;
+        var moving = f.state === 'toAlbert' || (SCOUT_LEAD && SCOUT_LEAD.scout && SCOUT_LEAD.scout.state !== 'waiting');
+        ctx.save(); ctx.globalAlpha *= (f.alpha == null ? 1 : f.alpha);
+        drawKidSprite(moving ? 'side_' + pad2n(Math.floor(f.wf) % 16) + '.png' : 'idle_00.png', f.x, f.y, Math.cos(f.dir || 0) < 0, 1);
+        ctx.restore();
+      }
+    }
+    var fc = sfFogCanvas(now); // v1 drawUp: the fog over the map (NP5 fog of war)
+    if (fc) { ctx.save(); ctx.globalAlpha = SCOUT_FOG_ALPHA; ctx.imageSmoothingEnabled = true; ctx.drawImage(fc, 0, 0, SF_FW * SCOUT_FC, SF_FH * SCOUT_FC); ctx.restore(); }
   }
   // ---- the soldier's job (Chris, Nov 17) ----
   // After training he GUARDS: he patrols the mound on v1 cp4's GUARD arc
@@ -2185,24 +2575,8 @@
         // no fog to clear at dig start, finish on the clock instead.
         if (a.state === 'dig' && a.mine && (a.mine.fogTotal || 0) <= 0 && (QT - a.mine.digT0) >= ((a.mine.dur != null) ? a.mine.dur : MINE_DISCOVER_S)) finishDig(a);
       }
-      else if (a.job === 'scout' && a.state === 'out' && a.hidden && a.scoutBackAt != null && QT >= a.scoutBackAt) returnScout(a);
-      else if (a.job === 'scout' && a.state === 'out' && a.hidden && a.scoutUp) {
-        // v49 (Chris, Nov 18): while he is out, he wanders the surface
-        // around the mound hole doing his job — so Chris can SEE him
-        // upstairs. (The return branch above runs first when his 20 s are
-        // up; this branch runs on every other tick while he is out.)
-        var su = a.scoutUp;
-        if (su.tx == null) pickScoutUpTarget(a);
-        var sdx = su.tx - su.x, sdy = su.ty - su.y, sd = Math.hypot(sdx, sdy);
-        var sstep = Math.min(SCOUT_UP_SPEED * dt, sd);
-        if (sd > 1e-6) {
-          su.x += sdx / sd * sstep; su.y += sdy / sd * sstep;
-          if (Math.abs(sdx) > 0.3) su.flip = sdx < 0;
-          su.wf += sstep / (KSTEP * K_SIDE_AD * 1 * KW); // grown ant (m = 1)
-        }
-        if (sstep >= sd - 1e-6) pickScoutUpTarget(a); // reached the spot; wander to a new one
-      }
-      else if (a.job === 'scout' && a.state === 'idle' && a.scoutNextOut != null && QT >= a.scoutNextOut) { a.scoutNextOut = null; startScouting(a); }
+      else if (a.job === 'scout' && a.scout) stepScoutAnt(a, dt); // v51: the v1 tile machine (lead or solo)
+      else if (a.job === 'scout' && a.follow) stepFollower(a, dt); // v51: a follower walks with the lead (cp4)
     }
     tryAssignTrades();
   }
@@ -3181,7 +3555,7 @@
         frontier: frontierCells().map(function (c) { return c.k; }),
         grid: HEX_GRID.map(function (c) { return { k: c.k, x: Math.round(c.x * 100) / 100, y: Math.round(c.y * 100) / 100 }; }),
         tradePrices: (function () { var out = {}; TRADE_ITEMS.forEach(function (it) { out[it.id] = { count: placedCount(it.id), next: nextPrice(it.id), visible: isVisible(it.id) }; }); return out; })(),
-        ants: ANTS.map(function (a) { return { id: a.id, job: a.job || null, state: a.state, tradeItem: a.tradeItem || null, mine: a.mine ? a.mine.cell.k : null, mineDur: a.mine ? (a.mine.dur != null ? a.mine.dur : null) : null, hidden: !!a.hidden }; }),
+        ants: ANTS.map(function (a) { return { id: a.id, job: a.job || null, state: a.state, tradeItem: a.tradeItem || null, mine: a.mine ? a.mine.cell.k : null, mineDur: a.mine ? (a.mine.dur != null ? a.mine.dur : null) : null, hidden: !!a.hidden, scout: a.scout ? { role: a.scout.role, state: a.scout.state, tile: a.scout.tile ? a.scout.tile.join(',') : null, x: +a.scout.x.toFixed(1), y: +a.scout.y.toFixed(1), carry: !!a.scout.carry } : (a.follow ? { role: 'follower', state: a.follow.state, tile: null, x: +a.follow.x.toFixed(1), y: +a.follow.y.toFixed(1), carry: false } : null) }; }),
         minerSpeed: MINER_SPEED, trainS: TRAIN_S, mineDiscoverS: MINE_DISCOVER_S, firstMineS: FIRST_MINE_S, minedCount: minedCount
       };
     }
@@ -3203,6 +3577,28 @@
     // CHECKPOINT 4: trade school (read-only, for the harness).
     get tradeUnlocked() { return tradeUnlocked; },
     get freeEasel() { return FREE_EASEL; },
+    // v51: the v1 scout (read-only, for the harness).
+    get scout() {
+      return {
+        on: sfOn, discovered: Array.from(scoutDiscovered).sort(), scoutsHome: scoutScoutsHome,
+        seedsFound: scoutSeedsFound, coinsEarned: scoutCoinsEarned, firstSeed: scoutFirstSeed,
+        small: SCOUT_SMALL.map(function (s) { return { x: +s.x.toFixed(1), y: +s.y.toFixed(1), taken: s.taken }; }),
+        giants: SCOUT_GIANTS.map(function (g) { return { id: g.id, kind: g.kind, x: g.x, y: g.y }; }),
+        lead: SCOUT_LEAD ? SCOUT_LEAD.id : null
+      };
+    },
+    get scoutMask() { return SFM; }, // the live surface-fog mask (harness seeds/clears it, like BASE_FOG.mask)
+    get scoutDiscovered() { return scoutDiscovered; }, // the live discovered-tile set (harness adds tiles for the map-done test)
+    _scoutTileRect: scoutTileRect,
+    _scoutTileValid: scoutTileValid,
+    _scoutStart: startScouting, // harness drives a second graduate into the scout machine (follower/solo test)
+    _scoutTileOfPt: scoutTileOfPt,
+    _scoutChoices: scoutChoices,
+    _scoutSelectableTile: scoutSelectableTile,
+    _scoutGiantOnTile: scoutGiantOnTile,
+    _scoutFogAt: scoutFogAt,
+    _scoutFogCount: function (c, r) { var q = scoutTileCells(c, r), n = 0, i, j; for (j = q.j0; j < q.j1; j++) for (i = q.i0; i < q.i1; i++) if (SFM[j * SF_FW + i] > SCOUT_FOG_CLEAR) n++; return n; },
+    _scoutHoleUp: function () { return { x: SCOUT_HOLE_UP.x, y: SCOUT_HOLE_UP.y }; },
     get hexGrid() { return HEX_GRID.slice(); },
     get clearedCells() { return Object.keys(clearedCells); },
     frontierCells: frontierCells,
@@ -3221,12 +3617,12 @@
   // ---- the build menu (always on, just the four items + the bulldozer) ----
   var style = document.createElement('style');
   style.textContent =
-    '.bl-head{display:flex;justify-content:space-between;align-items:flex-end;padding:2px 6px 0}' +
+    '.bl-head{display:flex;justify-content:space-between;align-items:flex-end;padding:2px 6px 0;position:sticky;top:0;z-index:2;background:linear-gradient(110deg,#38271c,#583e28 48%,#302018)}' + // v51 fix 1: the header (tabs + bulldozer) is STICKY — it stays put while the cards scroll underneath it (the tray scrolls vertically on short screens, and the cards scroll sideways below it)
     '.bl-title{color:#f3e6c8;font-size:17px;font-weight:700;letter-spacing:.5px}' +
     '.bl-dozer{flex:none;border:2px solid #82562f;border-radius:12px;background:rgba(255,244,220,.14);color:#f3e6c8;font-size:22px;line-height:1;padding:6px 12px;cursor:pointer}' +
     '.bl-dozer.on{background:#a93226;border-color:#e74c3c}' +
     '.bl-dozer img{height:22px;width:auto;display:block}' + // v31: the bulldozer picture (cut from Chris's photo), same height as the old emoji so the button stays the same size
-    '.bl-cards{display:flex;gap:10px;justify-content:flex-start;border-top:2px solid #82562f}' +
+    '.bl-cards{display:flex;gap:10px;justify-content:flex-start;border-top:2px solid #82562f;overflow-x:auto;overflow-y:hidden;touch-action:pan-x;-webkit-overflow-scrolling:touch;scrollbar-width:thin}' + // v51 fix 1: the cards scroll SIDEWAYS (one row, never wrapped) — 7 trade cards, 4 fit, so he swipes through the rest; the header above stays fixed (sticky) and the bulldozer stays top-right
     '.bl-card{flex:0 0 calc((100% - 30px)/4);position:relative;background:linear-gradient(#2b1c11,#1e130d);border:1px solid #1d100a;border-radius:14px;padding:8px 6px 8px;display:flex;flex-direction:column;align-items:center;gap:5px;box-shadow:inset 0 3px 12px #08040299}' +
     '.bl-thumb{width:100%;height:104px;background-size:contain;background-repeat:no-repeat;background-position:center bottom}' +
     '.bl-name{color:#f3e6c8;font-size:14px}' +
