@@ -324,7 +324,7 @@
     get free() { return queenFree; },
     draw: queenFrame,
     step: stepFrame, // v49: advance the clock + step the logic without drawing (upstairs — the game keeps running while Chris is up there)
-    drawUp: drawUpScout, // v49: draw the scout(s) on the surface while they are out (upstairs)
+    drawUp: drawUpScout, // v49: draw the scout(s) on the surface while they are out (upstairs); v52: also the patrolling soldier(s)
   };
 
   // ---- CHECKPOINT 2: the brain timer (v1 CHAMBER_BUB / BRAIN_BED_ONLY) ----
@@ -1171,6 +1171,7 @@
   }
   function drawKid(a) {
     if (a.state === 'gone' || a.hidden) return;
+    if (a.job === 'soldier' && a.guard) return; // v52: guarding UPSTAIRS — drawn in drawUp, never underground
     if (a.state === 'ride') { drawRider(a); return; }
     // CHECKPOINT 4: a training ant is the training loop (ant + equipment,
     // like the ksDesk loop), not the idle sprite — and a digging miner is
@@ -1685,6 +1686,9 @@
   // timer. The scout below is the v1 tile machine (see the scout section).
   var GUARD_ARC = [165, 140, 115, 90, 65, 40, 15]; // v1 cp4 GUARD.ARC (degrees, around the hole)
   var GUARD_RX = 30, GUARD_RY = 16; // v1 cp4 GUARD.RX/RY (world units)
+  var GUARD_SPEED = 40 * 69 * 0.175 / 26.1; // v1 cp4 GUARD.SPEED = v1's scoutSpeed (~18.5 world/s)
+  var GUARD_GONE_S = 0.6, GUARD_FADE_S = 0.4; // v1 cp4 GUARD.GONE_S / FADE_S (emerge pause + fade-in)
+  var GUARD_STEP_R = 8; // v1 cp4 GUARD.STEP_R (each extra soldier patrols one ring further out)
   var LOOP_S = 0.45296 * KW; // v1 SC (130/287): the training loops are drawn at this scale for a grown ant, as in v1
   var TRADE_ORDER = ['miner', 'scout', 'soldier'];
   // ---- the training loops (v1, copied unchanged — never rewritten) ----
@@ -2478,7 +2482,18 @@
       if (!sfOn) { sfOn = true; scoutClearHomeTile(); scoutPlaceSmallSeeds(); }
     });
   }
-  function drawUpScout(now) { // v1 drawUp: small seeds, then the scouts, then the surface fog over the map
+  function drawUpScout(now) { // v1 drawUp: small seeds, then the scouts AND the soldier(s), then the surface fog over the map
+    // v52: the soldier patrols UPSTAIRS — drawn here alongside the scouts,
+    // whether or not any scout has switched the surface fog on yet.
+    for (var s0 = 0; s0 < ANTS.length; s0++) {
+      var sa = ANTS[s0];
+      if (sa.job !== 'soldier' || !sa.guard) continue;
+      var G = sa.guard;
+      if (G.wait > 0) continue;
+      ctx.save(); ctx.globalAlpha *= (G.alpha == null ? 1 : G.alpha);
+      drawKidSprite('side_' + pad2n(Math.floor(G.wf) % 16) + '.png', G.x, G.y, Math.cos(G.dir || 0) < 0, 1);
+      ctx.restore();
+    }
     if (!sfOn) return;
     var i, j, a;
     ctx.save(); ctx.fillStyle = '#8a5a2b'; ctx.strokeStyle = '#3b2410'; ctx.lineWidth = 0.4; // v1 drawUpSeeds (placeholder seed shape)
@@ -2512,25 +2527,51 @@
     if (fc) { ctx.save(); ctx.globalAlpha = SCOUT_FOG_ALPHA; ctx.imageSmoothingEnabled = true; ctx.drawImage(fc, 0, 0, SF_FW * SCOUT_FC, SF_FH * SCOUT_FC); ctx.restore(); }
   }
   // ---- the soldier's job (Chris, Nov 17) ----
-  // After training he GUARDS: he patrols the mound on v1 cp4's GUARD arc
-  // around the hole (RX 30, RY 16, angles 165..15, back and forth). NO
-  // THREAT in checkpoint 4 — he patrols only; the attacks come in a future
-  // checkpoint.
-  function guardPoint(k) {
-    var th = GUARD_ARC[k] * Math.PI / 180;
-    return { x: BC.HOLE_W.x + GUARD_RX * Math.cos(th), y: BC.HOLE_W.y - GUARD_RY * Math.sin(th) };
+  // After training he GUARDS UPSTAIRS: he walks out through the hole to
+  // the surface (the same emerge path the v51 scout uses — SCOUT_HOLE_UP /
+  // SCOUT_EMERGE_UP), then patrols the mound on v1 cp4's GUARD arc around
+  // the surface mound hole (RX 30, RY 16, angles 165..15, back and forth,
+  // SPEED = v1's scoutSpeed ~18.5 world/s). NO THREAT in checkpoint 4 —
+  // he patrols only; the attacks come in a future checkpoint.
+  // v52 fix 1: the v44-v51 code patrolled BELOW ground — guardPoint used
+  // BC.HOLE_W (the underground spiral hole, ~2820,4980) and the normal
+  // underground ant draw drew him there. That whole path is gone: he now
+  // emerges upstairs (a.guard, stepped by stepSoldierUp from stepTrade,
+  // drawn in drawUp alongside the scout) and is never drawn underground
+  // while guarding. guardRoute / stepSoldierUp are v1 cp4's guardRoute /
+  // stepSoldiersUp, ported verbatim (arc centre HOLE_UP - 3, +sin, route
+  // reversed at each end, GONE_S 0.6 emerge pause, FADE_S 0.4 fade-in).
+  function guardRoute(a, rev) {
+    var k = 0;
+    for (var i = 0; i < ANTS.length; i++) { if (ANTS[i] === a) break; if (ANTS[i].guard) k++; } // v1 STEP_R: each extra soldier patrols one ring further out
+    var rx = GUARD_RX + GUARD_STEP_R * k, ry = GUARD_RY + GUARD_STEP_R * 0.55 * k;
+    var C = { x: SCOUT_HOLE_UP.x, y: SCOUT_HOLE_UP.y - 3 };
+    var pts = GUARD_ARC.map(function (d) { var th = d * Math.PI / 180; return { x: C.x + rx * Math.cos(th), y: C.y + ry * Math.sin(th) }; });
+    if (rev) pts.reverse();
+    return pts;
   }
-  function startGuarding(a) {
-    a.guardIdx = 0; a.guardDir = 1;
-    patrolNext(a);
-  }
-  function patrolNext(a) {
-    walkAnt(a, guardPoint(a.guardIdx), function () {
-      a.guardIdx += a.guardDir;
-      if (a.guardIdx >= GUARD_ARC.length - 1) a.guardDir = -1;
-      else if (a.guardIdx <= 0) a.guardDir = 1;
-      patrolNext(a);
+  function startGuarding(a) { // v1 cp4 soldierStep: walk to the underground hole, then emerge upstairs to patrol
+    walkAnt(a, { x: BC.HOLE_W.x, y: BC.HOLE_W.y }, function () {
+      a.state = 'gone'; a.hidden = true; // upstairs now — never drawn underground while guarding
+      a.guard = { x: SCOUT_HOLE_UP.x, y: SCOUT_HOLE_UP.y, alpha: 0, wf: 0, dir: 0, rev: false, path: [], wait: GUARD_GONE_S };
+      a.guard.path = guardRoute(a, false);
     });
+  }
+  function stepSoldierUp(a, dt) { // v1 cp4 stepSoldiersUp: fade in, then walk the arc back and forth at GUARD_SPEED
+    var g = a.guard;
+    if (!g) return;
+    if (g.wait > 0) { g.wait -= dt; return; }
+    g.alpha = clamp(g.alpha + dt / GUARD_FADE_S, 0, 1);
+    var left = GUARD_SPEED * dt, n = 0;
+    while (left > 1e-9 && n++ < 8) {
+      if (!g.path.length) { g.rev = !g.rev; g.path = guardRoute(a, g.rev); }
+      var p = g.path[0], dx = p.x - g.x, dy = p.y - g.y, d = Math.hypot(dx, dy);
+      if (d > 1e-6) g.dir = Math.atan2(dy, dx);
+      var st = Math.min(left, d);
+      g.x += dx / (d || 1) * st; g.y += dy / (d || 1) * st; left -= st;
+      g.wf += st / (KSTEP * K_SIDE_AD * KW); // same walk-cycle units as the scout's upstairs wf
+      if (st >= d - 1e-6) g.path.shift();
+    }
   }
   // ---- the trade driver (runs every tick from stepKids) ----
   function stepTrade(dt) {
@@ -2577,6 +2618,7 @@
       }
       else if (a.job === 'scout' && a.scout) stepScoutAnt(a, dt); // v51: the v1 tile machine (lead or solo)
       else if (a.job === 'scout' && a.follow) stepFollower(a, dt); // v51: a follower walks with the lead (cp4)
+      else if (a.job === 'soldier' && a.guard) stepSoldierUp(a, dt); // v52: the soldier patrols UPSTAIRS on the guard arc (v1 cp4)
     }
     tryAssignTrades();
   }
@@ -3555,8 +3597,8 @@
         frontier: frontierCells().map(function (c) { return c.k; }),
         grid: HEX_GRID.map(function (c) { return { k: c.k, x: Math.round(c.x * 100) / 100, y: Math.round(c.y * 100) / 100 }; }),
         tradePrices: (function () { var out = {}; TRADE_ITEMS.forEach(function (it) { out[it.id] = { count: placedCount(it.id), next: nextPrice(it.id), visible: isVisible(it.id) }; }); return out; })(),
-        ants: ANTS.map(function (a) { return { id: a.id, job: a.job || null, state: a.state, tradeItem: a.tradeItem || null, mine: a.mine ? a.mine.cell.k : null, mineDur: a.mine ? (a.mine.dur != null ? a.mine.dur : null) : null, hidden: !!a.hidden, scout: a.scout ? { role: a.scout.role, state: a.scout.state, tile: a.scout.tile ? a.scout.tile.join(',') : null, x: +a.scout.x.toFixed(1), y: +a.scout.y.toFixed(1), carry: !!a.scout.carry } : (a.follow ? { role: 'follower', state: a.follow.state, tile: null, x: +a.follow.x.toFixed(1), y: +a.follow.y.toFixed(1), carry: false } : null) }; }),
-        minerSpeed: MINER_SPEED, trainS: TRAIN_S, mineDiscoverS: MINE_DISCOVER_S, firstMineS: FIRST_MINE_S, minedCount: minedCount
+        ants: ANTS.map(function (a) { return { id: a.id, job: a.job || null, state: a.state, tradeItem: a.tradeItem || null, mine: a.mine ? a.mine.cell.k : null, mineDur: a.mine ? (a.mine.dur != null ? a.mine.dur : null) : null, hidden: !!a.hidden, guard: a.guard ? { x: +a.guard.x.toFixed(1), y: +a.guard.y.toFixed(1), alpha: +a.guard.alpha.toFixed(2), rev: !!a.guard.rev, wait: +(a.guard.wait || 0).toFixed(2), path: a.guard.path.length } : null, scout: a.scout ? { role: a.scout.role, state: a.scout.state, tile: a.scout.tile ? a.scout.tile.join(',') : null, x: +a.scout.x.toFixed(1), y: +a.scout.y.toFixed(1), carry: !!a.scout.carry } : (a.follow ? { role: 'follower', state: a.follow.state, tile: null, x: +a.follow.x.toFixed(1), y: +a.follow.y.toFixed(1), carry: false } : null) }; }),
+        minerSpeed: MINER_SPEED, trainS: TRAIN_S, mineDiscoverS: MINE_DISCOVER_S, firstMineS: FIRST_MINE_S, minedCount: minedCount, guardSpeed: GUARD_SPEED, guardArc: GUARD_ARC.slice(), guardRx: GUARD_RX, guardRy: GUARD_RY
       };
     }
   };
@@ -3599,6 +3641,8 @@
     _scoutFogAt: scoutFogAt,
     _scoutFogCount: function (c, r) { var q = scoutTileCells(c, r), n = 0, i, j; for (j = q.j0; j < q.j1; j++) for (i = q.i0; i < q.i1; i++) if (SFM[j * SF_FW + i] > SCOUT_FOG_CLEAR) n++; return n; },
     _scoutHoleUp: function () { return { x: SCOUT_HOLE_UP.x, y: SCOUT_HOLE_UP.y }; },
+    _guardRoute: guardRoute, // v52: the soldier's guard arc (v1 cp4 guardRoute), for the harness
+    _guardHoleUp: function () { return { x: SCOUT_HOLE_UP.x, y: SCOUT_HOLE_UP.y }; },
     get hexGrid() { return HEX_GRID.slice(); },
     get clearedCells() { return Object.keys(clearedCells); },
     frontierCells: frontierCells,
@@ -3623,6 +3667,9 @@
     '.bl-dozer.on{background:#a93226;border-color:#e74c3c}' +
     '.bl-dozer img{height:22px;width:auto;display:block}' + // v31: the bulldozer picture (cut from Chris's photo), same height as the old emoji so the button stays the same size
     '.bl-cards{display:flex;gap:10px;justify-content:flex-start;border-top:2px solid #82562f;overflow-x:auto;overflow-y:hidden;touch-action:pan-x;-webkit-overflow-scrolling:touch;scrollbar-width:thin}' + // v51 fix 1: the cards scroll SIDEWAYS (one row, never wrapped) — 7 trade cards, 4 fit, so he swipes through the rest; the header above stays fixed (sticky) and the bulldozer stays top-right
+    '.bl-cards-wrap{position:relative}' + // v52 fix 2: the scroll-hint sliver anchors to this wrap (the cards row's right edge)
+    '.bl-scrollhint{position:absolute;right:0;top:50%;transform:translateY(-50%);width:20px;height:38px;display:none;align-items:center;justify-content:center;pointer-events:none;z-index:3;border-radius:10px 0 0 10px;background:linear-gradient(90deg,rgba(43,28,17,0),rgba(43,28,17,.92) 45%);color:#f3e6c8;font-size:22px;font-weight:700;line-height:1;text-shadow:0 1px 2px rgba(0,0,0,.6)}' + // v52 fix 2: a small sliver + › on the RIGHT edge of the cards row — a hint ONLY (pointer-events:none, mid-row so it never covers a card's top-right BUILD button, same dark brown as the menu). Shown only while more cards sit to the right; hidden at the far right end and whenever nothing scrolls.
+    '.bl-scrollhint.on{display:flex}' +
     '.bl-card{flex:0 0 calc((100% - 30px)/4);position:relative;background:linear-gradient(#2b1c11,#1e130d);border:1px solid #1d100a;border-radius:14px;padding:8px 6px 8px;display:flex;flex-direction:column;align-items:center;gap:5px;box-shadow:inset 0 3px 12px #08040299}' +
     '.bl-thumb{width:100%;height:104px;background-size:contain;background-repeat:no-repeat;background-position:center bottom}' +
     '.bl-name{color:#f3e6c8;font-size:14px}' +
@@ -3747,6 +3794,17 @@
   // v1, so this reuses checkpoint 2's own bubble erase flow instead.)
   var eraseMode = false;
 
+  function updateScrollHint() { // v52 fix 2: the sliver + › shows ONLY while the cards row can scroll further right (more cards off to the right). At the far right end, or when everything fits (4 or fewer cards), it hides. Hint only — pointer-events:none in CSS, so it can never block a BUILD button.
+    if (!tray) return;
+    var hint = tray.querySelector('.bl-scrollhint');
+    var cardsEl = tray.querySelector('.bl-cards');
+    if (!hint || !cardsEl) return;
+    var canScroll = cardsEl.scrollWidth - cardsEl.clientWidth > 2;
+    var moreRight = canScroll && (cardsEl.scrollWidth - cardsEl.clientWidth - cardsEl.scrollLeft) > 2;
+    if (moreRight) hint.classList.add('on');
+    else hint.classList.remove('on');
+  }
+
   function renderMenu() {
     if (!tray) return;
     if (activeTab === 'park' && !parkUnlocked) activeTab = 'queen'; // the park tab cannot be active before the first hatch
@@ -3762,7 +3820,7 @@
       }).join('') +
       '</div>' +
       '<button type="button" class="bl-dozer' + (eraseMode ? ' on' : '') + '" id="blDozer" aria-label="Bulldozer: remove a placed item"><img alt="" draggable="false" src="' + BULLDOZER_SRC + '"></button></div>' +
-      '<div class="bl-cards">';
+      '<div class="bl-cards-wrap"><div class="bl-cards">';
     tabOf(activeTab).items.forEach(function (it) {
       if (!isVisible(it.id)) return; // the bed gate: hidden items are not shown at all, never "Locked"
       var price = nextPrice(it.id); // the NEXT copy: firstPrice + 10 per copy already placed (per type)
@@ -3777,8 +3835,11 @@
           : '<button type="button" class="bl-build' + (afford ? '' : ' bl-cant') + '" data-build="' + it.id + '">BUILD</button>') +
         '</div>';
     });
-    html += '</div>';
+    html += '</div><div class="bl-scrollhint" aria-hidden="true">\u203a</div></div>'; // v52 fix 2: the scroll hint lives OUTSIDE the scrolling row (in the wrap), so it never scrolls away and never takes a card's place
     tray.innerHTML = html;
+    updateScrollHint(); // v52 fix 2: show the hint only while more cards sit to the right (tab change / unlock re-renders, so it re-checks then too)
+    var cardsEl = tray.querySelector('.bl-cards');
+    if (cardsEl) cardsEl.addEventListener('scroll', updateScrollHint);
     var dz = document.getElementById('blDozer');
     if (dz) dz.addEventListener('click', function (e) {
       e.stopPropagation();
