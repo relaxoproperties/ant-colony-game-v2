@@ -1005,6 +1005,29 @@
   // (one full 10.25s slide loop, 123 frames @ 12 fps).
   var KW = HEX.w / 791;
   var KID_SCALE = 0.5; // v1: kid = 0.5 x Albert
+  // v53 (Chris, Nov 20): ANT SIZES — the queen WALKING is the reference.
+  // Measured from the sprite files (PIL, alpha>=32, largest component):
+  // queen-walk.webp frame: ant body 104x69 px, drawn at QUEEN_UNDER_W/200
+  // world/px -> 17.86 wide x 11.85 high world. A grown side-walk sprite
+  // (kid50/side_*.png) is visible 59x42 px, drawn at KW*2 world/px ->
+  // 20.42 x 14.53 world — ~9% wider, ~15% taller than the queen walking.
+  // That is why the scout/soldier read BIGGER when walking. WALK_F scales
+  // every WALKING sprite so its visible body matches the queen's walking
+  // body (width ratio 0.875, height ratio 0.816, geometric mean 0.845).
+  // Idle sprites are NOT scaled: grown idle is 23.53 high vs the queen
+  // idle 25.38 — already within 7%. Kids stay half-size (their walk is
+  // WALK_F * 0.5, so a kid walking is half a grown ant walking, as in v1).
+  var QUEEN_WALK_BODY_W = 17.86, QUEEN_WALK_BODY_H = 11.85;
+  var WALK_F = 0.845;
+  // v53 miner: the old "41 px visible ant" was WRONG — 41 px was the
+  // frame rows 0..40, which include the baked-in DIRT DOTS. The ant body
+  // itself (largest component, PIL) is 24 px wide x 27 px high, rows
+  // 14..40, feet on row 40. At the old PW_S (23.53/41) the body was only
+  // 13.8 x 15.5 world — that is why the digger looked super small.
+  // MINER_PW_S sizes the body WIDTH to the queen's walking body width:
+  // 24 px * PW_S = 17.86 world (body then 20.1 world high, digging pose).
+  var MINER_BODY_W_PX = 24, MINER_BODY_H_PX = 27, MINER_FEET_ROW = 40;
+  var MINER_PW_S = QUEEN_WALK_BODY_W / MINER_BODY_W_PX; // ~0.744 world/px
   var KID_SPEED = 2.5437173536208046 * 12 * KW; // v1 KID_SPEED (chamber px/s) -> world/s
   var AD_SPEED = KID_SPEED / KID_SCALE; // v1: grown ants
   var KSTEP = 8.364, K_SIDE_AD = 0.2027512636394711; // v1 STEP + K_SIDE_AD
@@ -1135,6 +1158,9 @@
     ctx.drawImage(im, -an[0] * sc, -an[1] * sc, im.naturalWidth * sc, im.naturalHeight * sc);
     ctx.restore();
   }
+  function drawKidWalk(name, x, y, flip, m) { // v53: WALKING only — same sprite, scaled by WALK_F so the visible walking body matches the queen's walking body (17.86 x 11.85 world). Idle/riding sprites keep their v1 scale.
+    drawKidSprite(name, x, y, flip, m * WALK_F);
+  }
   function newKid(g, x, y) { // v1 newKid
     // v30 fix 4 (Chris): one kid per park item — rode = has used a park item
     // (only a kid who rode moves on to school); schooled = finished school
@@ -1183,7 +1209,7 @@
     // idle there — not at his (stale) surface spot, and not hidden.
     if (a.job === 'scout' && a.scout && a.scout.under && (a.scout.state === 'down' || a.scout.state === 'rest' || a.scout.state === 'downOut')) {
       var U = a.scout.under;
-      if (U.path.length) drawKidSprite('side_' + pad2n(Math.floor(U.wf) % 16) + '.png', U.x, U.y, U.flip, a.m);
+      if (U.path.length) drawKidWalk('side_' + pad2n(Math.floor(U.wf) % 16) + '.png', U.x, U.y, U.flip, a.m); // v53: walking size = queen walking size
       else drawKidSprite('idle_' + pad2n(IDLE_PLAY[Math.floor((QT + a.ph) * IDLE_FPS) % IDLE_PLAY.length]) + '.png', U.x, U.y, false, a.m);
       return;
     }
@@ -1199,7 +1225,7 @@
       return;
     }
     if (a.state === 'walk') {
-      drawKidSprite('side_' + pad2n(Math.floor(a.wf) % 16) + '.png', a.x, a.y, a.flip, a.m);
+      drawKidWalk('side_' + pad2n(Math.floor(a.wf) % 16) + '.png', a.x, a.y, a.flip, a.m); // v53: walking size = queen walking size
       return;
     }
     drawKidSprite('idle_' + pad2n(IDLE_PLAY[Math.floor((QT + a.ph) * IDLE_FPS) % IDLE_PLAY.length]) + '.png', a.x, a.y, false, a.m);
@@ -1819,9 +1845,9 @@
     // v48) is drawn ABOVE the digging miner, in v1's drawTag
     // style (zero-padded mmss, white 11px bold, dark outline) — the same
     // "above the ant" offset as the other stage timers (top - 8). His feet
-    // are at a.y and his head is 41*PW_S above it (the grown-ant height the
-    // plain-work strip is drawn at, same formula as drawMinerDig), so the
-    // timer sits at a.y - 41*PW_S - 8. It counts down from the full
+    // are at a.y and his head is MINER_BODY_H_PX*MINER_PW_S above it (the
+    // digging ant's body height, same formula as drawMinerDig), so the
+    // timer sits at a.y - MINER_BODY_H_PX*MINER_PW_S - 8. It counts down from the full
     // discovery time and stays visible (brainMmss clamps at 00:00) for the
     // whole time he digs that hexagon; it vanishes when he finishes it
     // (finishDig clears a.mine) and reappears over the next one.
@@ -1836,8 +1862,7 @@
       var left;
       if (a.mine.fogTotal > 0) left = dur * Math.max(0, (a.mine.fogLeft != null ? a.mine.fogLeft : a.mine.fogTotal)) / a.mine.fogTotal;
       else left = dur - (QT - a.mine.digT0);
-      var PW_S = (2 * 68 * KW) / 41; // grown-ant scale, same as drawMinerDig
-      drawTag(a.x, a.y - 41 * PW_S - 8, brainMmss(left), 1, 0);
+      drawTag(a.x, a.y - MINER_BODY_H_PX * MINER_PW_S - 8, brainMmss(left), 1, 0); // v53: MINER_PW_S, same as drawMinerDig
     }
   }
   // ---- the trade assignment (drawer rule, capacity rule) ----
@@ -2049,12 +2074,14 @@
     // (queen-dig-side.webp, the queen WITH A CROWN) is no longer the
     // miner's dig; the front strip (queen-dig.webp, art.dig) stays the
     // QUEEN's dig (room builds).
-    // SIZE (Chris: "you know what size to make it"): the miner is a GROWN
-    // ant (Albert size). Measured (PIL, alpha>=32): the ant's visible
-    // height is 41 px at most (rows 0..40; the head bobs 0..8 as he digs),
-    // feet at row 40. A grown ant is drawn 23.53 world tall (kid visible
-    // 68 px x 2 x KW), so the strip is drawn at PW_S = 23.53/41 world per
-    // frame px — the digging ant is exactly Albert size, not kid size.
+    // SIZE (v53, Chris Nov 20): the miner digs at the QUEEN's walking
+    // size. CORRECTION to the v46 measurement: "41 px" was the frame rows
+    // 0..40, which include the baked-in DIRT DOTS. The ant BODY itself
+    // (largest component, PIL) is 24 px wide x 27 px high, rows 14..40,
+    // feet on row 40 — at the old PW_S (23.53/41) the body was only
+    // 13.8 x 15.5 world, which is why the digger looked super small.
+    // MINER_PW_S sizes the body WIDTH to the queen's walking body width
+    // (24 px * PW_S = 17.86 world; body then 20.1 world high, digging pose).
     // The digging animation plays the WHOLE discovery, with the dirt dots
     // baked into the strip flying behind him the whole time (v46: the slow
     // progressive reveal — the animation never stops until the hexagon is
@@ -2069,8 +2096,7 @@
     var t0 = (a.mine && a.mine.digT0 != null) ? a.mine.digT0 : QT;
     var f = Math.floor((QT - t0) * 8) % 6;
     if (f < 0) f += 6;
-    var PW_VIS_H = 41; // max visible ant height in the strip, px (rows 0..40, alpha>=32)
-    var PW_S = (2 * 68 * KW) / PW_VIS_H; // grown-ant height (23.53 world) / 41 px
+    var PW_S = MINER_PW_S; // v53: body width = queen walking body width (17.86 world)
     var W = 64 * PW_S, H = 61 * PW_S;
     // Face the hexagon he is digging. v47 fix 2 (Chris, Nov 18): he was
     // digging BACKWARDS — the flip was inverted. The plain-work strip
@@ -2093,8 +2119,8 @@
     ctx.save();
     ctx.translate(a.x, a.y);
     ctx.scale(faceRight ? 1 : -1, 1);
-    // Feet (frame row 40, bottom edge row 41) land on a.y; frame centred on a.x.
-    ctx.drawImage(strip, f * 64, 0, 64, 61, -W / 2, -PW_VIS_H * PW_S, W, H);
+    // Feet (frame row 40) land on a.y; frame centred on a.x.
+    ctx.drawImage(strip, f * 64, 0, 64, 61, -W / 2, -MINER_FEET_ROW * PW_S, W, H);
     ctx.restore();
     // v48 (Chris, Nov 18): NO dust cloud on the digging miner — the v1
     // dustAt puffs here looked like "a little tornado cloud" and he
@@ -2491,7 +2517,7 @@
       var G = sa.guard;
       if (G.wait > 0) continue;
       ctx.save(); ctx.globalAlpha *= (G.alpha == null ? 1 : G.alpha);
-      drawKidSprite('side_' + pad2n(Math.floor(G.wf) % 16) + '.png', G.x, G.y, Math.cos(G.dir || 0) < 0, 1);
+      drawKidWalk('side_' + pad2n(Math.floor(G.wf) % 16) + '.png', G.x, G.y, Math.cos(G.dir || 0) < 0, 1); // v53: walking size = queen walking size
       ctx.restore();
     }
     if (!sfOn) return;
@@ -2512,14 +2538,16 @@
         var walking = S.state !== 'waiting';
         var frame = walking ? 'side_' + pad2n(Math.floor(S.wf) % 16) + '.png' : 'idle_' + pad2n(IDLE_PLAY[Math.floor((QT + a.ph) * IDLE_FPS) % IDLE_PLAY.length]) + '.png';
         ctx.save(); ctx.globalAlpha *= (S.alpha == null ? 1 : S.alpha);
-        drawKidSprite(frame, S.x, S.y, Math.cos(S.dir || 0) < 0, 1);
+        if (walking) drawKidWalk(frame, S.x, S.y, Math.cos(S.dir || 0) < 0, 1); // v53: walking size = queen walking size
+        else drawKidSprite(frame, S.x, S.y, Math.cos(S.dir || 0) < 0, 1); // waiting: idle, v1 scale
         ctx.restore();
         if (S.carry) { ctx.save(); ctx.fillStyle = '#8a5a2b'; ctx.strokeStyle = '#3b2410'; ctx.lineWidth = 0.4; ctx.beginPath(); ctx.ellipse(S.x, S.y - 12, 2.2, 1.5, 0.4, 0, 7); ctx.fill(); ctx.stroke(); ctx.restore(); } // v1: the carried seed over him
       } else if (a.follow) {
         var f = a.follow;
         var moving = f.state === 'toAlbert' || (SCOUT_LEAD && SCOUT_LEAD.scout && SCOUT_LEAD.scout.state !== 'waiting');
         ctx.save(); ctx.globalAlpha *= (f.alpha == null ? 1 : f.alpha);
-        drawKidSprite(moving ? 'side_' + pad2n(Math.floor(f.wf) % 16) + '.png' : 'idle_00.png', f.x, f.y, Math.cos(f.dir || 0) < 0, 1);
+        if (moving) drawKidWalk('side_' + pad2n(Math.floor(f.wf) % 16) + '.png', f.x, f.y, Math.cos(f.dir || 0) < 0, 1); // v53: walking size = queen walking size
+        else drawKidSprite('idle_00.png', f.x, f.y, Math.cos(f.dir || 0) < 0, 1); // idle, v1 scale
         ctx.restore();
       }
     }
@@ -3598,7 +3626,8 @@
         grid: HEX_GRID.map(function (c) { return { k: c.k, x: Math.round(c.x * 100) / 100, y: Math.round(c.y * 100) / 100 }; }),
         tradePrices: (function () { var out = {}; TRADE_ITEMS.forEach(function (it) { out[it.id] = { count: placedCount(it.id), next: nextPrice(it.id), visible: isVisible(it.id) }; }); return out; })(),
         ants: ANTS.map(function (a) { return { id: a.id, job: a.job || null, state: a.state, tradeItem: a.tradeItem || null, mine: a.mine ? a.mine.cell.k : null, mineDur: a.mine ? (a.mine.dur != null ? a.mine.dur : null) : null, hidden: !!a.hidden, guard: a.guard ? { x: +a.guard.x.toFixed(1), y: +a.guard.y.toFixed(1), alpha: +a.guard.alpha.toFixed(2), rev: !!a.guard.rev, wait: +(a.guard.wait || 0).toFixed(2), path: a.guard.path.length } : null, scout: a.scout ? { role: a.scout.role, state: a.scout.state, tile: a.scout.tile ? a.scout.tile.join(',') : null, x: +a.scout.x.toFixed(1), y: +a.scout.y.toFixed(1), carry: !!a.scout.carry } : (a.follow ? { role: 'follower', state: a.follow.state, tile: null, x: +a.follow.x.toFixed(1), y: +a.follow.y.toFixed(1), carry: false } : null) }; }),
-        minerSpeed: MINER_SPEED, trainS: TRAIN_S, mineDiscoverS: MINE_DISCOVER_S, firstMineS: FIRST_MINE_S, minedCount: minedCount, guardSpeed: GUARD_SPEED, guardArc: GUARD_ARC.slice(), guardRx: GUARD_RX, guardRy: GUARD_RY
+        minerSpeed: MINER_SPEED, trainS: TRAIN_S, mineDiscoverS: MINE_DISCOVER_S, firstMineS: FIRST_MINE_S, minedCount: minedCount, guardSpeed: GUARD_SPEED, guardArc: GUARD_ARC.slice(), guardRx: GUARD_RX, guardRy: GUARD_RY,
+        walkF: WALK_F, queenWalkBodyW: QUEEN_WALK_BODY_W, queenWalkBodyH: QUEEN_WALK_BODY_H, minerPwS: MINER_PW_S, minerBodyW: MINER_BODY_W_PX, minerBodyH: MINER_BODY_H_PX, minerFeetRow: MINER_FEET_ROW
       };
     }
   };
