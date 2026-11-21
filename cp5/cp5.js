@@ -63,10 +63,10 @@ const S2S=720/390;   // v3 camera s is on a 390x844 screen; bv1 spp is on the 72
 function imOk(im){return !!(im&&(im.ok||((im.naturalWidth||im.width)>0))&&!im.bad)}
 function loadIm(src){const im=new Image();im.decoding='async';im.onload=()=>{im.ok=1;SQ.loaded++};im.onerror=()=>{im.bad=1;SQ.failed=(SQ.failed||0)+1;console.warn('[cp5] image failed: '+src)};im.src=src;SQ.want++;return im}
 function sqLoad(){if(SQ.preload||!DATA)return;SQ.preload=true;
- // v59: ?v=59 on the frame + REST urls (phone cache-bust — take1 frames
- // replace the v54 frames at the same filenames; the PLAIN is unchanged).
- for(let i=0;i<DATA.n;i++)SQ.IM[i]=loadIm(BASE+'sq_'+pad3(i)+'.webp?v=59');
- SQ.REST=loadIm(BASE+'acorn_runtime.png?v=59');SQ.PLAIN=loadIm(PLAIN_SRC)}
+ // v60: ?v=60 on the frame + REST urls (phone cache-bust — take6 frames
+ // replace the v59 frames at the same filenames; the PLAIN is unchanged).
+ for(let i=0;i<DATA.n;i++)SQ.IM[i]=loadIm(BASE+'sq_'+pad3(i)+'.webp?v=60');
+ SQ.REST=loadIm(BASE+'acorn_runtime.png?v=60');SQ.PLAIN=loadIm(PLAIN_SRC)}
 // v57: pre-DECODE the frames before the scene starts. The "skipping a beat"
 // on Chris's phone is a decode hitch, not missing art: the squirrel IS one
 // continuous 10 s take (150 frames @ 24 fps), but each frame's FIRST
@@ -117,7 +117,7 @@ const DASH={SPRINT:2.4,APPROACH_END:28,PAUSE:0.4,EASE:0.1};
 // r47 (Chris 8:20 PM ET): body-anchored run. HEAD anchor (centroid of the opaque pixels in the front 18% of each sprite, measured from the
 // v54 sq_007..013.webp alpha) moved so it advances exactly RUN.D/7 (25.3 px) per run frame; draw x offsets for frames 7..13 (code only, no art).
 // Removes the 12->13 hitch (+40 px) and the backward-ish wrap 13->7 (+5 px). Applied to the run-in laps, the authored 7..13 and the run-out laps.
-const RUNFIX=[0.0,-12.3,-13.8,-4.8,-6.9,-1.3,1.5]; // v59: re-measured for take1 (take1-build_params.json); take1's head bobs more in the bound, so the corrections are larger
+const RUNFIX=[0.0,-3.2,-4.6,-7.9,-8.4,-4.1,-1.8]; // v60: re-measured for take6 (take6-build_params.json); take6's head bobs less in the bound than take1's, so the corrections are smaller
 // r48 (Chris 8:27 PM ET): LUNGE after the drop. Frames <=133 (set-down ~112, settled by 118, the stand) keep 24 fps. The clip's own crouch 134..137 plays
 // fast (0.10 s, squashed scaleY 0.93), the spring 138..140 fast (stretched 1.05), then a burst: the run-out stride stretched (2x -> 1x the
 // run step, ease-out over 0.30 s) with a small hop arc, flowing into the r47 run-out (same frames, same RUNFIX line-up).
