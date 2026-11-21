@@ -19,7 +19,7 @@ const canvas=document.querySelector('canvas'),video=document.querySelector('vide
 // so only the grass/mound fades; she arrives fully visible from off-screen.
 const queenFly=document.querySelector('#queenFly'),flyCtx=queenFly.getContext('2d');let ctx=canvas.getContext('2d');const mainCtx=ctx;
 // BV1 Step 1: the opening gate is cf2783d5's own surface set again (no basement picture in it).
-const names={mound:'mound-plain.webp',moundDug:'mound-dug.webp',landing:'queen-landing.webp',dig:'queen-dig.webp',plainWork:'plain-work-clean.webp?v=57',walk:'queen-walk.webp',wide:'ground-wide-feather.webp',map:'map-hd.jpg'},art={};
+const names={mound:'mound-plain.webp',moundDug:'mound-dug.webp',landing:'queen-landing.webp',dig:'queen-dig.webp',plainWork:'plain-work-arms.webp?v=58',walk:'queen-walk.webp',wide:'ground-wide-feather.webp',map:'map-hd.jpg'},art={};
 // Surface: queen digs from behind at Q, then walks left into the black hole D at the front grass line.
 const Q={x:448,y:771},D={x:406,bottom:723,w:98,h:108};
 // Real approved flat-top programming hex, in HD-map coordinates.
@@ -383,7 +383,7 @@ goUp.addEventListener('click',e=>{e.preventDefault();if((state==='underground'||
 // Read-only diagnostics for verification; no visible debug UI and no autoplay shortcuts.
 window.openingDemo={get openLog(){return OPEN_LOG.slice()},get land(){return {f0:LAND.f0,n:LAND.n,seen:LAND.seen.size,lag:landLag,trace:LAND.trace}},traceLanding(){LAND.trace=[]},get basementReady(){return basementReady},get stage(){return state},get videoWhy(){return videoWhy},downEnd:()=>downEnd(),get queen(){return {...queen}},get tile(){return TILE},get spp(){return spp},get lookX(){return lookX},get lookY(){return lookY},HEX,CEILING_HEX,FLOOR_HEX,HORIZON_Y,BUILT_CEILINGS,horizonPath,CHAMBER,ROOM_COMPOSE,COMPOSE_X,APPEAR,QUEEN_DOWN_W,QUEEN_DOWN_BOB,VIDEO_FADE_SECONDS,LANDING_FPS,LANDING_SECONDS,FLOOR_REVEAL_SECONDS,get revealProgress(){return floorRevealProgress()},get panProgress(){return floorRevealProgress()},get dip(){return {startLookY:floorLookYStart,world:floorDipWorld,phonePx:floorDipWorld*spp*view.s,lastDownWorld:lastDownDipWorld}},get menuPan(){return pan},BC,APPEAR,QUEEN_UNDER_W,get view(){return {...view}},get hexCss(){return HEX.w*spp*view.s},get spiralCss(){const c=worldToCanvas(BC.SPIRAL_W.x,BC.SPIRAL_W.y);return {x:view.x+c.x*view.s,y:view.y+(c.y-pan)*view.s}},get queenDrawn(){return {...queen,w:QUEEN_UNDER_W,emerge:emergeT0?clamp((performance.now()-emergeT0)/1000/BC.EMERGE_SECONDS):0}},INITIAL,MAP_RECT,MIN_SPP,MAX_SPP,worldToCanvas,plainToCanvas,setView(v){spp=v.spp??spp;lookX=v.lookX??lookX;lookY=v.lookY??lookY;cameraBounds();positionTarget()},jump(next){begin(next)},seek(seconds){started=performance.now()-seconds*1000}};
 </script>
-<script src="base-layer.js?v=57"></script>
+<script src="base-layer.js?v=58"></script>
 <script src="cp5/cp5-data.js?v=54"></script>
 <script src="cp5/cp5.js?v=57"></script>
 </body></html>
