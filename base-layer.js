@@ -4192,7 +4192,7 @@
   //    portrait already wears her crown, so no crown overlay is drawn.
   var bmRefreshT = 0; // v55: last time the open brain menu refreshed (stepFrame throttle)
   var ANT_NAMES = ['ALBERT', 'ALLEN', 'ANDY', 'ANNA', 'AMOS', 'AVA']; // NP5 line 697
-  var QUEEN_ANT = { id: 'queen', queen: true, name: 'QUEEN', portrait: 'assets/brain-v3/queen-brain-portrait.webp?v=59', lvl: 1, ideas: 0 };
+  var QUEEN_ANT = { id: 'queen', queen: true, name: 'QUEEN', portrait: 'assets/brain-v3/queen-brain-portrait.webp?v=60', lvl: 1, ideas: 0 };
   var brainById = {}; // ant id -> roster record (name + portrait only now)
   var brainNameN = 0;
   function brainFor(a) {
@@ -4211,7 +4211,14 @@
   //   Mine     = ants with job 'miner' (training at the globe/microscope, or mining)
   //   Scout    = ants with job 'scout' (training at an easel, or scouting)
   //   Attack   = ants with job 'soldier' (training in the gym, or patrolling)
-  //   Work     = grown, schooled ants with NO trade job yet (the available workforce)
+  //   Work     = grown, schooled ants with NO trade job yet AND actually
+  //              free — not in trade training (a.train) and not sitting at
+  //              a school desk (a.schoolDesk). v60 (Chris, Nov 21): the
+  //              three grown ants in the ?checkpoint=5 shortcut sit at
+  //              desks waiting — students, not workers — so Work read 3
+  //              and he said it should not be there. A desk-sitter or a
+  //              trainee is not available workforce; a freed ant (trade
+  //              item destroyed, no desk, no train, no job) still counts.
   //   Strength = ants carrying a giant seed home (a scout on the carry counts
   //              on Scout AND on Strength — he is doing both at once)
   //   Rally    = 0, honestly: there is no rally system in checkpoints 1-5.
@@ -4225,7 +4232,7 @@
       if (a.job === 'miner') c.mine++;
       else if (a.job === 'scout') { c.scout++; if (a.scout && a.scout.carry) c.str++; }
       else if (a.job === 'soldier') c.atk++;
-      else if (a.m > KID_SCALE && a.schooled) c.work++;
+      else if (a.m > KID_SCALE && a.schooled && !a.train && !a.schoolDesk) c.work++;
     }
     return c;
   }
