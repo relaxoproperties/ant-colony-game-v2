@@ -16,8 +16,9 @@
 // a timer. Bed = the brain timer: v1's counter above her head in the royal
 // chamber counts down 120s while she rests on the bed (NP5 drawTag, "02:00");
 // at 0:00 the brain bubble appears, tap = +1 brain, 2-3 coins tracked,
-// no HUD, no idea minigame. The counter IS the brain-giver. CHECKPOINT 2 STOPS
-// at 8 brains (squirrel at 9 and idea game at 10 are later checkpoints).
+// no HUD, no idea minigame. The counter IS the brain-giver. CHECKPOINT 2 STOPPED
+// at 8 brains; CHECKPOINT 5 (v54) raises the cap to 9, where the squirrel comes
+// (idea game at 10 is checkpoint 6).
 // Fridge = kitchen room timer 5:00, cooler = water room timer 7:00: a countdown
 // over the item; at 00:00 a leaf/drop bubble appears, tap = she eats/drinks (3s)
 // and the timer restarts. Basket = the egg cycle: lay (2s) -> tends at +2/+4/+6
@@ -43,6 +44,12 @@
 // rock fog one hexagon at a time (frontier rule); cleared hexagons become
 // buildable. ?checkpoint=4 skips to trade school with a grown-up ant at a desk,
 // so checkpoint 4 can be tested WITHOUT playing through checkpoints 1-3.
+// CHECKPOINT 5 (Nov 21, v54): the SQUIRREL, layered on checkpoint 4. At 9
+// brains the squirrel runs in from the right, drops the plain acorn (the
+// future Seed Money Bank's acorn, 1:1) on the first free surface hex, and
+// runs out left; the game stays above ground and the acorn stays drawn.
+// Brains are NOT reset — the 10th brain / idea game / bank are checkpoint 6.
+// ?checkpoint=5 starts with 8 brains (one brain-bubble tap from the squirrel).
 (function () {
   'use strict';
   var URLQ = new URLSearchParams(location.search);
@@ -335,7 +342,7 @@
   // whenever she leaves the bed (any build activity distracts her, v1 brainReset).
   var BRAIN_EVERY = 120; // v1 CHAMBER_BUB.EVERY_S
   var BRAIN_COINS = [2, 3]; // v1
-  var BRAIN_CAP = 8; // CHECKPOINT 2 ends at 8 brains (v1's squirrel comes at 9, idea game at 10 — later checkpoints)
+  var BRAIN_CAP = 9; // CHECKPOINT 5 ends at 9 brains (v1's squirrel comes at 9, idea game at 10 — checkpoint 6)
   var BR = { t: 0, ready: false, brains: 0, coins: 0 };
   function brainReset() { BR.t = 0; }
   function queenHeadW() { return { x: queen.x, y: queen.y - QUEEN_UNDER_W * 0.58 }; } // v1
@@ -397,7 +404,7 @@
       return;
     }
     // v1 brain counter (see above): counts down BRAIN_EVERY-BR.t above her head.
-    // Checkpoint 2 stops at 8 brains: no counter once she has 8.
+    // Checkpoint 5 stops at 9 brains: no counter once she has 9.
     if (BR.brains < BRAIN_CAP && !BR.ready && atHome() && QN.mode === 'idle' && !QN.busy) {
       drawTag(queen.x, queen.y - QUEEN_UNDER_W * 0.62, brainMmss(BRAIN_EVERY - BR.t), 0, 0);
     }
@@ -420,7 +427,7 @@
     setTimeout(function () { if (d.parentNode) d.parentNode.removeChild(d); }, 700);
   }
   function tapBrainBubble(b) {
-    BR.ready = false; BR.t = 0; BR.brains = Math.min(BRAIN_CAP, BR.brains + 1); // checkpoint 2 stops at 8 brains
+    BR.ready = false; BR.t = 0; BR.brains = Math.min(BRAIN_CAP, BR.brains + 1); // checkpoint 5 stops at 9 brains
     var n = BRAIN_COINS[0] + Math.floor(Math.random() * (BRAIN_COINS[1] - BRAIN_COINS[0] + 1));
     BR.coins += n;
     floatTxt('+1', b.x, b.y);
@@ -4093,11 +4100,16 @@
 
   renderMenu();
 
-  // TEST-ONLY ?start=downstairs / ?checkpoint=2 / ?checkpoint=3 / ?checkpoint=4: skip the (LOCKED) opening to the exact real arrival state.
+  // TEST-ONLY ?start=downstairs / ?checkpoint=2 / ?checkpoint=3 / ?checkpoint=4 / ?checkpoint=5: skip the (LOCKED) opening to the exact real arrival state.
   // ?checkpoint=2 is Chris's Checkpoint 2 test link: straight underground, menu open, ready to place.
   // ?checkpoint=3 is the same for checkpoint 3 testing.
   // ?checkpoint=4 is the same for checkpoint 4 testing, PLUS the trade-school
   // prerequisites (setupTradeTest): a grown-up ant at a desk, the trade tab open.
+  // ?checkpoint=5 is the same for checkpoint 5 testing, PLUS the trade-school
+  // prerequisites AND 8 brains already collected (setupCp5Test): the queen
+  // rests on her bed, so the 120 s brain timer runs and the next brain bubble
+  // (tap = 9 brains) brings the squirrel. No save exists, so a reload starts
+  // over at 8 brains again — the squirrel replays once per session.
   function setupTradeTest() {
     // CHECKPOINT 4 test shortcut (Chris, Nov 17): start with the
     // prerequisites already met, so checkpoint 4 can be tested WITHOUT
@@ -4135,7 +4147,22 @@
     activeTab = 'trade';
     renderMenu();
   }
-  if (URLQ.get('start') === 'downstairs' || URLQ.get('checkpoint') === '2' || URLQ.get('checkpoint') === '3' || URLQ.get('checkpoint') === '4') {
+  function setupCp5Test() {
+    // CHECKPOINT 5 test shortcut: the whole checkpoint 4 test setup (bed,
+    // three grown ants at desks, trade school open) PLUS 8 brains already
+    // collected, so the squirrel is one brain-bubble tap away. The brain
+    // timer itself is untouched (120 s, bed-only): she rests on the bed and
+    // the bubble appears when it completes, exactly as in the real flow.
+    setupTradeTest();
+    BR.brains = 8; BR.t = 0; BR.ready = false;
+    // v54: she is ALREADY resting on the bed (the real flow settles her there
+    // when the bed is built — the shortcut must match that end state, or the
+    // 120 s brain timer never runs: atHome() needs her within 2 units of home
+    // and nothing sends her home while idle). Without this she stands at the
+    // spiral and the 9th brain never comes from just waiting.
+    queen.x = QN.home.x; queen.y = QN.home.y;
+  }
+  if (URLQ.get('start') === 'downstairs' || URLQ.get('checkpoint') === '2' || URLQ.get('checkpoint') === '3' || URLQ.get('checkpoint') === '4' || URLQ.get('checkpoint') === '5') {
     var go = function () {
       if (typeof ready !== 'undefined' && !ready) { setTimeout(go, 40); return; }
       loadBasement();
@@ -4143,6 +4170,7 @@
       emergeT0 = performance.now() - BC.EMERGE_SECONDS * 1000 - 1; emerged = true; // she already walked out in checkpoint 1; never replay on later descents
       begin('underground');
       if (URLQ.get('checkpoint') === '4') setupTradeTest(); // CHECKPOINT 4: the trade-school prerequisites, ready to test
+      if (URLQ.get('checkpoint') === '5') setupCp5Test(); // CHECKPOINT 5: trade-school prerequisites + 8 brains, ready to test
       // Snap the camera to the real arrival view. The descending transition
       // does this in the real flow; the hook skips it, so without this the
       // camera stays at the start view and placed items sit off-screen.
