@@ -1,0 +1,208 @@
+// ===================== CP5 (checkpoint 5, SQUIRREL) — v54 =====================
+// Port of v1 cp5/cp5.js (Builder 4, Nov 14 2026) onto the BASE LAYER.
+// What changed vs v1 (and why — the base layer is NOT bv1):
+//  * No eval hook: v1 wired in via window.__cp5Eval + a `step` swap inside the
+//    bv1 IIFE. The base layer has no such hook, so this file is self-contained:
+//    it reads brains through window.BASE_TIMERS, the placing state through
+//    window.BASE_ITEMS.placing, and runs its own requestAnimationFrame tick
+//    (window.cp5.tick, also callable by the harness). Nothing in base-layer.js
+//    is patched except BRAIN_CAP (8 -> 9) and the ?checkpoint=5 shortcut.
+//  * Draw: wraps window.BASE_QUEEN.drawUp (called by index.html's drawSurface
+//    while state === 'entered', inside the world transform) instead of
+//    swapping BV.drawUp. The squirrel + acorn therefore draw exactly where
+//    the scout/soldier draw, in world coords.
+//  * No save system: the base layer has no save, so v1's firstDone persistence
+//    (squirrelDone / acornHex) has no equivalent. Once-only is per SESSION:
+//    after the scene plays, SQ.state stays 'done' and it will not replay
+//    until the page reloads. A reload replays it if brains are still >= 9
+//    (with ?checkpoint=5 that means one brain-bubble tap away again).
+//  * No idea game, no bank: BANK.built stays false; drawBank is gone. The
+//    ground acorn is the Seed Money Bank's plain acorn (cp6/assets/bank/
+//    acorn_bank_canvas_1024.png), drawn at BANK.S = 157.385 world, centred
+//    on the drop point — acorn -> bank is 1:1 in checkpoint 6.
+//  * No sound, no <video>, no skip button (v1 had none — do not add one).
+//  * Everything else is v1 verbatim: trigger at 9 brains, preload at 8,
+//    the run-in / authored / run-out path (frames 7-13 sprint 2.4x, one 0.4 s
+//    held pause mid-screen, acorn set down ~frame 112 and settled by 118,
+//    lunge, exit left), the 1.2 s glide to the very far shot (CINE.FAR_K
+//    0.55, fit x0.94), the 1.0 s settle on the acorn, and STAYING above
+//    ground afterwards (player presses down).
+// Classic script, one global: window.cp5. No ES modules, no CDN.
+(function(){'use strict';
+// ==== THE squirrel trigger (Chris 12:13 PM ET: the 9th brain). Change this ONE number to move it. ====
+const SQUIRREL_AT_BRAINS=9;
+// NP5 dfc7b054 index.html line 1325-1326 (item 23), ported verbatim: 2+ hexes from the mound, diagonally up-right first, first FREE one wins.
+const SQ_HEXES=[[2,-2],[3,-3],[2,-3],[3,-2],[1,-2],[4,-3],[3,-4],[4,-4]];
+// NP4 note 19 framing (np4_block.js 222: whole squirrel+acorn scene, fit x0.94) x FAR_K = Chris 12:04 "zoom out very far"; END = the same NP4 framing on the acorn.
+const CINE={FAR_K:0.55,ZOOM_S:1.2,END_S:1.0};
+const C5={ready:false,errs:{},log:[],cine:null,restore:null,done:false};
+const URLQ=new URLSearchParams(location.search);
+const _src=(document.currentScript&&document.currentScript.src)||'';
+const BASE=window.CP5_BASE||((_src.replace(/[^/]+$/,'')||'cp5/')+'assets/squirrel-v3/');
+const DATA=window.CP5_DATA||null;
+// Chris 1:33 PM ET: the ground acorn = the Seed Money Bank's own PLAIN acorn (existing art: squirrel-transparent/v2/acorn-end/acorn_bank_canvas_1024.png,
+// "byte copy of the plain acorn cut-out, drawn like the Seed Bank picture"; outside the door / window / $ it is pixel-identical to
+// bank_house_cutout_dollar.png, same 1024 canvas). Drawn with the bank's exact transform (BANK.x-.52S, BANK.y-.52S, S, S), so acorn -> bank is 1:1.
+const PLAIN_SRC=window.CP5_PLAIN_ACORN||((_src?_src.replace(/cp5\/[^/]*$/,''):'')+'cp6/assets/bank/acorn_bank_canvas_1024.png');
+function plog(t){C5.log.push(t);if(C5.log.length>400)C5.log.shift()}
+function guard(name,fn,fb){return function(){try{return fn.apply(this,arguments)}catch(e){const k=name+':'+(e&&e.message);if(!C5.errs[k]){C5.errs[k]=1;console.warn('[cp5] '+name+' failed (kept running): '+(e&&e.stack||e))}if(fb)return fb.apply(this,arguments)}}}
+const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ease=t=>t*t*(3-2*t);
+const pad3=n=>String(n).padStart(3,'0');
+
+// NP5 item 23 + Chris 11:20: the squirrel comes at 9 brains collected (BR.brains). No timer. ?force=squirrel / squirrelNow() still start at once.
+const SQ={AT:20*60-20,state:'wait',t0:0,hex:null,off:{x:0,y:0},loaded:0,want:0,failed:0,IM:[],REST:null,preload:false};
+const BANK={built:false,acorn:false,hex:null,x:0,y:0,S:157.385,t:0,ready:0,EVERY_S:120,PER_ANT:5,builtT:0};
+const S2S=720/390;   // v3 camera s is on a 390x844 screen; bv1 spp is on the 720x1280 design
+
+function imOk(im){return !!(im&&(im.ok||((im.naturalWidth||im.width)>0))&&!im.bad)}
+function loadIm(src){const im=new Image();im.decoding='async';im.onload=()=>{im.ok=1;SQ.loaded++};im.onerror=()=>{im.bad=1;SQ.failed=(SQ.failed||0)+1;console.warn('[cp5] image failed: '+src)};im.src=src;SQ.want++;return im}
+function sqLoad(){if(SQ.preload||!DATA)return;SQ.preload=true;
+ // v54: ?v=54 on the frame + REST urls (phone cache-bust — these are
+ // newly-referenced images; the PLAIN is an existing unchanged file).
+ for(let i=0;i<DATA.n;i++)SQ.IM[i]=loadIm(BASE+'sq_'+pad3(i)+'.webp?v=54');
+ SQ.REST=loadIm(BASE+'acorn_runtime.png?v=54');SQ.PLAIN=loadIm(PLAIN_SRC)}
+
+// Surface axial hexes (NP5 hexCenter), in WORLD / map px. HEX is the opening's mound hex.
+// VERIFIED v54: base-layer HEX is {cx:2812, cy:4999.5, w:136.8566720971564} —
+// byte-identical to v1's, so this formula ports verbatim.
+function hexCenter(q,r){const HR=HEX.w/2,HT=HEX.w*Math.sqrt(3)/4;return {cx:HEX.cx+1.5*HR*q,cy:HEX.cy+2*HT*(r+q/2)}}
+
+// NP5 sqHexFree: hex distance >= 2 from the mound, and no building already on that surface hex. In bv1 the basement rooms live on their own
+// 23-cell chamber grid (not on surface hexes, unlike NP5's same-grid ROOMS), so the only surface building that can take a hex is the bank.
+// v54: there is no bank yet (checkpoint 6), so BANK.built is always false and the distance rule is the whole test.
+function sqHexFree(q,r){if(Math.abs(q)+Math.abs(r)+Math.abs(q+r)<4)return false;return !(BANK.built&&BANK.hex&&BANK.hex[0]===q&&BANK.hex[1]===r)}
+function pickAcornHex(){return (SQ_HEXES.find(([q,r])=>sqHexFree(q,r))||SQ_HEXES[0]).slice()}
+function setHex(h){SQ.hex=h.slice();window.CP5_ACORN_HEX=h.slice();const c=hexCenter(h[0],h[1]),A=DATA.acorn;SQ.off={x:c.cx-A.c[0],y:c.cy-A.c[1]};
+ const p=acornWorld();BANK.hex=h.slice();BANK.x=p.x;BANK.y=p.y;return p}
+// ---- CP5-1/CP5-2 (Chris 1:03 PM ET): the squirrel PATH is rebuilt in code from the SAME approved v54 frames, same size (no new video).
+// The authored plate starts with the squirrel already on screen (frame 0) and cuts it at the plate's left edge on the way out (frames 141-144),
+// then shows acorn-only crops (145-149): those were the "invisible boundaries" at the far zoom. New timeline (24 fps, entries {k,dx,dy}):
+//  1. ENTER: the clean run cycle 7..13 (frame 14 = frame 7 + RUN.D, measured) repeated from beyond the screen's right edge, then
+//  2. the authored frames 7..140 unchanged: run in, acorn set down on the drop hex (~112, settled by 118 = rest), stand, turn, leap left;
+//  3. EXIT: from the 140 leap the same run cycle continues left (bottom-aligned to the leap) until it is past the screen's left edge.
+// The acorn rest sprite (acorn_runtime.png) is drawn from frame 118 on, centred on the hex: its final position = the bank position.
+const RUN={A:7,B:14,D:{x:-177,y:0},EXIT_FROM:140,EXIT_K:8,EXIT_OFF:{x:-688,y:54},MARGIN:120};   // EXIT_OFF: frame 8's nose/feet onto frame 140's (one step on)
+function screenX(){let L=lookX-1000/spp,R=lookX+1000/spp;try{const g=game.getBoundingClientRect(),a=canvasToWorld((0-view.x)/view.s,640),b=canvasToWorld((g.width-view.x)/view.s,640);L=a.x;R=b.x}catch(e){}return {L,R}}
+// r46 (Chris 8:15 PM ET): a SMOOTH fast run. The run cycle 7..13 (measured stride RUN.D) plays at an EVEN rate (SPRINT x 24 fps, every
+// entry the same duration, pose index from elapsed time) at the same ground speed as r45; no frame flicking anywhere. Exactly ONE still pause
+// on the way IN (the mid-screen one: after lap round(M/3)), one held pose, with the speed eased down/up over ~0.1 s (entries stretched, pose and
+// position stay in step). NO pauses on the way OUT. Frames 28..140 (slow-down, ACORN DROP, stand, turn, leap) keep their exact 24 fps timing.
+const DASH={SPRINT:2.4,APPROACH_END:28,PAUSE:0.4,EASE:0.1};
+// r47 (Chris 8:20 PM ET): body-anchored run. HEAD anchor (centroid of the opaque pixels in the front 18% of each sprite, measured from the
+// v54 sq_007..013.webp alpha) moved so it advances exactly RUN.D/7 (25.3 px) per run frame; draw x offsets for frames 7..13 (code only, no art).
+// Removes the 12->13 hitch (+40 px) and the backward-ish wrap 13->7 (+5 px). Applied to the run-in laps, the authored 7..13 and the run-out laps.
+const RUNFIX=[0,-1.0,1.9,-0.3,5.0,8.1,9.1];
+// r48 (Chris 8:27 PM ET): LUNGE after the drop. Frames <=133 (set-down ~112, settled by 118, the stand) keep 24 fps. The clip's own crouch 134..137 plays
+// fast (0.10 s, squashed scaleY 0.93), the spring 138..140 fast (stretched 1.05), then a burst: the run-out stride stretched (2x -> 1x the
+// run step, ease-out over 0.30 s) with a small hop arc, flowing into the r47 run-out (same frames, same RUNFIX line-up).
+const LUNGE={FROM:134,CROUCH:[0.025,0.025,0.025,0.025],SPRING:{138:0.027,139:0.040,140:0.021},BURST:0.30,BOOST:1.0,HOP:45};
+function rfx(k){return (k>=RUN.A&&k<RUN.B)?RUNFIX[k-RUN.A]:0}
+function easeIn(T,run){let t=0;for(let j=T.length-1;j>=0&&t<DASH.EASE;j--){const u=t/DASH.EASE;T[j].d=run*(1+1.5*(1-u)*(1-u));t+=run}}
+function buildPath(){const F=DATA.frames,o=SQ.off,X0=screenX(),T=[],run=1/DATA.fps/DASH.SPRINT,fr=1/DATA.fps;
+ const fA=F[RUN.A],need=X0.R+RUN.MARGIN-(fA[0]+o.x),M=Math.max(1,Math.ceil(need/-RUN.D.x));
+ const stop=Math.max(1,Math.round(M/3));let easeOut=0;
+ for(let m=M;m>=1;m--){for(let k=RUN.A;k<RUN.B;k++){let d=run;if(easeOut>0){const u=1-easeOut/DASH.EASE;d=run*(1+1.5*(1-u)*(1-u));easeOut-=run}T.push({k,dx:-RUN.D.x*m+rfx(k),dy:0,d})}
+  if(m===stop&&M>1){easeIn(T,run);T.push({k:RUN.A,dx:-RUN.D.x*(m-1),dy:0,d:DASH.PAUSE,pause:1});easeOut=DASH.EASE}}
+ const auth0=T.length;for(let k=RUN.A;k<=RUN.EXIT_FROM;k++){const e={k,dx:rfx(k),dy:0,d:k<DASH.APPROACH_END?run:fr};
+  if(k>=LUNGE.FROM){const c=k-LUNGE.FROM;if(c<LUNGE.CROUCH.length){e.d=LUNGE.CROUCH[c];e.sy=0.93}else{e.d=LUNGE.SPRING[k]||run;e.sy=1.05}}T.push(e)}
+ let off={...RUN.EXIT_OFF},k=RUN.EXIT_K,guard=0,b=0,ex=0;const NB=Math.max(1,Math.round(LUNGE.BURST/run)),step=-RUN.D.x/(RUN.B-RUN.A);
+ while(guard++<400){const e={k,dx:off.x+rfx(k)+ex,dy:off.y,d:run};if(b<NB){const u=b/NB;e.dy-=LUNGE.HOP*Math.sin(Math.PI*u);e.sy=1+0.04*Math.sin(Math.PI*u);b++;ex-=step*LUNGE.BOOST*(1-b/NB)*(1-b/NB)}T.push(e);const f=F[k];if(f[0]+f[2]+off.x+o.x<X0.L-RUN.MARGIN)break;k++;if(k>=RUN.B){k=RUN.A;off={x:off.x+RUN.D.x,y:off.y+RUN.D.y}}}
+ let c=0;SQ.cum=T.map(e=>(c+=e.d));SQ.path=T;SQ.restAt=auth0+(DATA.restFrame-RUN.A);
+ plog('path: '+M+' laps in, '+T.length+' frames, '+c.toFixed(2)+' s, rest at '+SQ.restAt);return T}
+// r45: index = first entry whose cumulative end time is past the clock (entries have their own durations)
+function pathIdx(now){const t=(now-SQ.t0)/1000;if(t<0)return -1;const C=SQ.cum;if(!C||!SQ.path)return Math.floor(t*DATA.fps);let lo=0,hi=C.length;while(lo<hi){const m=(lo+hi)>>1;if(C[m]<=t)lo=m+1;else hi=m}return lo}
+function acornWorld(){const A=DATA.acorn,o=SQ.off;return {x:A.c[0]+o.x,y:A.c[1]+o.y}}
+
+function beginPlay(now){if(!DATA||SQ.loaded<SQ.want*.7)return false;
+ const p=setHex(pickAcornHex());BANK.acorn=false;
+ // NP5 moves the approved layer as one piece onto the drop hex (np3 item 23); the clip clock starts once the far shot is reached (stepCine)
+ SQ.state='pre';SQ.t0=0;plog('squirrel pre hex='+SQ.hex+' acorn='+p.x.toFixed(1)+','+p.y.toFixed(1));
+ cineStart(now);return true}
+
+function stepSquirrel(now,dt){if(SQ.state==='done'&&!C5.cine)return;
+ if(SQ.state==='wait'){const go=TRIGGER();if(go||brains()>=SQUIRREL_AT_BRAINS-1)sqLoad();
+  if(go&&SQ.preload&&SQ.loaded>=SQ.want*.7){
+   const st=typeof state==='string'?state:'';if(IDEA_BLOCK())return;
+   if(!(st==='underground'||st==='entered'||st==='menu'||st==='ascending'||st==='descending'))return;
+   beginPlay(now)}}
+ if(SQ.state==='play'){if(!SQ.path)buildPath();const i=pathIdx(now);if(i>=SQ.restAt)BANK.acorn=true;
+  if(i>=SQ.path.length){SQ.state='done';BANK.acorn=true;markSquirrelDone();plog('acorn landed')}}}
+
+// ==== SQUIRREL TRIGGER: comes when the player has collected SQUIRREL_AT_BRAINS brains (BR.brains). No timer. ====
+// Override: window.CP5_TRIGGER=function(){return <true when the squirrel should come>}; or cp5.debug.squirrelNow() / ?force=squirrel.
+// v54: brains come from the base layer's read-only handle (window.BASE_TIMERS.brain.brains); there is no save, so
+// "already played" is a per-session flag (C5.done) — a reload replays it if brains are still >= 9.
+function brains(){try{return (window.BASE_TIMERS&&BASE_TIMERS.brain&&BASE_TIMERS.brain.brains)|0}catch(e){return 0}}
+function TRIGGER(T){try{if(typeof window.CP5_TRIGGER==='function')return !!window.CP5_TRIGGER(T)}catch(e){}
+ if(SQ.state!=='wait')return false;
+ if(C5.force||URLQ.get('force')==='squirrel')return true;
+ if(C5.done)return false;
+ return brains()>=SQUIRREL_AT_BRAINS}
+function markSquirrelDone(){C5.done=true;C5.force=false}
+
+// v54: the base layer has no idea game (BR.game does not exist). The only
+// block is placing/carrying an item (BASE_ITEMS.placing).
+function IDEA_BLOCK(){try{if(window.BASE_ITEMS&&BASE_ITEMS.placing)return true}catch(e){}return false}
+
+// ---- NP4 note 19 cinematic, CP5-link version: freeze input, go up to the ground floor, glide to a VERY far wide shot of the whole
+// squirrel + acorn scene, play the clip there, then settle on the acorn and STAY above ground (Chris 12:04: the player presses down). ----
+function cineEl(){let el=document.getElementById('cineBlock');if(el)return el;
+ el=document.createElement('div');el.id='cineBlock';el.style.cssText='position:absolute;inset:0;z-index:9999;display:none;background:transparent;pointer-events:none';
+ // r49 (Chris 8:37 PM ET: 'couldn't zoom in when the video was playing'): the block layer lets touches through to the canvas, so the normal
+ // pinch-zoom / one-finger pan work during the scene; button CLICKS (down arrow, menu...) are still swallowed while the scene runs.
+ if(window.addEventListener)window.addEventListener('click',e=>{if(C5.cine&&e.target!==canvas){e.stopPropagation();if(e.cancelable)e.preventDefault()}},true);
+ if(typeof game!=='undefined'&&game&&game.appendChild)game.appendChild(el);
+ ['pointerdown','pointerup','pointermove','click','touchstart','touchend','touchmove','wheel'].forEach(k=>el.addEventListener(k,e=>{e.stopPropagation();if(e.cancelable)e.preventDefault()},{passive:false}));
+ return el}
+function sceneBox(){const o=SQ.off,A=DATA.acorn;let x0=A.tl[0],y0=A.tl[1],x1=A.tl[0]+A.wh[0],y1=A.tl[1]+A.wh[1];
+ DATA.frames.forEach(f=>{if(!f)return;x0=Math.min(x0,f[0]);y0=Math.min(y0,f[1]);x1=Math.max(x1,f[0]+f[2]);y1=Math.max(y1,f[1]+f[3])});return {x0:x0+o.x,x1:x1+o.x,y0:y0+o.y,y1:y1+o.y}}
+function fitS(b,k){const lo=typeof MIN_SPP==='number'?MIN_SPP:.1,hi=typeof MAX_SPP==='number'?MAX_SPP:8;return clamp(Math.min(720/(b.x1-b.x0),1280/(b.y1-b.y0))*0.94*k,lo,hi)}
+function cineStart(now){if(C5.cine)return;C5.restore=null;
+ C5.cine={t0:now,phase:'up',g:null};cineEl().style.display='block';plog('cine:start');
+ try{if(typeof state!=='undefined'&&(state==='underground'||state==='menu')){if(typeof begin==='function')begin('ascending')}}catch(e){}}
+function setCam(x,y,s){lookX=x;lookY=y;spp=s;if(typeof cameraBounds==='function')cameraBounds();if(typeof positionTarget==='function')positionTarget();C5.camSet={x:lookX,y:lookY,s:spp}}
+// r49: once the player pinches/pans (camera no longer where the scene put it), the scene stops driving the camera for the rest of the scene
+function userCam(C){const k=C5.camSet;if(!C.user&&k&&(Math.abs(lookX-k.x)>.5||Math.abs(lookY-k.y)>.5||Math.abs(spp-k.s)>1e-4)){C.user=true;plog('cine: player camera')}return C.user}
+function glideStep(G,now){const u=ease(clamp((now-G.t0)/1000/G.dur));if(C5.cine&&C5.cine.user)return u>=1;setCam(G.a.x+(G.b.x-G.a.x)*u,G.a.y+(G.b.y-G.a.y)*u,G.a.s+(G.b.s-G.a.s)*u);return u>=1}
+function stepCine(now){const C=C5.cine;if(!C)return;const st=typeof state==='string'?state:'';userCam(C);
+ if(C.phase==='up'){if(st!=='entered')return;const b=sceneBox();C5.far={x:(b.x0+b.x1)/2,y:(b.y0+b.y1)/2,s:fitS(b,CINE.FAR_K)};
+  C.g={t0:now,dur:CINE.ZOOM_S,a:{x:lookX,y:lookY,s:spp},b:C5.far};C.phase='zoom';plog('cine:far spp '+C5.far.s.toFixed(3))}
+ if(C.phase==='zoom'){if(glideStep(C.g,now)){C.phase='play';SQ.state='play';SQ.t0=now;SQ.path=null;buildPath();plog('squirrel play')}return}
+ if(C.phase==='play'){if(!C.user)setCam(C5.far.x,C5.far.y,C5.far.s);if(SQ.state==='done'){const p=acornWorld(),b=sceneBox();
+   C.g={t0:now,dur:CINE.END_S,a:{x:lookX,y:lookY,s:spp},b:{x:p.x,y:p.y,s:fitS(b,1)}};C.phase='settle'}return}
+ if(C.phase==='settle'&&glideStep(C.g,now))cineEnd()}
+function cineEnd(){const C=C5.cine;if(!C)return;C5.cine=null;cineEl().style.display='none';
+ plog('cine:end, stays above ground ('+state+')')}   // no begin('descending'): the player presses the down arrow
+
+// ---- draw (world transform; called from the BASE_QUEEN.drawUp wrapper, after the existing up pass) ----
+function drawAcorn(){if(!DATA||!imOk(SQ.REST)||BANK.built||SQ.state==='pre')return;if(SQ.state==='play'){if(!SQ.path||pathIdx(performance.now())<SQ.restAt)return}
+ if(imOk(SQ.PLAIN)){const S=BANK.S;ctx.drawImage(SQ.PLAIN,BANK.x-.52*S,BANK.y-.52*S,S,S);return}
+ const A=DATA.acorn,o=SQ.off;ctx.drawImage(SQ.REST,A.tl[0]+o.x,A.tl[1]+o.y,A.wh[0],A.wh[1])}
+function drawSquirrel(now){if(!DATA||(SQ.state!=='play'&&SQ.state!=='done'))return;
+ if(SQ.state==='play'){if(!SQ.path)buildPath();const i=Math.max(0,pathIdx(now));drawAcorn();if(i>=SQ.path.length)return;
+  for(let j=i;j>=Math.max(0,i-6);j--){const e=SQ.path[j],im=SQ.IM[e.k],f=DATA.frames[e.k];if(imOk(im)&&f){const o=SQ.off;const sy=e.sy||1;ctx.drawImage(im,f[0]+o.x+e.dx,f[1]+o.y+e.dy+f[3]*(1-sy),f[2],f[3]*sy);SQ.drawn={i,k:e.k,x:f[0]+o.x+e.dx,y:f[1]+o.y+e.dy,w:f[2],h:f[3]};return}}return}
+ drawAcorn()}
+function drawUpCP5(now,orig){if(orig)orig(now);drawSquirrel(now)}
+
+// ---- tick (own rAF loop; the base layer has no step hook to borrow) ----
+function cp5Tick(now){now=now||performance.now();stepSquirrel(now,0);stepCine(now)}
+function loop(now){cp5Tick(now);if(typeof requestAnimationFrame==='function')requestAnimationFrame(loop)}
+
+// ---- init ----
+function init(){if(C5.ready)return;if(!DATA){plog('missing CP5_DATA (load cp5-data.js first)');return}
+ // Wrap BASE_QUEEN.drawUp so the squirrel/acorn draw in the surface pass
+ // (index.html drawSurface, state 'entered', world transform already applied).
+ try{if(window.BASE_QUEEN&&typeof BASE_QUEEN.drawUp==='function'&&!BASE_QUEEN.__cp5Wrapped){const u0=BASE_QUEEN.drawUp;BASE_QUEEN.drawUp=guard('drawUp',function(now){drawUpCP5(now,u0)},u0);BASE_QUEEN.__cp5Wrapped=true}}catch(e){plog('drawUp wrap failed '+(e&&e.message))}
+ sqLoad();C5.ready=true;plog('cp5 ready (v54 single-take art, '+SQ.want+' images)');
+ if(typeof requestAnimationFrame==='function')requestAnimationFrame(loop)}
+
+// ---- test helpers (QC / harness). squirrelNow = NP5 openingDemo.squirrelNow ----
+function squirrelNow(){sqLoad();C5.force=true;plog('squirrelNow');return SQ.state}
+
+window.cp5={init:guard('init',init),tick:guard('tick',cp5Tick),get ready(){return C5.ready},bank:BANK,sq:SQ,SQUIRREL_AT_BRAINS,SQ_HEXES,pickAcornHex,get acornHex(){return SQ.hex&&SQ.hex.slice()},
+ debug:{C5,SQ,BANK,DATA,CINE,RUN,buildPath,screenX,hexCenter,sqHexFree,pickAcornHex,sceneBox,acornWorld,squirrelNow,sqLoad,beginPlay,
+  get log(){return C5.log},get errs(){return Object.keys(C5.errs)},
+  state:()=>({sq:SQ.state,cine:!!C5.cine,phase:C5.cine&&C5.cine.phase,far:C5.far||null,shared:window.CP5_ACORN_HEX||null,acorn:!!BANK.acorn,built:!!BANK.built,loaded:SQ.loaded,want:SQ.want,hex:SQ.hex,x:BANK.x,y:BANK.y,brains:brains()}),
+  goUpstairs(){try{if(typeof begin==='function'&&state!=='entered')begin('entered');const h=SQ.hex||pickAcornHex(),c=hexCenter(h[0],h[1]);if(window.openingDemo&&openingDemo.setView)openingDemo.setView({spp:Math.min(MAX_SPP||4,2.4),lookX:c.cx,lookY:c.cy})}catch(e){}}}};
+init();
+})();
