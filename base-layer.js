@@ -313,6 +313,11 @@
     stepRoomTimers();
     stepEggs();
     stepKids(dt); // CHECKPOINT 3: the kids walk, ride, go to school, grow
+    // v55: while the queen's brain menu is open, its numbers stay live —
+    // the S.W.A.R.M.S. counts, the food/water meters and the roster refresh
+    // twice a second as ants change task. (bmRefreshT is declared with the
+    // v55 block below; var hoisting makes this safe before it runs.)
+    if (typeof window !== 'undefined' && window.BrainMenu3 && BrainMenu3.isOpen && QT - bmRefreshT > 0.5) { bmRefreshT = QT; BrainMenu3.refresh(); }
   }
   // Called from drawUnderground (index.html) once per frame while she is free.
   function queenFrame(now) {
@@ -355,8 +360,13 @@
     return Math.max(19, Math.min(30, HEX.w * pxw * 0.13)) / pxw; // v1
   }
   var IBRAIN = new Image(); IBRAIN.src = 'assets/menu-ant/iBrain.webp';
+  // v55 fix 1 (Chris, Nov 21): the bubble must ALSO appear while the build
+  // menu is open (state === 'menu'). The timer already runs in menu state,
+  // but the old `state === 'menu'` suppression meant that at 00:00 the
+  // screen showed neither the counter (hidden once BR.ready) nor the
+  // bubble. The placing suppression stays (hidden while carrying, per v1).
   function brainBubble() {
-    if (!BR.ready || mode === 'carrying' || (typeof state !== 'undefined' && state === 'menu')) return null;
+    if (!BR.ready || mode === 'carrying') return null;
     var h = queenHeadW(), r = bubbleR();
     return { kind: 'brain', x: h.x, y: h.y - r - 4 / (spp * view.s), r: r }; // v1, hidden while placing
   }
@@ -1954,6 +1964,10 @@
     var tr = a.train;
     a.train = null; a.tradeItem = null; // the drawer frees: he physically leaves the item
     a.state = 'idle'; a.arrT = QT;
+    // v55 redesign (Chris, Nov 21): NO skill points — the brain menu is a
+    // queen-only colony overview now, and the S.W.A.R.M.S. card numbers are
+    // live counts of ants on each task, not spendable points. Nothing here
+    // grants points any more.
     if (!tr) return;
     if (tr.trade === 'miner') startMining(a);
     else if (tr.trade === 'scout') startScouting(a);
@@ -4072,6 +4086,8 @@
         return;
       }
       if (mode === 'idle') {
+        // v55: a tap while the giant ant menu is open closes it (NP5 worldTap).
+        if (typeof UI !== 'undefined' && UI.ant) { closeAntMenu(); return; }
         var w = toWorld(e);
         var tb = hitTimerBubble(w);
         if (tb) {
@@ -4080,6 +4096,9 @@
           else if (tb.kind === 'tend' || tb.kind === 'spoil' || tb.kind === 'lay') tapBasketBubble(tb);
           return;
         }
+        // v55 redesign (Chris, Nov 21): the queen is the ONLY ant with a
+        // menu. Tapping a worker ant opens nothing — she is tapped through
+        // #queenTarget, not the canvas (the button sits over her).
         var hit = placedItemAt(w.x, w.y);
         if (hit) {
           // v28: erase mode armed — the tap asks "Are you sure you want to
@@ -4097,6 +4116,588 @@
     cv.addEventListener('pointerup', endPlacePtr);
     cv.addEventListener('pointercancel', endPlacePtr);
   }
+
+  // ---- v55: the BRAIN MENU + GIANT ANT MENU (ported from NP5, old-game-NP5-code) ----
+  // Fix 2 — the brain menu, QUEEN-ONLY colony overview (Chris, Nov 21):
+  // "I'm not doing an individual ant world anymore." The queen guides
+  // everything, so SHE is the only ant with a menu. Tap the queen
+  // (#queenTarget) -> the giant ant menu (#menuAnt, head/body/bottom zones,
+  // 300 ms-per-zone glow sweep, no text) -> tap the HEAD zone -> bubble
+  // buttons; MENU.head = [{id:'brain'}] -> tap the brain icon ->
+  // choose('brain') -> openBrain -> BrainMenu3.open. The hammer icon in
+  // the same giant menu opens the build sheet instead (that fork is the
+  // point). Tapping a worker ant opens NOTHING. No #bvBrainBtn, no flashing
+  // HUDs, no header on the build menu.
+  //
+  // The six S.W.A.R.M.S. cards stay EXACTLY as they were (Chris: "the cards
+  // are supposed to stay the same. It's supposed to spell the word swarms.
+  // It's an acronym."): Strength "Carries +5 items", Work "Builds faster",
+  // Attack "Wins in fewer hits", Rally (no effect line — undecided, blank),
+  // Mine "Digs faster", Scout "Finds more items", same icons, same coloured
+  // bottom strips, same two-rows-of-three layout. What changed is the NUMBER
+  // on each card: it is the count of ants on that task RIGHT NOW, live —
+  // cards are NOT spendable, there are NO skill points any more (the old
+  // "You have N skill points to add" line is gone: it has no source in this
+  // design). colonyCounts() maps jobs to cards (see below).
+  //
+  // Inside the brain menu (Chris: "a pretty cool way to look at what's
+  // inside the queen's brain"): the roster — the old top-left list of every
+  // ant and what it is doing — opens from the "…" button as a "Colony"
+  // panel; the ideas open from the Idea button as an "Ideas" panel. The
+  // Idea button shows the count (0 in cp5 — the idea mini-game is
+  // checkpoint 6 territory; tapping it shows the ideas list, it does not
+  // start a mini-game). MINOR CHANGE (Chris, Nov 21): the food and water
+  // meters are added to the brain menu (top row, flanking the seed-money
+  // pill) — they were never there before.
+  //
+  // ASSET GAPS (none of these exist in the workspace or on the live site):
+  //  * queen-brain-portrait-v3b.webp — MISSING. The queen portrait is frame 0
+  //    of her approved front idle strip (queen_idle_front_strip_v1.png),
+  //    cropped to the 390:334 portrait aspect: assets/brain-v3/queen-portrait.webp.
+  //  * menuAnt.webp (the giant ant picture) — MISSING. The giant menu shows
+  //    the queen's brain portrait instead (object-fit:cover in the NP5 frame).
+  //  * hammerIcon.svg, bm3-sans.woff, bm3-banner.woff — MISSING. The hammer
+  //    button uses the game's own hammer art (assets/items/hammer-tab.png);
+  //    the @font-face rules are ported verbatim and fall back to DejaVu
+  //    Sans / Georgia, as the canvas text already does.
+  //  * The queen's crown layers (wings-tips-behind, base-underhat-headtop)
+  //    are missing too (only hat-crown-lowered.webp exists); the queen
+  //    portrait already wears her crown, so no crown overlay is drawn.
+  var bmRefreshT = 0; // v55: last time the open brain menu refreshed (stepFrame throttle)
+  var ANT_NAMES = ['ALBERT', 'ALLEN', 'ANDY', 'ANNA', 'AMOS', 'AVA']; // NP5 line 697
+  var QUEEN_ANT = { id: 'queen', queen: true, name: 'QUEEN', portrait: 'assets/brain-v3/queen-portrait.webp', lvl: 1, ideas: 0 };
+  var brainById = {}; // ant id -> roster record (name + portrait only now)
+  var brainNameN = 0;
+  function brainFor(a) {
+    if (!a) return null;
+    if (a.queen) return QUEEN_ANT;
+    var rec = brainById[a.id];
+    if (!rec) {
+      var ni = brainNameN++;
+      rec = { id: a.id, name: ANT_NAMES[ni] || ('ANT ' + (ni + 1)), portrait: 'assets/brain-v3/' + (ni % 2 ? 'bm_portraitAllen.webp' : 'bm_portraitAlbert.webp') };
+      brainById[a.id] = rec;
+    }
+    return rec;
+  }
+  // ---- v55: job counts for the S.W.A.R.M.S. cards (one ant, one card, except
+  // Strength — see below). Live from ANTS, refreshed while the menu is open.
+  //   Mine     = ants with job 'miner' (training at the globe/microscope, or mining)
+  //   Scout    = ants with job 'scout' (training at an easel, or scouting)
+  //   Attack   = ants with job 'soldier' (training in the gym, or patrolling)
+  //   Work     = grown, schooled ants with NO trade job yet (the available workforce)
+  //   Strength = ants carrying a giant seed home (a scout on the carry counts
+  //              on Scout AND on Strength — he is doing both at once)
+  //   Rally    = 0, honestly: there is no rally system in checkpoints 1-5.
+  // Kids still in the nursery / at school are not on any card — they show in
+  // the roster instead.
+  function colonyCounts() {
+    var c = { str: 0, work: 0, atk: 0, rally: 0, mine: 0, scout: 0 };
+    for (var i = 0; i < ANTS.length; i++) {
+      var a = ANTS[i];
+      if (!a || a.state === 'gone' || a.hidden) continue;
+      if (a.job === 'miner') c.mine++;
+      else if (a.job === 'scout') { c.scout++; if (a.scout && a.scout.carry) c.str++; }
+      else if (a.job === 'soldier') c.atk++;
+      else if (a.m > KID_SCALE && a.schooled) c.work++;
+    }
+    return c;
+  }
+  var RIDE_NAMES = { slide: 'the slide', swingset: 'the swing set', spinningcircle: 'the spinning circle', teetertotter: 'the teeter totter' };
+  function antActivity(a) { // one plain line for the roster: what this ant is doing
+    if (!a) return '';
+    if (a.train) return a.train.trade === 'miner' ? 'Training to mine' : a.train.trade === 'scout' ? 'Training to scout' : 'Training to be a soldier';
+    if (a.job === 'miner') return a.mine ? 'Mining' : 'Going to mine';
+    if (a.job === 'scout') return a.scout ? (a.scout.carry ? 'Carrying a giant seed home' : 'Scouting') : 'Going to scout';
+    if (a.job === 'soldier') return a.guard ? 'Patrolling upstairs' : 'Going to guard';
+    if (a.state === 'grow') return 'Growing up';
+    if (a.state === 'ride') return 'Playing on ' + (RIDE_NAMES[(a.slot && a.slot.piece)] || 'a park piece');
+    if (a.toSchool) return a.state === 'idle' ? 'Studying at school' : 'Going to school';
+    if (a.state === 'walk') return 'Walking';
+    if (a.m > KID_SCALE && a.schooled) return 'Waiting for work';
+    return 'In the nursery';
+  }
+  function queenActivity() {
+    if (QN.mode === 'walk') return 'Walking';
+    if (QN.mode === 'act') return 'Busy';
+    if (QN.settled) return 'Resting on her bed';
+    return 'In the entrance';
+  }
+  function rosterRows() { // queen first, then every ant in the colony
+    var rows = [{ n: 'QUEEN', v: queenActivity() }];
+    for (var i = 0; i < ANTS.length; i++) {
+      var a = ANTS[i];
+      if (!a || a.state === 'gone' || a.hidden) continue;
+      rows.push({ n: brainFor(a).name, v: antActivity(a) });
+    }
+    return rows;
+  }
+  var UI = { ant: null, part: null, brain: null }; // NP5 UI (giant menu / brain menu state)
+
+  // ---- v55 CSS: the giant ant menu + the brain menu (NP5 CSS lines 31-53 + 54-147, verbatim except as noted) ----
+  // Noted adaptations: (1) #menuAnt img.ma gains width:100% + object-fit:cover
+  // (the portraits are 390:334, not the tall menuAnt.webp); (2) the .bm3-meter /
+  // .bm3-pause rules are scoped under .bm3 — the base layer already has an
+  // UNSCOPED .bm3-meter for the food/water meters (#bvMeters), and NP5's
+  // absolute positioning would break those if it leaked out.
+  var bm3style = document.createElement('style');
+  bm3style.textContent = `
+.ui{position:absolute}
+#menuAnt{right:0;bottom:0;width:46%;height:46%;display:none;z-index:8}
+#menuAnt img.ma{position:absolute;right:4%;bottom:2%;width:100%;height:92%;object-fit:cover;object-position:center top;pointer-events:none;filter:drop-shadow(0 4px 8px #000a)}
+#menuAnt img.ma.ot9tHid{visibility:hidden}
+#menuAnt .zone{position:absolute;right:16.8%;width:50.4%;border-radius:50%;border:0;background:transparent;padding:0}
+#menuAnt .zoneX{position:absolute;right:16.8%;width:calc(50.4% + 48px);border-radius:28px;border:0;background:transparent;padding:0;-webkit-tap-highlight-color:transparent}
+#menuAnt .zone.on{background:transparent;box-shadow:none}
+#maX{position:absolute;right:4px;top:-74px;width:44px;height:44px;border-radius:50%;border:2px solid #fff8;background:#000b;color:#fff;font-size:20px;z-index:2}
+#bub{display:none;z-index:9;background:#fff;border-radius:22px;padding:10px;gap:10px;box-shadow:0 4px 14px #0008}
+#bub:after{content:'';position:absolute;right:-14px;top:50%;margin-top:-10px;border:10px solid transparent;border-left:14px solid #fff;border-right:0}
+#bub button{width:78px;height:78px;box-sizing:border-box;border-radius:16px;border:2px solid #d9cdb6;background:#fbf6ea center/contain no-repeat;background-origin:content-box;background-clip:border-box;position:relative;padding:11px}
+#o11n20{position:absolute;pointer-events:none;z-index:30;border-radius:50%;opacity:0;mix-blend-mode:screen;background:radial-gradient(ellipse at center,rgba(255,246,205,.55) 0%,rgba(255,246,205,.303) 45%,rgba(255,246,205,0) 72%)}#o11n20.go{animation:o11n20f 300ms ease-in-out 1 both}@keyframes o11n20f{0%{opacity:0}40%{opacity:1}100%{opacity:0}}
+@font-face{font-family:'BM3 Sans';src:url(assets/brain-v3/bm3-sans.woff) format('woff');font-weight:700}
+@font-face{font-family:'BM3 Banner';src:url(assets/brain-v3/bm3-banner.woff) format('woff');font-weight:400 900}
+.bm3{--u:calc(var(--bm-w,390px)/390);--pic:296;--dy:0;position:absolute;inset:0;z-index:40;background:#1d130d;overflow:hidden;
+  font-family:'BM3 Sans','DejaVu Sans',Verdana,sans-serif;font-weight:700;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.bm3[data-tall='1']{--pic:334;--dy:40}
+.bm3[hidden]{display:none}
+.bm3-portrait{position:absolute;left:0;top:0;width:100%;height:calc(var(--pic)*var(--u));background:center top/100% calc(334*var(--u)) no-repeat}
+.bm3-portrait::after{content:'';position:absolute;left:0;right:0;bottom:0;height:calc(22*var(--u));background:linear-gradient(transparent,#1d130d)}
+.bm3-name{position:absolute;left:0;right:0;top:calc(128*var(--u));transform:translateY(-50%);text-align:center;
+  font:900 calc(31*var(--u))/1 'BM3 Banner',Georgia,serif;letter-spacing:calc(1.2*var(--u));
+  background:linear-gradient(#fff2c4 0%,#f3cf82 45%,#d8a24c 72%,#f1c978 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 calc(1.2*var(--u)) 0 #7a4a1c) drop-shadow(0 calc(2*var(--u)) calc(2*var(--u)) rgba(0,0,0,.6));white-space:nowrap}
+.bm3-btn{position:absolute;top:calc(41*var(--u));width:calc(30*var(--u));height:calc(30*var(--u));border-radius:50%;border:0;padding:0;background:rgba(58,52,48,.92);display:grid;place-items:center;cursor:pointer}
+.bm3-btn svg{width:46%;height:46%}
+.bm3-close{left:calc(19*var(--u))}.bm3-more{right:calc(19*var(--u))}
+.bm3-lvl{position:absolute;left:50%;top:calc((300 + var(--dy))*var(--u));transform:translateX(-50%);min-width:calc(120*var(--u));height:calc(34*var(--u));box-sizing:border-box;padding:0 calc(16*var(--u));
+  border-radius:calc(9*var(--u));background:linear-gradient(#f6d27a,#e0a940 55%,#c98d2c);border:calc(2*var(--u)) solid #8a5a1c;
+  box-shadow:inset 0 calc(1*var(--u)) 0 rgba(255,255,255,.55),0 calc(2*var(--u)) calc(4*var(--u)) rgba(0,0,0,.5);
+  display:grid;place-items:center;font:700 calc(18*var(--u))/1 'BM3 Sans',sans-serif;letter-spacing:calc(.6*var(--u));color:#4a2c0e;white-space:nowrap}
+.bm3-skill{position:absolute;left:0;right:0;top:calc((349 + var(--dy))*var(--u));transform:translateY(-50%);text-align:center;white-space:nowrap;
+  font:700 calc(16*var(--u))/1.25 'BM3 Sans',sans-serif;letter-spacing:calc(.3*var(--u));color:#fffd76;text-shadow:0 0 calc(2*var(--u)) rgba(255,230,90,.55);animation:bm3flash 1s steps(1,end) infinite}
+.bm3-skill.zero,.bm3[data-flash=off] .bm3-skill{animation:none;color:#d9c3a0;text-shadow:none}
+@keyframes bm3flash{50%{opacity:.35}}
+.bm3-card{position:absolute;width:calc(114*var(--u));height:calc(100*var(--u));box-sizing:border-box;padding:calc(5*var(--u)) calc(4*var(--u)) 0;border-radius:calc(10*var(--u));overflow:hidden;
+  background:#f8ecd3;border:calc(2*var(--u)) solid #c9a46a;box-shadow:0 calc(2*var(--u)) calc(4*var(--u)) rgba(0,0,0,.5);cursor:default; /* v55: cards are counts, not spendable — no pointer */
+  display:flex;flex-direction:column;align-items:center;font-family:inherit;color:#3a2208;transition:transform .08s}
+.bm3-card:active{transform:scale(.95)}
+.bm3-top{display:flex;align-items:center;justify-content:center;gap:calc(8*var(--u));height:calc(30*var(--u));flex:none}
+.bm3-card i{display:block;width:calc(40*var(--u));height:calc(30*var(--u));background:center/contain no-repeat;flex:none}
+.bm3-card b{display:block;margin-top:calc(1*var(--u));font:700 calc(15*var(--u))/calc(18*var(--u)) 'BM3 Sans',sans-serif;color:#3a2208;white-space:nowrap}
+.bm3-card .bm3-num{display:block;font:700 calc(26*var(--u))/calc(30*var(--u)) 'BM3 Sans',sans-serif;color:#55351e;min-width:calc(18*var(--u))}
+.bm3-card em{display:block;margin-top:calc(1*var(--u));font:700 calc(13*var(--u))/calc(15*var(--u)) 'BM3 Sans',sans-serif;font-style:normal;color:#6a4626;text-align:center;max-height:calc(30*var(--u));overflow:hidden}
+.bm3-card::after{content:'';position:absolute;left:0;right:0;bottom:0;height:calc(6*var(--u));background:var(--strip)}
+.bm3-card.bump .bm3-num{animation:bm3bump .25s}
+@keyframes bm3bump{50%{transform:scale(1.3)}}
+.bm3[data-points="0"] .bm3-card{cursor:default}
+.bm3-idea{position:absolute;left:calc(16*var(--u));bottom:calc(14*var(--u));width:calc(128*var(--u));height:calc(50*var(--u));box-sizing:border-box;padding:0;
+  border-radius:calc(14*var(--u));background:linear-gradient(#f6d27a,#e0a940 55%,#c98d2c);border:calc(2*var(--u)) solid #8a5a1c;
+  box-shadow:inset 0 calc(1*var(--u)) 0 rgba(255,255,255,.55),0 calc(3*var(--u)) calc(8*var(--u)) rgba(0,0,0,.6);
+  display:flex;align-items:center;justify-content:center;gap:calc(6*var(--u));font:700 calc(22*var(--u))/1 'BM3 Sans',sans-serif;color:#4a2c0e;white-space:nowrap;cursor:pointer}
+.bm3-idea img{height:calc(28*var(--u))}
+.bm3-idea.tick{animation:bm3bump .35s}
+.bm3-hammer{position:absolute;left:calc(154*var(--u));bottom:calc(10*var(--u));width:calc(58*var(--u));height:calc(58*var(--u));box-sizing:border-box;border-radius:50%;border:calc(3*var(--u)) solid #fff;padding:0;
+  background:rgba(40,30,20,.78) center/calc(44*var(--u)) no-repeat;box-shadow:0 calc(3*var(--u)) calc(10*var(--u)) #0009;cursor:pointer}
+.bm3-hammer[hidden]{display:none}
+.bm3-zone{position:absolute;left:calc(226*var(--u));right:calc(10*var(--u));top:calc((584 + var(--dy)*1.2)*var(--u));bottom:calc(10*var(--u));pointer-events:none}
+.bm3-spot{position:absolute;right:calc(10*var(--u));bottom:calc(10*var(--u));width:calc(164*var(--u));height:calc(150*var(--u));pointer-events:none;z-index:3}
+.bm3[data-tall='1'] .bm3-spot{height:calc(214*var(--u))}
+.bm3-fly{position:absolute;inset:0;background:center/contain no-repeat;opacity:0;transform:translate(calc(160*var(--u)),0) scale(.4);
+  transition:transform .55s cubic-bezier(.2,1.3,.4,1),opacity .3s;filter:drop-shadow(0 0 calc(14*var(--u)) rgba(255,207,58,.85))}
+.bm3-fly.in{opacity:1;transform:none}
+.bm3-fly.swap{opacity:0;transition:opacity .35s}
+.bm3-fly.out{opacity:0;transform:translate(var(--tx),var(--ty)) scale(.15);transition:transform .6s ease-in,opacity .6s ease-in}
+.bm3-fly.gone{opacity:0;transform:scale(.6);transition:transform .5s ease-in,opacity .5s ease-in}
+.bm3-fly.q{filter:drop-shadow(0 calc(3*var(--u)) calc(6*var(--u)) rgba(0,0,0,.55))}
+.smRead{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:16px;background:rgba(40,30,20,.78);border:2px solid #f3cf82;color:#f3cf82;font:700 13px/1 'BM3 Sans','AntUI Sans','DejaVu Sans',sans-serif;white-space:nowrap}.smRead b{color:#fff3d6;font-size:17px}
+.bm3 .smBrain{position:absolute;left:50%;top:calc(41*var(--u));height:calc(30*var(--u));transform:translateX(-50%);z-index:2}
+.bm3 .bm3-meter{position:absolute;left:calc(16*var(--u));bottom:calc(70*var(--u));width:calc(128*var(--u));height:calc(22*var(--u));display:flex;align-items:center;gap:calc(5*var(--u));z-index:2;pointer-events:none}
+.bm3 .bm3-meter[hidden]{display:none} .bm3 .bm3-pause{position:absolute;left:calc(16*var(--u));bottom:calc(98*var(--u));z-index:2;pointer-events:none;font:800 calc(12*var(--u))/1 'BM3 Sans','DejaVu Sans',sans-serif;color:#ffd0e6;text-shadow:0 1px 2px #000;white-space:nowrap} .bm3 .bm3-pause[hidden]{display:none}
+.bm3 .bm3-meter i{flex:none;width:calc(20*var(--u));height:calc(20*var(--u));background:url(assets/brain-v3/iBrain.webp) center/contain no-repeat}
+.bm3 .bm3-meter .bar{flex:1;height:calc(10*var(--u));border-radius:calc(6*var(--u));background:rgba(0,0,0,.45);border:1px solid #f3cf82;overflow:hidden}
+.bm3 .bm3-meter .bar b{display:block;height:100%;width:0;background:linear-gradient(90deg,#ff9ad0,#ff5fa8);transition:width .3s}
+.bm3 .bm3-meter em{flex:none;font:800 calc(13*var(--u))/1 'BM3 Sans','DejaVu Sans',sans-serif;color:#fff;font-style:normal;text-shadow:0 1px 2px #000}
+.bm3-idea.ready{box-shadow:0 0 calc(12*var(--u)) #ffd84a;animation:bm3bump 1.2s infinite}
+/* v55 redesign: the food + water meters (Chris, Nov 21 — they were never in
+   the brain menu). Two small pills in the top row, flanking the centred seed
+   money pill: leaf/droplet icon + mini bar + number, live from MV. */
+.bm3-fw{position:absolute;top:calc(41*var(--u));height:calc(30*var(--u));display:flex;align-items:center;gap:calc(4*var(--u));padding:0 calc(6*var(--u));border-radius:calc(15*var(--u));background:rgba(40,30,20,.78);border:2px solid #f3cf82;color:#f3cf82;font:700 calc(13*var(--u))/1 'BM3 Sans','DejaVu Sans',sans-serif;white-space:nowrap;z-index:2}
+.bm3-fw.food{left:calc(54*var(--u))}.bm3-fw.water{right:calc(54*var(--u))}
+.bm3-fw i{flex:none;width:calc(14*var(--u));height:calc(14*var(--u));background:center/contain no-repeat}
+.bm3-fw .bar{flex:none;width:calc(22*var(--u));height:calc(8*var(--u));border-radius:calc(4*var(--u));background:rgba(0,0,0,.45);border:1px solid #f3cf82;overflow:hidden}
+.bm3-fw .bar b{display:block;height:100%;width:0}
+.bm3-fw.food .bar b{background:linear-gradient(90deg,#b5e048,#6da332)}
+.bm3-fw.water .bar b{background:linear-gradient(90deg,#7cc4e8,#3a7fc1)}
+.bm3-fw em{font-style:normal;color:#fff3d6;font-size:calc(14*var(--u))}
+/* v55 redesign: the roster + ideas panel inside the brain menu (NP5 .pwin
+   "Colony" look: #1d130d body, #8a5a1c gold frame, dark header with gold
+   banner title, round close X, cream #f6ead0 rows). Opens from the "…"
+   button (Colony) or the Idea button (Ideas); closes back to the menu. */
+.bm3-panel{position:absolute;z-index:21;left:12px;right:12px;top:64px;bottom:16px;display:flex;flex-direction:column;background:#1d130d;color:#fff3d6;border:3px solid #8a5a1c;border-radius:16px;box-shadow:0 6px 18px #000a;overflow:hidden}
+.bm3-panel[hidden]{display:none}
+.bm3-panel-head{flex:none;height:46px;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 7px 0 14px;background:linear-gradient(#3a2614,#26180d);border-bottom:3px solid #8a5a1c}
+.bm3-panel-title{font-family:'BM3 Banner',Georgia,serif;font-weight:900;font-size:18px;color:#f3cf82}
+.bm3-panel-x{width:34px;height:34px;border-radius:50%;background:#4a3a30;border:0;color:#fff;font-size:16px;display:grid;place-items:center;padding:0;cursor:pointer}
+.bm3-panel-body{overflow:auto;padding:8px;display:flex;flex-direction:column;gap:6px;-webkit-overflow-scrolling:touch}
+.bm3-row{display:flex;justify-content:space-between;align-items:center;gap:10px;background:#f6ead0;color:#3a2208;border:2px solid #c9a46a;border-radius:10px;padding:7px 10px;font-size:15px;line-height:1.15}
+.bm3-row b{font-size:15px;white-space:nowrap}
+.bm3-row span{font-size:13px;color:#6a4626;text-align:right}
+.bm3-empty{color:#d9c3a0;font-size:14px;padding:6px 4px}
+`;
+  document.head.appendChild(bm3style);
+
+  // ---- Brain Menu v3 (NP5 JS lines 163-271, verbatim except the ResizeObserver
+  // guard — the test harness has no ResizeObserver, and the module must not
+  // throw there; real browsers have it). Assets are re-pointed below, NP5-style.
+  (function (global) {
+    'use strict';
+    const BASE = (document.currentScript && document.currentScript.src) ? document.currentScript.src.replace(/[^/]*$/, '') : 'brain-menu-v3/';
+    const assets = {
+      portraitAlbert: BASE + 'assets/portrait-albert.webp', portraitAllen: BASE + 'assets/portrait-allen.webp',
+      hammer: BASE + 'assets/hammer-icon.svg', brain: BASE + 'assets/iBrain.webp', noIdea: BASE + 'assets/no-idea.svg', workbench: BASE + 'assets/worktable-chris.png',
+      strength: BASE + 'assets/icon-strength.png', work: BASE + 'assets/icon-work.png', attack: BASE + 'assets/icon-attack.png',
+      rally: BASE + 'assets/icon-rally.png', mine: BASE + 'assets/icon-mine.png', scout: BASE + 'assets/icon-scout.png',
+    };
+    const TEMPLATE = {
+      cardW: 114, cardH: 100,
+      slots: [[10, 370], [138, 364], [266, 370], [10, 478], [138, 472], [266, 478]],
+      stats: [
+        { key: 'str', label: 'Strength', art: 'strength', strip: '#8f5c25', desc: 'Carries +5 items' },
+        { key: 'work', label: 'Work', art: 'work', strip: '#467d39', desc: 'Builds faster' },
+        { key: 'atk', label: 'Attack', art: 'attack', strip: '#b9342b', desc: 'Wins in fewer hits' },
+        { key: 'rally', label: 'Rally', art: 'rally', strip: 'linear-gradient(90deg,#c99a3c,#edbe62 50%,#c99a3c)', desc: '' },
+        { key: 'mine', label: 'Mine', art: 'mine', strip: '#30609e', desc: 'Digs faster' },
+        { key: 'scout', label: 'Scout', art: 'scout', strip: '#60489e', desc: 'Finds more items' },
+      ],
+      levelText: (n) => `Level ${n}`, // v55: skillText is gone — no skill points in this design
+      ideaText: (n) => `Idea ${n}`,
+      TALL: 1.95,
+    };
+    const KEYS = TEMPLATE.stats.map((s) => s.key);
+    function ensure(a) { // v55: only the queen's own fields — name, level, ideas. No st/sp.
+      if (typeof a.lvl !== 'number') a.lvl = 1; if (typeof a.ideas !== 'number') a.ideas = 0; if (!a.name) a.name = 'QUEEN'; return a;
+    }
+    const portraitFor = (a) => a.portrait || (a.id % 2 ? assets.portraitAllen : assets.portraitAlbert);
+    let R = null, cur = null, flyT = []; const listeners = [];
+    const emit = (t, d) => listeners.forEach((fn) => fn(t, d));
+    const $ = (s) => R.querySelector(s);
+    function mount(host) {
+      if (R) return API;
+      R = document.createElement('div'); R.className = 'bm3'; R.hidden = true;
+      R.innerHTML = `<div class="bm3-portrait"></div><div class="bm3-name"></div>
+      <button class="bm3-btn bm3-close" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M5 5L19 19M19 5L5 19" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg></button>
+      <button class="bm3-btn bm3-more" aria-label="More"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="2.1" fill="#fff"/><circle cx="12" cy="12" r="2.1" fill="#fff"/><circle cx="19" cy="12" r="2.1" fill="#fff"/></svg></button>
+      <div class="bm3-lvl"></div>
+      ${TEMPLATE.stats.map((s, i) => {
+        const [l, t] = TEMPLATE.slots[i];
+        return `<button class="bm3-card" data-k="${s.key}" style="left:calc(${l}*var(--u));top:calc((${t} + var(--dy))*var(--u));--strip:${s.strip}"><span class="bm3-top"><i style="background-image:url('${assets[s.art]}')"></i><span class="bm3-num">0</span></span><b>${s.label}</b>${s.desc ? `<em>${s.desc}</em>` : ''}</button>`;
+      }).join('')}
+      <button class="bm3-idea"><img alt="" src="${assets.brain}"><span></span></button>
+      <button class="bm3-hammer" aria-label="build" hidden style="background-image:url('${assets.hammer}')"></button>
+      <div class="bm3-zone"></div><div class="bm3-spot"></div>
+      <div class="bm3-fw bm3-food" aria-label="food"><i style="background-image:url('assets/icons/fi_leaf.webp')"></i><span class="bar"><b></b></span><em></em></div>
+      <div class="bm3-fw bm3-water" aria-label="water"><i style="background-image:url('assets/icons/icon_water_droplet.png')"></i><span class="bar"><b></b></span><em></em></div>
+      <div class="bm3-panel" hidden><div class="bm3-panel-head"><span class="bm3-panel-title"></span><button class="bm3-panel-x" type="button" aria-label="Close">✕</button></div><div class="bm3-panel-body"></div></div>`;
+      (host || document.body).appendChild(R);
+      const fit = () => { R.style.setProperty('--bm-w', R.clientWidth + 'px'); R.dataset.tall = R.clientHeight / Math.max(1, R.clientWidth) >= TEMPLATE.TALL ? '1' : '0'; };
+      R._fit = fit;
+      if (typeof ResizeObserver !== 'undefined') { try { new ResizeObserver(fit).observe(R); } catch (e) {} }
+      const tap = (el, fn) => el.addEventListener('click', (e) => { e.stopPropagation(); fn(e); });
+      // v55: the cards are counts, not buttons — no tap wiring at all.
+      tap($('.bm3-close'), close); tap($('.bm3-more'), () => emit('more', { ant: cur }));
+      tap($('.bm3-idea'), () => emit('idea', { ant: cur, ideas: cur && cur.ideas }));
+      tap($('.bm3-panel-x'), () => { const p = $('.bm3-panel'); if (p) p.hidden = true; });
+      tap($('.bm3-hammer'), () => { emit('hammer', { ant: cur }); if (global.BuildShortcut) global.BuildShortcut.go('brain'); });
+      return API;
+    }
+    function render() {
+      if (!cur) return; const a = cur;
+      $('.bm3-name').textContent = a.name; $('.bm3-portrait').style.backgroundImage = `url("${portraitFor(a)}")`;
+      $('.bm3-lvl').textContent = TEMPLATE.levelText(a.lvl);
+      // v55: the number on each card is the LIVE count of ants on that task
+      // (colonyCounts, outer scope) — never a skill level, never spendable.
+      // Labels are set here too (not just in the template): the harness fake
+      // DOM drops text nodes from innerHTML, so a template-only label reads
+      // empty there. Numbers are stored as strings (textContent coerces in
+      // real browsers, but the fake DOM stores the raw value).
+      var c = colonyCounts();
+      R.querySelectorAll('.bm3-card').forEach((el) => {
+        var st = null;
+        for (var si = 0; si < TEMPLATE.stats.length; si++) if (TEMPLATE.stats[si].key === el.dataset.k) st = TEMPLATE.stats[si];
+        if (st) el.querySelector('b').textContent = st.label;
+        el.querySelector('.bm3-num').textContent = String(c[el.dataset.k]);
+      });
+      // (Single-class queries only: the harness fake DOM cannot do '.bm3-idea span'.)
+      var ib = $('.bm3-idea'); if (ib && ib.children[1]) ib.children[1].textContent = TEMPLATE.ideaText(a.ideas);
+      // v55: food + water meters (Chris — they were never in the brain menu).
+      // (Single-class queries only: the harness fake DOM cannot do '.bar b'.)
+      var fw = $('.bm3-food'), ww = $('.bm3-water'), fb = fw && fw.querySelector('.bar'), wb = ww && ww.querySelector('.bar');
+      if (fw && fb && fb.children[0]) { fb.children[0].style.width = (100 * MV.food / METERS.food.cap).toFixed(1) + '%'; fw.querySelector('em').textContent = String(Math.round(MV.food)); }
+      if (ww && wb && wb.children[0]) { wb.children[0].style.width = (100 * MV.water / METERS.water.cap).toFixed(1) + '%'; ww.querySelector('em').textContent = String(Math.round(MV.water)); }
+      updateSeedPill(); updateIdeaMeter(); // outer-scope, hoisted
+    }
+    function open(ant, o = {}) { if (!R) mount(); cur = ensure(ant); if ('hammer' in o) setHammer(o.hammer);
+      var p = $('.bm3-panel'); if (p) p.hidden = true; // a fresh open never shows a stale panel
+      R.hidden = false; R._fit(); render(); emit('open', { ant }); return API; }
+    function close() { if (!R) return; flyT.forEach(clearTimeout); flyT = []; $('.bm3-spot').innerHTML = ''; R.hidden = true; const a = cur; cur = null; emit('close', { ant: a }); }
+    function setIdeas(n) { if (cur) { cur.ideas = n; render(); } }
+    function setHammer(on) { $('.bm3-hammer').hidden = !on; }
+    function showIdea({ result = 'idea', pic = assets.workbench, hold = 1600, phase = null } = {}) {
+      const z = $('.bm3-spot'); z.innerHTML = ''; flyT.forEach(clearTimeout); flyT = [];
+      const mk = (img, cls) => { const f = document.createElement('div'); f.className = 'bm3-fly ' + (cls || ''); f.style.backgroundImage = `url("${img}")`; z.appendChild(f); return f; };
+      const zb = z.getBoundingClientRect(), ib = $('.bm3-idea').getBoundingClientRect();
+      const aim = (f) => { f.style.setProperty('--tx', (ib.left + ib.width / 2 - (zb.left + zb.width / 2)) + 'px'); f.style.setProperty('--ty', (ib.top + ib.height / 2 - (zb.top + zb.height / 2)) + 'px'); };
+      const land = () => { cur.ideas++; render(); setHammer(true); const b = $('.bm3-idea'); b.classList.remove('tick'); void b.offsetWidth; b.classList.add('tick'); emit('ideaLanded', { ant: cur, ideas: cur.ideas }); };
+      if (result !== 'idea') {
+        const q = mk(assets.noIdea, 'q');
+        if (phase) { q.classList.add('in'); return API; }
+        void q.offsetWidth; q.classList.add('in');
+        flyT.push(setTimeout(() => q.classList.add('gone'), 550 + hold)); flyT.push(setTimeout(() => q.remove(), 550 + hold + 500));
+        return API;
+      }
+      const brain = mk(assets.brain), thing = mk(pic); aim(thing);
+      if (phase === 'brain') { brain.classList.add('in'); return API; }
+      if (phase === 'in') { thing.classList.add('in'); brain.remove(); return API; }
+      if (phase === 'out') { thing.classList.add('in', 'out'); brain.remove(); land(); return API; }
+      void brain.offsetWidth; brain.classList.add('in');
+      flyT.push(setTimeout(() => { brain.classList.add('swap'); thing.style.transition = 'opacity .35s'; thing.style.transform = 'none'; thing.classList.add('in'); }, 900));
+      flyT.push(setTimeout(() => { thing.style.transition = ''; thing.classList.add('out'); }, 1250 + hold));
+      flyT.push(setTimeout(() => { land(); z.innerHTML = ''; }, 1250 + hold + 600));
+      return API;
+    }
+    const API = {
+      mount, open, close, refresh: render, setIdeas, setHammer, showIdea,
+      ensure, TEMPLATE, assets, get current() { return cur; }, get isOpen() { return !!(R && !R.hidden); }, get root() { return R; },
+      on(fn) { listeners.push(fn); return () => listeners.splice(listeners.indexOf(fn), 1); }, setFlash(on) { if (R) R.dataset.flash = on ? 'on' : 'off'; }
+    };
+    global.BrainMenu3 = API;
+  })(window);
+
+  // ---- v55: BrainMenu3 assets, seed-money pill, ideas meter (NP5 integration, adapted) ----
+  // NP5 re-points every asset to assets/brain-v3/; the hammer falls back to
+  // the game's own hammer art (hammerIcon.svg is missing — see the header).
+  Object.assign(BrainMenu3.assets, {
+    portraitAlbert: 'assets/brain-v3/bm_portraitAlbert.webp', portraitAllen: 'assets/brain-v3/bm_portraitAllen.webp',
+    hammer: 'assets/items/hammer-tab.png', noIdea: 'assets/brain-v3/noIdea.webp', brain: 'assets/brain-v3/iBrain.webp', workbench: 'assets/brain-v3/wtChris.webp',
+    strength: 'assets/brain-v3/bm3_strength.webp', work: 'assets/brain-v3/bm3_work.webp', attack: 'assets/brain-v3/bm3_attack.webp',
+    rally: 'assets/brain-v3/bm3_rally.webp', mine: 'assets/brain-v3/bm3_mine.webp', scout: 'assets/brain-v3/bm3_scout.webp'
+  });
+  BrainMenu3.mount(document.querySelector('#game'));
+  (function () {
+    var r = BrainMenu3.root, d = document.createElement('div');
+    d.className = 'smRead smBrain'; d.setAttribute('aria-label', 'seed money'); d.innerHTML = 'seed money <b class="smAmt">0</b>'; r.appendChild(d);
+    ['pointerdown', 'pointerup', 'click', 'touchstart', 'touchend', 'wheel'].forEach(function (k) { r.addEventListener(k, function (e) { e.stopPropagation(); }); });
+  })();
+  // Ideas meter (NP5 lines 1455-1466): the brain meter, bottom-left, queen
+  // only. Bar = brains collected toward the cap (BR.brains / BRAIN_CAP);
+  // the Idea button is NEVER .ready in v55 — the mini-game is checkpoint 6,
+  // so nothing here may imply it is available.
+  var ideaMeter = document.createElement('div'); ideaMeter.className = 'bm3-meter'; ideaMeter.innerHTML = '<i></i><span class="bar"><b></b></span><em></em>'; BrainMenu3.root.appendChild(ideaMeter);
+  var ideaPause = document.createElement('div'); ideaPause.className = 'bm3-pause'; ideaPause.hidden = true; BrainMenu3.root.appendChild(ideaPause);
+  function updateSeedPill() {
+    var els = BrainMenu3.root.querySelectorAll('.smAmt');
+    for (var i = 0; i < els.length; i++) els[i].textContent = String(BR.coins);
+  }
+  function updateIdeaMeter() {
+    var q = BrainMenu3.current === QUEEN_ANT;
+    ideaMeter.hidden = !q;
+    if (!q) return;
+    ideaMeter.querySelector('b').style.width = (100 * BR.brains / BRAIN_CAP).toFixed(1) + '%';
+    var em = ideaMeter.querySelector('em'), t = BR.brains + ' / ' + BRAIN_CAP;
+    if (em.textContent !== t) em.textContent = t;
+  }
+  BrainMenu3.on(function (t) {
+    if (t === 'open') { updateSeedPill(); updateIdeaMeter(); }
+    if (t === 'close') UI.brain = null;
+    if (t === 'more') openRoster(); // "…" = the colony roster (NP5 #rosterWin)
+    if (t === 'idea') openIdeas(); // Idea button = the ideas list, NOT the mini-game (cp6)
+  });
+  // ---- v55: the roster + ideas panels INSIDE the brain menu ----
+  // One shared panel (.bm3-panel, NP5 .pwin "Colony" look). Rows are built
+  // with createElement + textContent (never innerHTML strings), so the
+  // harness fake DOM — which drops text nodes from innerHTML — reads them.
+  function bmPanel(title, rows, emptyText) {
+    var p = BrainMenu3.root.querySelector('.bm3-panel');
+    if (!p) return;
+    var t = p.querySelector('.bm3-panel-title'); if (t) t.textContent = title;
+    var body = p.querySelector('.bm3-panel-body');
+    while (body.children.length) body.removeChild(body.children[0]); // (no firstChild in the harness fake DOM)
+    if (!rows.length) {
+      var e = document.createElement('div'); e.className = 'bm3-empty'; e.textContent = emptyText || 'Nothing here yet'; body.appendChild(e);
+    } else {
+      rows.forEach(function (r) {
+        var row = document.createElement('div'); row.className = 'bm3-row';
+        var b = document.createElement('b'); b.textContent = r.n; row.appendChild(b);
+        var s = document.createElement('span'); s.textContent = r.v; row.appendChild(s);
+        body.appendChild(row);
+      });
+    }
+    p.hidden = false;
+  }
+  function openRoster() { bmPanel('Colony', rosterRows(), 'No ants yet'); }
+  function openIdeas() {
+    // v55: the colony has NO ideas yet in cp5 — the idea game (10th brain)
+    // is checkpoint 6. Show that honestly; do NOT start a mini-game.
+    bmPanel('Ideas', [{ n: 'Idea 0', v: 'None yet — the queen has her next idea at 10 brains (checkpoint 6)' }], '');
+  }
+  window.BuildShortcut = { go: function () { BrainMenu3.close(); choose('ham', QUEEN_ANT); } };
+  // ---- v55: the GIANT ANT MENU (NP5 lines 698-907, adapted) ----
+  // Tap the QUEEN (queenTarget) -> giant menu. head -> body -> bottom
+  // glow, 300 ms each, then wait. No text. head = brain icon; body =
+  // hammer (only the queen builds — NP5 ANT_NO_HAMMER). No cloud (no
+  // pheromone system in this build), no move/binoculars/stop (no room
+  // assignment or scouting toggle in this build), no teams. The giant menu
+  // is queen-only: openAntMenu refuses any other ant.
+  var IC = { brain: 'assets/menu-ant/iBrain.webp', ham: 'assets/menu-ant/iHammer.webp' };
+  var MENU = {
+    head: [{ id: 'brain' }],
+    body: [{ id: 'ham', need: function (a) { return a.queen; } }],
+    bottom: []
+  };
+  var partItems = function (part, a) { return MENU[part].filter(function (it) { return !it.need || it.need(a); }); };
+  var ICON_OF = { brain: 'brain', ham: 'ham' };
+  var N20 = { MS: 300, A: 0.55, GLOW: '255,246,205', ON_PIC: true };
+  var gEl = function (id) { return document.getElementById(id); };
+  var maEl = document.createElement('div'); maEl.id = 'menuAnt'; maEl.className = 'ui';
+  maEl.innerHTML = '<img class="ma" id="maImg" alt="" src="assets/brain-v3/bm_portraitAlbert.webp"><button id="maX" type="button" aria-label="close">✕</button>' +
+    ' <button class="zoneX" data-part="head" style="top:calc(-8.3% + 72px);height:36.4%" aria-label=""></button>' +
+    ' <button class="zoneX" data-part="body" style="top:calc(36.6% + 48px);height:16.8%" aria-label=""></button>' +
+    ' <button class="zoneX" data-part="bottom" style="top:calc(63.7% + 24px);height:26.6%" aria-label=""></button>' +
+    ' <button class="zone" data-part="head" style="top:calc(9.9% + 72px);height:18.2%"></button>' +
+    ' <button class="zone" data-part="body" style="top:calc(36.6% + 48px);height:16.8%"></button>' +
+    ' <button class="zone" data-part="bottom" style="top:calc(63.7% + 24px);height:26.6%"></button>';
+  var gameEl = document.querySelector('#game');
+  if (gameEl) gameEl.appendChild(maEl);
+  var maImg = gEl('maImg');
+  var bub = document.createElement('div'); bub.id = 'bub'; bub.className = 'ui';
+  if (gameEl) gameEl.appendChild(bub);
+  var glowEl = document.createElement('div'); glowEl.id = 'o11n20';
+  if (gameEl) gameEl.appendChild(glowEl);
+  var n20T = [];
+  function relRect(el) {
+    var p = maEl.parentNode.getBoundingClientRect(), r = el.getBoundingClientRect();
+    return { x: r.left - p.left, y: r.top - p.top, w: r.width, h: r.height };
+  }
+  function n20Clear() { n20T.forEach(clearTimeout); n20T = []; glowEl.classList.remove('go'); glowEl.style.opacity = 0; }
+  function n20Glow(part) {
+    var z = maEl.querySelector('.zone[data-part="' + part + '"]'), r = relRect(z), pic = relRect(maImg), w = r.w * 1.28, h = r.h * 1.22, cx = N20.ON_PIC ? pic.x + pic.w / 2 : r.x + r.w / 2;
+    glowEl.style.left = (cx - w / 2) + 'px'; glowEl.style.top = (r.y + r.h / 2 - h / 2) + 'px'; glowEl.style.width = w + 'px'; glowEl.style.height = h + 'px';
+    glowEl.classList.remove('go'); void glowEl.offsetWidth; glowEl.classList.add('go');
+  }
+  function openAntMenu(a) {
+    if (!a || !a.queen) return; // v55: queen-only — a worker ant has no menu
+    closeAntMenu();
+    // The build menu sheet closes (state back underground, room un-lifted)
+    // so the two menus never overlap; the hammer re-opens it (the fork).
+    var bm = document.querySelector('#buildMenu');
+    if (bm) bm.classList.remove('open');
+    if (typeof state !== 'undefined' && state === 'menu') { state = 'underground'; if (typeof pan !== 'undefined') pan = 0; if (typeof syncFloors === 'function') syncFloors(); }
+    UI.ant = a; UI.part = null;
+    if (maImg) maImg.src = QUEEN_ANT.portrait; // queen-only: always her portrait
+    maEl.style.display = 'block';
+    var P = ['head', 'body', 'bottom'].filter(function (p) { return partItems(p, a).length; });
+    P.forEach(function (p, i) { n20T.push(setTimeout(function () { n20Glow(p); }, i * N20.MS)); });
+    n20T.push(setTimeout(n20Clear, P.length * N20.MS));
+  }
+  function closeAntMenu() {
+    n20Clear();
+    if (maEl) maEl.style.display = 'none';
+    if (bub) { bub.style.display = 'none'; bub.className = 'ui'; }
+    if (UI) { UI.ant = null; UI.part = null; }
+  }
+  function bubButtons(items, a) {
+    bub.innerHTML = '';
+    items.forEach(function (it) {
+      var b = document.createElement('button'); b.type = 'button'; b.dataset.id = it.id;
+      b.style.backgroundImage = 'url(' + IC[ICON_OF[it.id]] + ')'; b.setAttribute('aria-label', it.id);
+      b.addEventListener('click', function (e) { e.stopPropagation(); choose(it.id, a); });
+      bub.appendChild(b);
+    });
+  }
+  function openPart(part) {
+    var a = UI.ant; if (!a) return;
+    n20Clear();
+    var items = partItems(part, a);
+    if (!items.length) { UI.part = null; bub.style.display = 'none'; return; }
+    UI.part = part; bubButtons(items, a); bub.className = 'ui'; bub.style.display = 'flex';
+    var z = relRect(maEl.querySelector('.zone[data-part="' + part + '"]')), bw = bub.offsetWidth, bh = bub.offsetHeight;
+    bub.style.left = Math.max(8, z.x - 14 - bw) + 'px'; bub.style.top = Math.max(8, z.y + z.h / 2 - bh / 2) + 'px';
+  }
+  maEl.querySelectorAll('[data-part]').forEach(function (z) { z.addEventListener('click', function (e) { e.stopPropagation(); openPart(z.dataset.part); }); });
+  gEl('maX').addEventListener('click', function (e) { e.stopPropagation(); closeAntMenu(); });
+  function openBrain(a) {
+    closeAntMenu();
+    if (!a || !a.queen) return; // v55: queen-only — only her brain menu exists
+    BrainMenu3.open(QUEEN_ANT, { hammer: false });
+    updateSeedPill(); updateIdeaMeter();
+    UI.brain = 'queen';
+  }
+  function openBuildMenu() {
+    // The build menu is index.html's queenTarget click (state -> 'menu').
+    // Called programmatically, so it is an UNTRUSTED click: the queenTarget
+    // interceptor below lets it through and the build menu opens as on arrival.
+    var q = document.querySelector('#queenTarget');
+    if (q) q.click();
+  }
+  function choose(id, a) {
+    a = a || UI.ant;
+    if (id === 'brain') { openBrain(a); return; }
+    if (id === 'ham') { closeAntMenu(); openBuildMenu(); return; }
+  }
+  function antAtWorld(w) {
+    var r = Math.max(9, 26 / (spp * view.s));
+    var best = null, bd = r;
+    for (var i = 0; i < ANTS.length; i++) {
+      var a = ANTS[i];
+      if (a.state === 'gone' || a.hidden) continue;
+      var d = Math.hypot(a.x - w.x, a.y - 4 - w.y);
+      if (d < bd) { bd = d; best = a; }
+    }
+    return best;
+  }
+  // ---- v55: tapping the QUEEN opens her giant menu (NP5 queenTarget) ----
+  // index.html's queenTarget click still opens the build menu — and the
+  // arrival auto-open (begin('underground') -> queenTarget.click(), a
+  // LOCKED checkpoint-1 behaviour) must keep doing exactly that. So this
+  // capture listener on #game only intercepts TRUSTED taps (a real finger):
+  // those open the giant menu instead, and the build menu is reached from
+  // the hammer in the giant menu. Programmatic clicks pass through untouched.
+  if (gameEl) gameEl.addEventListener('click', function (e) {
+    if (!e || !e.target || e.target.id !== 'queenTarget') return;
+    if (!e.isTrusted) return;
+    if (typeof state !== 'undefined' && state !== 'underground' && state !== 'menu') return;
+    if (window.BrainMenu3 && BrainMenu3.isOpen) return;
+    if (e.stopPropagation) e.stopPropagation();
+    if (e.preventDefault) e.preventDefault();
+    openAntMenu(QUEEN_ANT);
+  }, true);
+
+  // ---- v55 test handles (read-only state + tap entry points, same pattern as BASE_TEST) ----
+  window.BASE_TEST.openAntMenu = openAntMenu;
+  window.BASE_TEST.closeAntMenu = closeAntMenu;
+  window.BASE_TEST.openBrain = openBrain;
+  window.BASE_TEST.openRoster = openRoster;
+  window.BASE_TEST.openIdeas = openIdeas;
+  window.BASE_TEST.brainFor = brainFor;
+  window.BASE_TEST.antAtWorld = antAtWorld;
+  window.BASE_TEST.colonyCounts = colonyCounts;
+  window.BASE_TEST.rosterRows = rosterRows;
+  window.BASE_TEST._finishTrain = finishTrain;
+  window.BASE_TEST.tapQueen = function () { openAntMenu(QUEEN_ANT); }; // harness: the trusted-tap equivalent
+  window.BASE_TEST.refreshBrainMenu = function () { if (window.BrainMenu3) BrainMenu3.refresh(); };
+  Object.defineProperty(window.BASE_TEST, 'antMenu', { get: function () { return UI.ant ? { id: UI.ant.id, queen: !!UI.ant.queen } : null; } });
+  Object.defineProperty(window.BASE_TEST, 'brainMenu', {
+    get: function () {
+      if (!window.BrainMenu3 || !BrainMenu3.isOpen) return null;
+      var c = BrainMenu3.current;
+      var panel = BrainMenu3.root.querySelector('.bm3-panel');
+      var panelRows = null;
+      if (panel && !panel.hidden) {
+        panelRows = { title: (panel.querySelector('.bm3-panel-title') || {}).textContent || '', rows: Array.prototype.slice.call(panel.querySelectorAll('.bm3-row')).map(function (r) { return { n: (r.querySelector('b') || {}).textContent || '', v: (r.querySelector('span') || {}).textContent || '' }; }) };
+      }
+      return { name: c.name, lvl: c.lvl, ideas: c.ideas, counts: colonyCounts(), seedMoney: BR.coins, food: Math.round(MV.food), water: Math.round(MV.water), panel: panelRows };
+    }
+  });
+  Object.defineProperty(window.BASE_TEST, 'seedMoney', { get: function () { return BR.coins; } });
 
   renderMenu();
 
@@ -4151,10 +4752,15 @@
     // CHECKPOINT 5 test shortcut: the whole checkpoint 4 test setup (bed,
     // three grown ants at desks, trade school open) PLUS 8 brains already
     // collected, so the squirrel is one brain-bubble tap away. The brain
-    // timer itself is untouched (120 s, bed-only): she rests on the bed and
-    // the bubble appears when it completes, exactly as in the real flow.
+    // timer itself is untouched (120 s, bed-only) except that the shortcut
+    // starts it at 110 s elapsed (v55: 10 s left) — she rests on the bed and
+    // the bubble appears ~10 s in, exactly as in the real flow.
     setupTradeTest();
-    BR.brains = 8; BR.t = 0; BR.ready = false;
+    BR.brains = 8; BR.t = 110; BR.ready = false; // v55 (Chris, Nov 21): the
+    // ?checkpoint=5 test shortcut starts with only 10 s left on the 120 s
+    // timer, so the bubble appears ~10 s in — he is testing specific things
+    // and does not want to wait the full 2 minutes. Test shortcut ONLY; the
+    // normal 120 s timer is unchanged everywhere else.
     // v54: she is ALREADY resting on the bed (the real flow settles her there
     // when the bed is built — the shortcut must match that end state, or the
     // 120 s brain timer never runs: atHome() needs her within 2 units of home
