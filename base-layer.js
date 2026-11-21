@@ -2122,6 +2122,13 @@
     // fully discovered). v48: no dustAt cloud (Chris — it looked like a
     // little tornado); the strip's own dirt dots are the whole effect.
     // The discovery is 120 s for the first hexagon, 2352 s after that (v48).
+    // v58 (Chris, Nov 21): the arms ARE re-posed now — the front leg is
+    // re-drawn frame by frame in plain-work-arms.webp (new file; the v57
+    // cleaned strip is the source, original untouched). Hip fixed at
+    // (46,33); the foot scrapes forward to x54, drags back, lifts, and
+    // plants again — measured foot-tip x per frame [52,54,50,49,52,53],
+    // max 5 px from the old static toe (49,39); v57 measured 0 px. Only
+    // the leg patch (x44-56, y33-41) differs from the cleaned strip.
     var strip = art.plainWork;
     if (!strip || !strip.complete || !strip.naturalWidth) {
       drawKidSprite('idle_' + pad2n(IDLE_PLAY[Math.floor((QT + a.ph) * IDLE_FPS) % IDLE_PLAY.length]) + '.png', a.x, a.y, false, a.m);
