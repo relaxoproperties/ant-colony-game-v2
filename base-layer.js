@@ -317,19 +317,15 @@
     // the S.W.A.R.M.S. counts, the food/water meters and the roster refresh
     // twice a second as ants change task. (bmRefreshT is declared with the
     // v55 block below; var hoisting makes this safe before it runs.)
-    // v57: the game-screen roster panel refreshes on the same tick while
-    // it is open, and the designed roster button shows only on the main
-    // floors (underground / menu / entered) — never during the intro or
-    // the squirrel cinematic (NP5 hides its HUD during cine too).
+    // v57: the roster panel refreshes on the same tick while it is open.
+    // v59: the roster button lives INSIDE the brain menu now (Chris:
+    // "I only want that to be in the brain menu, not in the actual
+    // game"), so no game-screen visibility toggle is needed — the
+    // button is hidden whenever the menu is hidden.
     if (typeof window !== 'undefined' && QT - bmRefreshT > 0.5) {
       bmRefreshT = QT;
       if (window.BrainMenu3 && BrainMenu3.isOpen) BrainMenu3.refresh();
       if (typeof rosterWin !== 'undefined' && rosterWin && !rosterWin.hidden) renderRosterWin();
-    }
-    if (typeof rosterBtn !== 'undefined' && rosterBtn) {
-      var showRosterBtn = (typeof state !== 'undefined' && (state === 'underground' || state === 'menu' || state === 'entered')) && !(typeof window !== 'undefined' && window.cp5 && window.cp5.debug && window.cp5.debug.C5 && window.cp5.debug.C5.cine);
-      var wantDisplay = showRosterBtn ? 'grid' : 'none';
-      if (rosterBtn.style.display !== wantDisplay) rosterBtn.style.display = wantDisplay;
     }
   }
   // Called from drawUnderground (index.html) once per frame while she is free.
@@ -4172,16 +4168,17 @@
   // meters are added to the brain menu (top row, flanking the seed-money
   // pill) — they were never there before.
   //
-  // THE PICTURE (v56 fix — Chris: "the picture was wrong though"): the
-  // brain menu's portrait area is a SCENE (390x334): forest background,
-  // empty wooden sign across the top (the name banner sits over it), the
-  // ant small at bottom centre — see bm_portraitAlbert.webp. The old
-  // correct queen file, queen-brain-portrait-v3b.webp, exists NOWHERE, so
-  // the queen's portrait is a PORT, not a new design: Albert's scene
-  // background + sign, with the queen (her approved front-idle-strip art,
-  // the same queen as in the game) composited at bottom centre at the same
-  // ground line Albert stands on: assets/brain-v3/queen-brain-portrait.webp.
-  // The bare cutout (queen-portrait.webp) is kept untouched as the source.
+  // THE PICTURE (v59 — Chris sent the ORIGINAL queen brain-menu
+  // screenshot, Grok's build): Albert FRONT-FACING AND LARGE in the
+  // 390x334 frame — big round head facing the camera, big eyes, smile,
+  // body + legs below, feet on the forest floor — with the gold crown
+  // with red jewels sitting high on top of his head between the
+  // antennae. Built from bm_portraitAlbert.webp (same ant, same forest
+  // + wooden sign): Albert cut out and scaled 2.0x, crown-only crop of
+  // hat-crown-lowered.webp at ~50% of head width. NOT the queen's idle
+  // front-strip frame (v56/v57 used that — wrong) and NOT the small
+  // Albert + crown (v59 v1 — too small). Backups in /tmp:
+  // queen-portrait-idle-v57-backup.webp, queen-albert-small-crown-v1-backup.webp.
   //
   // ASSET GAPS (none of these exist in the workspace or on the live site):
   //  * queen-brain-portrait-v3b.webp — MISSING (see above; the composite
@@ -4195,7 +4192,7 @@
   //    portrait already wears her crown, so no crown overlay is drawn.
   var bmRefreshT = 0; // v55: last time the open brain menu refreshed (stepFrame throttle)
   var ANT_NAMES = ['ALBERT', 'ALLEN', 'ANDY', 'ANNA', 'AMOS', 'AVA']; // NP5 line 697
-  var QUEEN_ANT = { id: 'queen', queen: true, name: 'QUEEN', portrait: 'assets/brain-v3/queen-brain-portrait.webp?v=57', lvl: 1, ideas: 0 };
+  var QUEEN_ANT = { id: 'queen', queen: true, name: 'QUEEN', portrait: 'assets/brain-v3/queen-brain-portrait.webp?v=59', lvl: 1, ideas: 0 };
   var brainById = {}; // ant id -> roster record (name + portrait only now)
   var brainNameN = 0;
   function brainFor(a) {
@@ -4346,7 +4343,7 @@
    (z-index 2) covered the close X. That is exactly Chris's v56 screenshot:
    one pill cut off at the far left, no food pill, no X. Fixed selectors. */
 .bm3-fw{position:absolute;top:calc(41*var(--u));height:calc(30*var(--u));display:flex;align-items:center;gap:calc(4*var(--u));padding:0 calc(6*var(--u));border-radius:calc(15*var(--u));background:rgba(40,30,20,.78);border:2px solid #f3cf82;color:#f3cf82;font:700 calc(13*var(--u))/1 'BM3 Sans','DejaVu Sans',sans-serif;white-space:nowrap;z-index:2}
-.bm3-fw.bm3-food{left:calc(54*var(--u))}.bm3-fw.bm3-water{right:calc(54*var(--u))}
+.bm3-fw.bm3-food{left:calc(54*var(--u))}.bm3-fw.bm3-water{right:calc(71*var(--u))} /* v59: water moved 54u -> 71u so it never overlaps the roster button at right:19u */
 .bm3-fw i{flex:none;width:calc(14*var(--u));height:calc(14*var(--u));background:center/contain no-repeat}
 .bm3-fw .bar{flex:none;width:calc(22*var(--u));height:calc(8*var(--u));border-radius:calc(4*var(--u));background:rgba(0,0,0,.45);border:1px solid #f3cf82;overflow:hidden}
 .bm3-fw .bar b{display:block;height:100%;width:0}
@@ -4357,7 +4354,9 @@
    "Colony" look: #1d130d body, #8a5a1c gold frame, dark header with gold
    banner title, round close X, cream #f6ead0 rows). Opens from the Idea
    button; closes back to the menu. v57: the roster no longer lives here —
-   it moved to the designed #rosterBtn on the game screen (NP5). */
+   it moved to the designed #rosterBtn on the game screen (NP5). v59: Chris
+   ("I only want that to be in the brain menu, not in the actual game") —
+   the button + panel are back INSIDE the brain menu (children of .bm3). */
 .bm3-panel{position:absolute;z-index:21;left:12px;right:12px;top:64px;bottom:16px;display:flex;flex-direction:column;background:#1d130d;color:#fff3d6;border:3px solid #8a5a1c;border-radius:16px;box-shadow:0 6px 18px #000a;overflow:hidden}
 .bm3-panel[hidden]{display:none}
 .bm3-panel-head{flex:none;height:46px;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 7px 0 14px;background:linear-gradient(#3a2614,#26180d);border-bottom:3px solid #8a5a1c}
@@ -4368,19 +4367,20 @@
 .bm3-row b{font-size:15px;white-space:nowrap}
 .bm3-row span{font-size:13px;color:#6a4626;text-align:right}
 .bm3-empty{color:#d9c3a0;font-size:14px;padding:6px 4px}
-/* v57: the DESIGNED roster button (NP5 #rosterBtn, verbatim look + position:
-   gold circular button with a list icon, top-LEFT of the game screen — the
-   NP5 code position (left 12px, top 12px). Chris's "upper left corner in the
-   upper right corner" was ambiguous; the code position wins. It opens the
-   Colony roster (names + what each ant is doing), which used to hide behind
-   the brain menu's "…" button. Hidden until the main floors (JS toggles
-   display grid/none). */
-#rosterBtn{position:absolute;z-index:6;left:calc(12px + env(safe-area-inset-left,0px));top:calc(12px + env(safe-area-inset-top,0px));width:44px;height:44px;border-radius:50%;border:2px solid #8a5a1c;background:linear-gradient(#f6d27a,#e0a940 55%,#c98d2c);box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 3px 8px rgba(0,0,0,.6);display:none;place-items:center;padding:0;cursor:pointer}
+/* v59: the DESIGNED roster button (NP5 #rosterBtn, verbatim look: gold
+   circular button with a list icon). Chris (Nov 21): "I only want that
+   to be in the brain menu, not in the actual game" — so it lives INSIDE
+   the brain menu (.bm3), top row, top-RIGHT where the deleted "…"
+   button was (right 19u, top 41u). The water pill moved right:54u ->
+   right:71u so the two never overlap. The button is hidden whenever
+   the menu is hidden (it is a child of .bm3); no JS visibility toggle.
+   It opens the Colony roster (names + what each ant is doing). */
+#rosterBtn{position:absolute;z-index:2;right:calc(19*var(--u));top:calc(41*var(--u));width:44px;height:44px;border-radius:50%;border:2px solid #8a5a1c;background:linear-gradient(#f6d27a,#e0a940 55%,#c98d2c);box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 3px 8px rgba(0,0,0,.6);display:grid;place-items:center;padding:0;cursor:pointer}
 #rosterBtn svg{width:24px;height:24px}
-/* v57: the roster panel on the GAME screen (NP5 .pwin.big geometry: left 12,
-   right 12, top 144, bottom 16). Reuses the brain menu's .bm3-panel look
-   (same gold frame, header, cream rows) so it reads as the same panel. */
-#rosterWin{top:calc(144px + env(safe-area-inset-top,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:21}
+/* v59: the roster panel lives inside the brain menu now (child of .bm3),
+   so it uses the inside-menu panel geometry (top 64px, like the Ideas
+   panel) instead of the v57 game-screen geometry (top 144px). */
+#rosterWin{top:calc(64px + env(safe-area-inset-top,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:21}
 `;
   document.head.appendChild(bm3style);
 
@@ -4474,7 +4474,10 @@
       updateSeedPill(); updateIdeaMeter(); // outer-scope, hoisted
     }
     function open(ant, o = {}) { if (!R) mount(); cur = ensure(ant); if ('hammer' in o) setHammer(o.hammer);
-      var p = $('.bm3-panel'); if (p) p.hidden = true; // a fresh open never shows a stale panel
+      // a fresh open never shows a stale panel (v59: ALL panels — the Ideas
+      // panel AND the roster panel are both .bm3-panel children of R; the
+      // old code closed only the first match, so the roster stayed open)
+      R.querySelectorAll('.bm3-panel').forEach(function (p) { p.hidden = true; });
       R.hidden = false; R._fit(); render(); emit('open', { ant }); return API; }
     function close() { if (!R) return; flyT.forEach(clearTimeout); flyT = []; $('.bm3-spot').innerHTML = ''; R.hidden = true; const a = cur; cur = null; emit('close', { ant: a }); }
     function setIdeas(n) { if (cur) { cur.ideas = n; render(); } }
@@ -4576,14 +4579,12 @@
     // is checkpoint 6. Show that honestly; do NOT start a mini-game.
     bmPanel('Ideas', [{ n: 'Idea 0', v: 'None yet — the queen has her next idea at 10 brains (checkpoint 6)' }], '');
   }
-  // ---- v57: the DESIGNED roster button (NP5 #rosterBtn) ----
-  // The roster (names + what each ant is doing) used to open from the brain
-  // menu's "…" button. Chris: he had a little designed button for that,
-  // "supposed to be at the upper left corner in the upper right corner".
-  // NP5's code position is top-LEFT (left 12px, top 12px) on the game
-  // screen, so that is where it goes. The button lives on #game (not inside
-  // the brain menu), and the panel is a game-screen overlay (NP5 .pwin.big
-  // geometry) reusing the .bm3-panel look. The "…" button is deleted.
+  // ---- v59: the DESIGNED roster button (NP5 #rosterBtn) — INSIDE the
+  // brain menu only (Chris, Nov 21: "I only want that to be in the
+  // brain menu, not in the actual game"). The button + panel are
+  // children of the brain menu root (BrainMenu3.root), NOT #game, so
+  // they can never appear during normal play. The "…" button stays
+  // deleted — one clear roster button, top-right of the menu.
   var rosterBtn = document.createElement('button');
   rosterBtn.id = 'rosterBtn'; rosterBtn.type = 'button'; rosterBtn.setAttribute('aria-label', 'Colony roster');
   rosterBtn.innerHTML = '<svg viewBox="0 0 24 24"><g fill="#4a2c0e"><circle cx="5" cy="6" r="1.9"/><circle cx="5" cy="12" r="1.9"/><circle cx="5" cy="18" r="1.9"/><rect x="9" y="4.7" width="12" height="2.6" rx="1.3"/><rect x="9" y="10.7" width="12" height="2.6" rx="1.3"/><rect x="9" y="16.7" width="12" height="2.6" rx="1.3"/></g></svg>';
@@ -4592,7 +4593,9 @@
   rosterWin.innerHTML = '<div class="bm3-panel-head"><span class="bm3-panel-title"></span><button class="bm3-panel-x" type="button" aria-label="Close">✕</button></div><div class="bm3-panel-body"></div>';
   rosterWin.querySelector('.bm3-panel-title').textContent = 'Colony';
   var gameRootEl = document.querySelector('#game');
-  if (gameRootEl) { gameRootEl.appendChild(rosterBtn); gameRootEl.appendChild(rosterWin); }
+  var bmRootEl = (typeof BrainMenu3 !== 'undefined' && BrainMenu3.root) || null;
+  if (bmRootEl) { bmRootEl.appendChild(rosterBtn); bmRootEl.appendChild(rosterWin); }
+  else if (gameRootEl) { gameRootEl.appendChild(rosterBtn); gameRootEl.appendChild(rosterWin); } // fallback: mount ran later (never in practice — mount is line ~4523)
   // NP5 pattern: the button + panel swallow their own gestures so a tap on
   // them never reaches the canvas below.
   ['pointerdown', 'click', 'touchstart', 'touchend', 'wheel'].forEach(function (ev) {
