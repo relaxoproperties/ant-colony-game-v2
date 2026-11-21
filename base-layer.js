@@ -4086,8 +4086,8 @@
         return;
       }
       if (mode === 'idle') {
-        // v55: a tap while the giant ant menu is open closes it (NP5 worldTap).
-        if (typeof UI !== 'undefined' && UI.ant) { closeAntMenu(); return; }
+        // v56: no giant menu any more — the queen's tap goes straight to the
+        // brain menu, so there is nothing to close here (NP5 worldTap is gone).
         var w = toWorld(e);
         var tb = hitTimerBubble(w);
         if (tb) {
@@ -4117,17 +4117,19 @@
     cv.addEventListener('pointercancel', endPlacePtr);
   }
 
-  // ---- v55: the BRAIN MENU + GIANT ANT MENU (ported from NP5, old-game-NP5-code) ----
+  // ---- v56: the BRAIN MENU, QUEEN-ONLY (ported from NP5, old-game-NP5-code) ----
   // Fix 2 — the brain menu, QUEEN-ONLY colony overview (Chris, Nov 21):
   // "I'm not doing an individual ant world anymore." The queen guides
-  // everything, so SHE is the only ant with a menu. Tap the queen
-  // (#queenTarget) -> the giant ant menu (#menuAnt, head/body/bottom zones,
-  // 300 ms-per-zone glow sweep, no text) -> tap the HEAD zone -> bubble
-  // buttons; MENU.head = [{id:'brain'}] -> tap the brain icon ->
-  // choose('brain') -> openBrain -> BrainMenu3.open. The hammer icon in
-  // the same giant menu opens the build sheet instead (that fork is the
-  // point). Tapping a worker ant opens NOTHING. No #bvBrainBtn, no flashing
-  // HUDs, no header on the build menu.
+  // everything, so SHE is the only ant with a menu. v56 (Chris, Nov 21):
+  // "I get why you put the big ant menu, but that's actually not what I
+  // was requesting" — the GIANT ANT MENU (#menuAnt, head/body/bottom zones,
+  // glow sweep, brain icon in a bubble) is DELETED. Tapping the queen
+  // (#queenTarget) goes STRAIGHT to the full-screen brain menu (.bm3).
+  // The hammer button inside the brain menu still opens the build sheet
+  // (BuildShortcut.go); the build menu itself still opens the usual way
+  // (arrival auto-open, programmatic queenTarget click). Tapping a worker
+  // ant opens NOTHING. No #bvBrainBtn, no flashing HUDs, no header on the
+  // build menu.
   //
   // The six S.W.A.R.M.S. cards stay EXACTLY as they were (Chris: "the cards
   // are supposed to stay the same. It's supposed to spell the word swarms.
@@ -4150,12 +4152,20 @@
   // meters are added to the brain menu (top row, flanking the seed-money
   // pill) — they were never there before.
   //
+  // THE PICTURE (v56 fix — Chris: "the picture was wrong though"): the
+  // brain menu's portrait area is a SCENE (390x334): forest background,
+  // empty wooden sign across the top (the name banner sits over it), the
+  // ant small at bottom centre — see bm_portraitAlbert.webp. The old
+  // correct queen file, queen-brain-portrait-v3b.webp, exists NOWHERE, so
+  // the queen's portrait is a PORT, not a new design: Albert's scene
+  // background + sign, with the queen (her approved front-idle-strip art,
+  // the same queen as in the game) composited at bottom centre at the same
+  // ground line Albert stands on: assets/brain-v3/queen-brain-portrait.webp.
+  // The bare cutout (queen-portrait.webp) is kept untouched as the source.
+  //
   // ASSET GAPS (none of these exist in the workspace or on the live site):
-  //  * queen-brain-portrait-v3b.webp — MISSING. The queen portrait is frame 0
-  //    of her approved front idle strip (queen_idle_front_strip_v1.png),
-  //    cropped to the 390:334 portrait aspect: assets/brain-v3/queen-portrait.webp.
-  //  * menuAnt.webp (the giant ant picture) — MISSING. The giant menu shows
-  //    the queen's brain portrait instead (object-fit:cover in the NP5 frame).
+  //  * queen-brain-portrait-v3b.webp — MISSING (see above; the composite
+  //    replaces it). menuAnt.webp — NO LONGER NEEDED (giant menu deleted).
   //  * hammerIcon.svg, bm3-sans.woff, bm3-banner.woff — MISSING. The hammer
   //    button uses the game's own hammer art (assets/items/hammer-tab.png);
   //    the @font-face rules are ported verbatim and fall back to DejaVu
@@ -4165,7 +4175,7 @@
   //    portrait already wears her crown, so no crown overlay is drawn.
   var bmRefreshT = 0; // v55: last time the open brain menu refreshed (stepFrame throttle)
   var ANT_NAMES = ['ALBERT', 'ALLEN', 'ANDY', 'ANNA', 'AMOS', 'AVA']; // NP5 line 697
-  var QUEEN_ANT = { id: 'queen', queen: true, name: 'QUEEN', portrait: 'assets/brain-v3/queen-portrait.webp', lvl: 1, ideas: 0 };
+  var QUEEN_ANT = { id: 'queen', queen: true, name: 'QUEEN', portrait: 'assets/brain-v3/queen-brain-portrait.webp', lvl: 1, ideas: 0 };
   var brainById = {}; // ant id -> roster record (name + portrait only now)
   var brainNameN = 0;
   function brainFor(a) {
@@ -4231,28 +4241,17 @@
     }
     return rows;
   }
-  var UI = { ant: null, part: null, brain: null }; // NP5 UI (giant menu / brain menu state)
+  var UI = { brain: null }; // v56: the queen's tap goes straight to the brain menu — no giant menu, no UI.ant/part
 
-  // ---- v55 CSS: the giant ant menu + the brain menu (NP5 CSS lines 31-53 + 54-147, verbatim except as noted) ----
-  // Noted adaptations: (1) #menuAnt img.ma gains width:100% + object-fit:cover
-  // (the portraits are 390:334, not the tall menuAnt.webp); (2) the .bm3-meter /
-  // .bm3-pause rules are scoped under .bm3 — the base layer already has an
-  // UNSCOPED .bm3-meter for the food/water meters (#bvMeters), and NP5's
-  // absolute positioning would break those if it leaked out.
+  // ---- v56 CSS: the brain menu (NP5 CSS lines 54-147, verbatim except as noted) ----
+  // The giant ant menu CSS (#menuAnt, #bub, #o11n20) is DELETED in v56.
+  // Noted adaptation: the .bm3-meter / .bm3-pause rules are scoped under
+  // .bm3 — the base layer already has an UNSCOPED .bm3-meter for the
+  // food/water meters (#bvMeters), and NP5's absolute positioning would
+  // break those if it leaked out. (v56: the old #menuAnt img.ma adaptation
+  // is gone with the giant menu.)
   var bm3style = document.createElement('style');
   bm3style.textContent = `
-.ui{position:absolute}
-#menuAnt{right:0;bottom:0;width:46%;height:46%;display:none;z-index:8}
-#menuAnt img.ma{position:absolute;right:4%;bottom:2%;width:100%;height:92%;object-fit:cover;object-position:center top;pointer-events:none;filter:drop-shadow(0 4px 8px #000a)}
-#menuAnt img.ma.ot9tHid{visibility:hidden}
-#menuAnt .zone{position:absolute;right:16.8%;width:50.4%;border-radius:50%;border:0;background:transparent;padding:0}
-#menuAnt .zoneX{position:absolute;right:16.8%;width:calc(50.4% + 48px);border-radius:28px;border:0;background:transparent;padding:0;-webkit-tap-highlight-color:transparent}
-#menuAnt .zone.on{background:transparent;box-shadow:none}
-#maX{position:absolute;right:4px;top:-74px;width:44px;height:44px;border-radius:50%;border:2px solid #fff8;background:#000b;color:#fff;font-size:20px;z-index:2}
-#bub{display:none;z-index:9;background:#fff;border-radius:22px;padding:10px;gap:10px;box-shadow:0 4px 14px #0008}
-#bub:after{content:'';position:absolute;right:-14px;top:50%;margin-top:-10px;border:10px solid transparent;border-left:14px solid #fff;border-right:0}
-#bub button{width:78px;height:78px;box-sizing:border-box;border-radius:16px;border:2px solid #d9cdb6;background:#fbf6ea center/contain no-repeat;background-origin:content-box;background-clip:border-box;position:relative;padding:11px}
-#o11n20{position:absolute;pointer-events:none;z-index:30;border-radius:50%;opacity:0;mix-blend-mode:screen;background:radial-gradient(ellipse at center,rgba(255,246,205,.55) 0%,rgba(255,246,205,.303) 45%,rgba(255,246,205,0) 72%)}#o11n20.go{animation:o11n20f 300ms ease-in-out 1 both}@keyframes o11n20f{0%{opacity:0}40%{opacity:1}100%{opacity:0}}
 @font-face{font-family:'BM3 Sans';src:url(assets/brain-v3/bm3-sans.woff) format('woff');font-weight:700}
 @font-face{font-family:'BM3 Banner';src:url(assets/brain-v3/bm3-banner.woff) format('woff');font-weight:400 900}
 .bm3{--u:calc(var(--bm-w,390px)/390);--pic:296;--dy:0;position:absolute;inset:0;z-index:40;background:#1d130d;overflow:hidden;
@@ -4507,7 +4506,7 @@
   }
   BrainMenu3.on(function (t) {
     if (t === 'open') { updateSeedPill(); updateIdeaMeter(); }
-    if (t === 'close') UI.brain = null;
+    if (t === 'close') { UI.brain = null; restoreBuildMenu(); }
     if (t === 'more') openRoster(); // "…" = the colony roster (NP5 #rosterWin)
     if (t === 'idea') openIdeas(); // Idea button = the ideas list, NOT the mini-game (cp6)
   });
@@ -4539,94 +4538,34 @@
     // is checkpoint 6. Show that honestly; do NOT start a mini-game.
     bmPanel('Ideas', [{ n: 'Idea 0', v: 'None yet — the queen has her next idea at 10 brains (checkpoint 6)' }], '');
   }
-  window.BuildShortcut = { go: function () { BrainMenu3.close(); choose('ham', QUEEN_ANT); } };
-  // ---- v55: the GIANT ANT MENU (NP5 lines 698-907, adapted) ----
-  // Tap the QUEEN (queenTarget) -> giant menu. head -> body -> bottom
-  // glow, 300 ms each, then wait. No text. head = brain icon; body =
-  // hammer (only the queen builds — NP5 ANT_NO_HAMMER). No cloud (no
-  // pheromone system in this build), no move/binoculars/stop (no room
-  // assignment or scouting toggle in this build), no teams. The giant menu
-  // is queen-only: openAntMenu refuses any other ant.
-  var IC = { brain: 'assets/menu-ant/iBrain.webp', ham: 'assets/menu-ant/iHammer.webp' };
-  var MENU = {
-    head: [{ id: 'brain' }],
-    body: [{ id: 'ham', need: function (a) { return a.queen; } }],
-    bottom: []
-  };
-  var partItems = function (part, a) { return MENU[part].filter(function (it) { return !it.need || it.need(a); }); };
-  var ICON_OF = { brain: 'brain', ham: 'ham' };
-  var N20 = { MS: 300, A: 0.55, GLOW: '255,246,205', ON_PIC: true };
-  var gEl = function (id) { return document.getElementById(id); };
-  var maEl = document.createElement('div'); maEl.id = 'menuAnt'; maEl.className = 'ui';
-  maEl.innerHTML = '<img class="ma" id="maImg" alt="" src="assets/brain-v3/bm_portraitAlbert.webp"><button id="maX" type="button" aria-label="close">✕</button>' +
-    ' <button class="zoneX" data-part="head" style="top:calc(-8.3% + 72px);height:36.4%" aria-label=""></button>' +
-    ' <button class="zoneX" data-part="body" style="top:calc(36.6% + 48px);height:16.8%" aria-label=""></button>' +
-    ' <button class="zoneX" data-part="bottom" style="top:calc(63.7% + 24px);height:26.6%" aria-label=""></button>' +
-    ' <button class="zone" data-part="head" style="top:calc(9.9% + 72px);height:18.2%"></button>' +
-    ' <button class="zone" data-part="body" style="top:calc(36.6% + 48px);height:16.8%"></button>' +
-    ' <button class="zone" data-part="bottom" style="top:calc(63.7% + 24px);height:26.6%"></button>';
-  var gameEl = document.querySelector('#game');
-  if (gameEl) gameEl.appendChild(maEl);
-  var maImg = gEl('maImg');
-  var bub = document.createElement('div'); bub.id = 'bub'; bub.className = 'ui';
-  if (gameEl) gameEl.appendChild(bub);
-  var glowEl = document.createElement('div'); glowEl.id = 'o11n20';
-  if (gameEl) gameEl.appendChild(glowEl);
-  var n20T = [];
-  function relRect(el) {
-    var p = maEl.parentNode.getBoundingClientRect(), r = el.getBoundingClientRect();
-    return { x: r.left - p.left, y: r.top - p.top, w: r.width, h: r.height };
-  }
-  function n20Clear() { n20T.forEach(clearTimeout); n20T = []; glowEl.classList.remove('go'); glowEl.style.opacity = 0; }
-  function n20Glow(part) {
-    var z = maEl.querySelector('.zone[data-part="' + part + '"]'), r = relRect(z), pic = relRect(maImg), w = r.w * 1.28, h = r.h * 1.22, cx = N20.ON_PIC ? pic.x + pic.w / 2 : r.x + r.w / 2;
-    glowEl.style.left = (cx - w / 2) + 'px'; glowEl.style.top = (r.y + r.h / 2 - h / 2) + 'px'; glowEl.style.width = w + 'px'; glowEl.style.height = h + 'px';
-    glowEl.classList.remove('go'); void glowEl.offsetWidth; glowEl.classList.add('go');
-  }
-  function openAntMenu(a) {
-    if (!a || !a.queen) return; // v55: queen-only — a worker ant has no menu
-    closeAntMenu();
-    // The build menu sheet closes (state back underground, room un-lifted)
-    // so the two menus never overlap; the hammer re-opens it (the fork).
+  var bmWasOpen = false, bmNoRestore = false; // build-menu state across the brain menu (v56)
+  window.BuildShortcut = { go: function () { bmNoRestore = true; BrainMenu3.close(); bmNoRestore = false; openBuildMenu(); } };
+  // ---- v56: the QUEEN opens the BRAIN MENU directly (Chris, Nov 21) ----
+  // v55 made her tap open the GIANT ANT MENU first (head -> brain icon);
+  // Chris: "that's actually not what I was requesting" — the giant menu is
+  // DELETED. A trusted tap on the queen (#queenTarget) now opens the
+  // full-screen brain menu straight away. The build menu sheet closes
+  // while the brain menu is open (state back underground) and is restored
+  // when the brain menu closes, so the two menus never overlap and the
+  // player comes back to exactly where they were. The hammer in the brain
+  // menu still opens the build sheet (BuildShortcut.go above) — and the
+  // build menu itself still opens the usual way (arrival auto-open,
+  // programmatic queenTarget click), so the build sheet stays reachable.
+  function closeBuildMenuForBrain() {
     var bm = document.querySelector('#buildMenu');
+    bmWasOpen = !!(bm && bm.classList.contains('open'));
     if (bm) bm.classList.remove('open');
     if (typeof state !== 'undefined' && state === 'menu') { state = 'underground'; if (typeof pan !== 'undefined') pan = 0; if (typeof syncFloors === 'function') syncFloors(); }
-    UI.ant = a; UI.part = null;
-    if (maImg) maImg.src = QUEEN_ANT.portrait; // queen-only: always her portrait
-    maEl.style.display = 'block';
-    var P = ['head', 'body', 'bottom'].filter(function (p) { return partItems(p, a).length; });
-    P.forEach(function (p, i) { n20T.push(setTimeout(function () { n20Glow(p); }, i * N20.MS)); });
-    n20T.push(setTimeout(n20Clear, P.length * N20.MS));
   }
-  function closeAntMenu() {
-    n20Clear();
-    if (maEl) maEl.style.display = 'none';
-    if (bub) { bub.style.display = 'none'; bub.className = 'ui'; }
-    if (UI) { UI.ant = null; UI.part = null; }
+  function restoreBuildMenu() {
+    if (bmNoRestore || !bmWasOpen) return; // the hammer opens the build sheet itself — no double open
+    bmWasOpen = false;
+    openBuildMenu();
   }
-  function bubButtons(items, a) {
-    bub.innerHTML = '';
-    items.forEach(function (it) {
-      var b = document.createElement('button'); b.type = 'button'; b.dataset.id = it.id;
-      b.style.backgroundImage = 'url(' + IC[ICON_OF[it.id]] + ')'; b.setAttribute('aria-label', it.id);
-      b.addEventListener('click', function (e) { e.stopPropagation(); choose(it.id, a); });
-      bub.appendChild(b);
-    });
-  }
-  function openPart(part) {
-    var a = UI.ant; if (!a) return;
-    n20Clear();
-    var items = partItems(part, a);
-    if (!items.length) { UI.part = null; bub.style.display = 'none'; return; }
-    UI.part = part; bubButtons(items, a); bub.className = 'ui'; bub.style.display = 'flex';
-    var z = relRect(maEl.querySelector('.zone[data-part="' + part + '"]')), bw = bub.offsetWidth, bh = bub.offsetHeight;
-    bub.style.left = Math.max(8, z.x - 14 - bw) + 'px'; bub.style.top = Math.max(8, z.y + z.h / 2 - bh / 2) + 'px';
-  }
-  maEl.querySelectorAll('[data-part]').forEach(function (z) { z.addEventListener('click', function (e) { e.stopPropagation(); openPart(z.dataset.part); }); });
-  gEl('maX').addEventListener('click', function (e) { e.stopPropagation(); closeAntMenu(); });
   function openBrain(a) {
-    closeAntMenu();
-    if (!a || !a.queen) return; // v55: queen-only — only her brain menu exists
+    if (!a || !a.queen) return; // v56: queen-only — only her brain menu exists
+    if (window.BrainMenu3 && BrainMenu3.isOpen) return; // already open — a second tap must not reset bmWasOpen (the build-menu restore)
+    closeBuildMenuForBrain();
     BrainMenu3.open(QUEEN_ANT, { hammer: false });
     updateSeedPill(); updateIdeaMeter();
     UI.brain = 'queen';
@@ -4638,29 +4577,14 @@
     var q = document.querySelector('#queenTarget');
     if (q) q.click();
   }
-  function choose(id, a) {
-    a = a || UI.ant;
-    if (id === 'brain') { openBrain(a); return; }
-    if (id === 'ham') { closeAntMenu(); openBuildMenu(); return; }
-  }
-  function antAtWorld(w) {
-    var r = Math.max(9, 26 / (spp * view.s));
-    var best = null, bd = r;
-    for (var i = 0; i < ANTS.length; i++) {
-      var a = ANTS[i];
-      if (a.state === 'gone' || a.hidden) continue;
-      var d = Math.hypot(a.x - w.x, a.y - 4 - w.y);
-      if (d < bd) { bd = d; best = a; }
-    }
-    return best;
-  }
-  // ---- v55: tapping the QUEEN opens her giant menu (NP5 queenTarget) ----
+  // ---- v56: tapping the QUEEN opens her BRAIN MENU directly ----
   // index.html's queenTarget click still opens the build menu — and the
   // arrival auto-open (begin('underground') -> queenTarget.click(), a
   // LOCKED checkpoint-1 behaviour) must keep doing exactly that. So this
   // capture listener on #game only intercepts TRUSTED taps (a real finger):
-  // those open the giant menu instead, and the build menu is reached from
-  // the hammer in the giant menu. Programmatic clicks pass through untouched.
+  // those open the brain menu straight away — no giant menu, no head zone,
+  // no brain icon in a bubble. Programmatic clicks pass through untouched.
+  var gameEl = document.querySelector('#game');
   if (gameEl) gameEl.addEventListener('click', function (e) {
     if (!e || !e.target || e.target.id !== 'queenTarget') return;
     if (!e.isTrusted) return;
@@ -4668,23 +4592,19 @@
     if (window.BrainMenu3 && BrainMenu3.isOpen) return;
     if (e.stopPropagation) e.stopPropagation();
     if (e.preventDefault) e.preventDefault();
-    openAntMenu(QUEEN_ANT);
+    openBrain(QUEEN_ANT);
   }, true);
 
   // ---- v55 test handles (read-only state + tap entry points, same pattern as BASE_TEST) ----
-  window.BASE_TEST.openAntMenu = openAntMenu;
-  window.BASE_TEST.closeAntMenu = closeAntMenu;
   window.BASE_TEST.openBrain = openBrain;
   window.BASE_TEST.openRoster = openRoster;
   window.BASE_TEST.openIdeas = openIdeas;
   window.BASE_TEST.brainFor = brainFor;
-  window.BASE_TEST.antAtWorld = antAtWorld;
   window.BASE_TEST.colonyCounts = colonyCounts;
   window.BASE_TEST.rosterRows = rosterRows;
   window.BASE_TEST._finishTrain = finishTrain;
-  window.BASE_TEST.tapQueen = function () { openAntMenu(QUEEN_ANT); }; // harness: the trusted-tap equivalent
+  window.BASE_TEST.tapQueen = function () { openBrain(QUEEN_ANT); }; // harness: the trusted-tap equivalent (v56: straight to the brain menu)
   window.BASE_TEST.refreshBrainMenu = function () { if (window.BrainMenu3) BrainMenu3.refresh(); };
-  Object.defineProperty(window.BASE_TEST, 'antMenu', { get: function () { return UI.ant ? { id: UI.ant.id, queen: !!UI.ant.queen } : null; } });
   Object.defineProperty(window.BASE_TEST, 'brainMenu', {
     get: function () {
       if (!window.BrainMenu3 || !BrainMenu3.isOpen) return null;
