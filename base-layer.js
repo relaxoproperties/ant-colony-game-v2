@@ -317,7 +317,20 @@
     // the S.W.A.R.M.S. counts, the food/water meters and the roster refresh
     // twice a second as ants change task. (bmRefreshT is declared with the
     // v55 block below; var hoisting makes this safe before it runs.)
-    if (typeof window !== 'undefined' && window.BrainMenu3 && BrainMenu3.isOpen && QT - bmRefreshT > 0.5) { bmRefreshT = QT; BrainMenu3.refresh(); }
+    // v57: the game-screen roster panel refreshes on the same tick while
+    // it is open, and the designed roster button shows only on the main
+    // floors (underground / menu / entered) — never during the intro or
+    // the squirrel cinematic (NP5 hides its HUD during cine too).
+    if (typeof window !== 'undefined' && QT - bmRefreshT > 0.5) {
+      bmRefreshT = QT;
+      if (window.BrainMenu3 && BrainMenu3.isOpen) BrainMenu3.refresh();
+      if (typeof rosterWin !== 'undefined' && rosterWin && !rosterWin.hidden) renderRosterWin();
+    }
+    if (typeof rosterBtn !== 'undefined' && rosterBtn) {
+      var showRosterBtn = (typeof state !== 'undefined' && (state === 'underground' || state === 'menu' || state === 'entered')) && !(typeof window !== 'undefined' && window.cp5 && window.cp5.debug && window.cp5.debug.C5 && window.cp5.debug.C5.cine);
+      var wantDisplay = showRosterBtn ? 'grid' : 'none';
+      if (rosterBtn.style.display !== wantDisplay) rosterBtn.style.display = wantDisplay;
+    }
   }
   // Called from drawUnderground (index.html) once per frame while she is free.
   function queenFrame(now) {
@@ -4175,7 +4188,7 @@
   //    portrait already wears her crown, so no crown overlay is drawn.
   var bmRefreshT = 0; // v55: last time the open brain menu refreshed (stepFrame throttle)
   var ANT_NAMES = ['ALBERT', 'ALLEN', 'ANDY', 'ANNA', 'AMOS', 'AVA']; // NP5 line 697
-  var QUEEN_ANT = { id: 'queen', queen: true, name: 'QUEEN', portrait: 'assets/brain-v3/queen-brain-portrait.webp', lvl: 1, ideas: 0 };
+  var QUEEN_ANT = { id: 'queen', queen: true, name: 'QUEEN', portrait: 'assets/brain-v3/queen-brain-portrait.webp?v=57', lvl: 1, ideas: 0 };
   var brainById = {}; // ant id -> roster record (name + portrait only now)
   var brainNameN = 0;
   function brainFor(a) {
@@ -4308,7 +4321,7 @@
 .bm3-fly.gone{opacity:0;transform:scale(.6);transition:transform .5s ease-in,opacity .5s ease-in}
 .bm3-fly.q{filter:drop-shadow(0 calc(3*var(--u)) calc(6*var(--u)) rgba(0,0,0,.55))}
 .smRead{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:16px;background:rgba(40,30,20,.78);border:2px solid #f3cf82;color:#f3cf82;font:700 13px/1 'BM3 Sans','AntUI Sans','DejaVu Sans',sans-serif;white-space:nowrap}.smRead b{color:#fff3d6;font-size:17px}
-.bm3 .smBrain{position:absolute;left:50%;top:calc(41*var(--u));height:calc(30*var(--u));transform:translateX(-50%);z-index:2}
+.bm3 .smBrain{position:absolute;right:calc(16*var(--u));bottom:calc(14*var(--u));height:calc(30*var(--u));z-index:2}
 .bm3 .bm3-meter{position:absolute;left:calc(16*var(--u));bottom:calc(70*var(--u));width:calc(128*var(--u));height:calc(22*var(--u));display:flex;align-items:center;gap:calc(5*var(--u));z-index:2;pointer-events:none}
 .bm3 .bm3-meter[hidden]{display:none} .bm3 .bm3-pause{position:absolute;left:calc(16*var(--u));bottom:calc(98*var(--u));z-index:2;pointer-events:none;font:800 calc(12*var(--u))/1 'BM3 Sans','DejaVu Sans',sans-serif;color:#ffd0e6;text-shadow:0 1px 2px #000;white-space:nowrap} .bm3 .bm3-pause[hidden]{display:none}
 .bm3 .bm3-meter i{flex:none;width:calc(20*var(--u));height:calc(20*var(--u));background:url(assets/brain-v3/iBrain.webp) center/contain no-repeat}
@@ -4317,20 +4330,27 @@
 .bm3 .bm3-meter em{flex:none;font:800 calc(13*var(--u))/1 'BM3 Sans','DejaVu Sans',sans-serif;color:#fff;font-style:normal;text-shadow:0 1px 2px #000}
 .bm3-idea.ready{box-shadow:0 0 calc(12*var(--u)) #ffd84a;animation:bm3bump 1.2s infinite}
 /* v55 redesign: the food + water meters (Chris, Nov 21 — they were never in
-   the brain menu). Two small pills in the top row, flanking the centred seed
-   money pill: leaf/droplet icon + mini bar + number, live from MV. */
+   the brain menu). Two small pills in the top row (food left, water right):
+   leaf/droplet icon + mini bar + number, live from MV. v57: the position
+   selectors were .bm3-fw.food / .bm3-fw.water but the HTML classes are
+   bm3-food / bm3-water (the .bm3-fw element does NOT carry a 'food' class),
+   so neither pill got left/right positioning — both sat at the static left
+   edge overlapping, water (later in the DOM) painting on top, and both pills
+   (z-index 2) covered the close X. That is exactly Chris's v56 screenshot:
+   one pill cut off at the far left, no food pill, no X. Fixed selectors. */
 .bm3-fw{position:absolute;top:calc(41*var(--u));height:calc(30*var(--u));display:flex;align-items:center;gap:calc(4*var(--u));padding:0 calc(6*var(--u));border-radius:calc(15*var(--u));background:rgba(40,30,20,.78);border:2px solid #f3cf82;color:#f3cf82;font:700 calc(13*var(--u))/1 'BM3 Sans','DejaVu Sans',sans-serif;white-space:nowrap;z-index:2}
-.bm3-fw.food{left:calc(54*var(--u))}.bm3-fw.water{right:calc(54*var(--u))}
+.bm3-fw.bm3-food{left:calc(54*var(--u))}.bm3-fw.bm3-water{right:calc(54*var(--u))}
 .bm3-fw i{flex:none;width:calc(14*var(--u));height:calc(14*var(--u));background:center/contain no-repeat}
 .bm3-fw .bar{flex:none;width:calc(22*var(--u));height:calc(8*var(--u));border-radius:calc(4*var(--u));background:rgba(0,0,0,.45);border:1px solid #f3cf82;overflow:hidden}
 .bm3-fw .bar b{display:block;height:100%;width:0}
-.bm3-fw.food .bar b{background:linear-gradient(90deg,#b5e048,#6da332)}
-.bm3-fw.water .bar b{background:linear-gradient(90deg,#7cc4e8,#3a7fc1)}
+.bm3-fw.bm3-food .bar b{background:linear-gradient(90deg,#b5e048,#6da332)}
+.bm3-fw.bm3-water .bar b{background:linear-gradient(90deg,#7cc4e8,#3a7fc1)}
 .bm3-fw em{font-style:normal;color:#fff3d6;font-size:calc(14*var(--u))}
-/* v55 redesign: the roster + ideas panel inside the brain menu (NP5 .pwin
+/* v55 redesign: the ideas panel inside the brain menu (NP5 .pwin
    "Colony" look: #1d130d body, #8a5a1c gold frame, dark header with gold
-   banner title, round close X, cream #f6ead0 rows). Opens from the "…"
-   button (Colony) or the Idea button (Ideas); closes back to the menu. */
+   banner title, round close X, cream #f6ead0 rows). Opens from the Idea
+   button; closes back to the menu. v57: the roster no longer lives here —
+   it moved to the designed #rosterBtn on the game screen (NP5). */
 .bm3-panel{position:absolute;z-index:21;left:12px;right:12px;top:64px;bottom:16px;display:flex;flex-direction:column;background:#1d130d;color:#fff3d6;border:3px solid #8a5a1c;border-radius:16px;box-shadow:0 6px 18px #000a;overflow:hidden}
 .bm3-panel[hidden]{display:none}
 .bm3-panel-head{flex:none;height:46px;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 7px 0 14px;background:linear-gradient(#3a2614,#26180d);border-bottom:3px solid #8a5a1c}
@@ -4341,6 +4361,19 @@
 .bm3-row b{font-size:15px;white-space:nowrap}
 .bm3-row span{font-size:13px;color:#6a4626;text-align:right}
 .bm3-empty{color:#d9c3a0;font-size:14px;padding:6px 4px}
+/* v57: the DESIGNED roster button (NP5 #rosterBtn, verbatim look + position:
+   gold circular button with a list icon, top-LEFT of the game screen — the
+   NP5 code position (left 12px, top 12px). Chris's "upper left corner in the
+   upper right corner" was ambiguous; the code position wins. It opens the
+   Colony roster (names + what each ant is doing), which used to hide behind
+   the brain menu's "…" button. Hidden until the main floors (JS toggles
+   display grid/none). */
+#rosterBtn{position:absolute;z-index:6;left:calc(12px + env(safe-area-inset-left,0px));top:calc(12px + env(safe-area-inset-top,0px));width:44px;height:44px;border-radius:50%;border:2px solid #8a5a1c;background:linear-gradient(#f6d27a,#e0a940 55%,#c98d2c);box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 3px 8px rgba(0,0,0,.6);display:none;place-items:center;padding:0;cursor:pointer}
+#rosterBtn svg{width:24px;height:24px}
+/* v57: the roster panel on the GAME screen (NP5 .pwin.big geometry: left 12,
+   right 12, top 144, bottom 16). Reuses the brain menu's .bm3-panel look
+   (same gold frame, header, cream rows) so it reads as the same panel. */
+#rosterWin{top:calc(144px + env(safe-area-inset-top,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:21}
 `;
   document.head.appendChild(bm3style);
 
@@ -4384,7 +4417,6 @@
       R = document.createElement('div'); R.className = 'bm3'; R.hidden = true;
       R.innerHTML = `<div class="bm3-portrait"></div><div class="bm3-name"></div>
       <button class="bm3-btn bm3-close" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M5 5L19 19M19 5L5 19" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg></button>
-      <button class="bm3-btn bm3-more" aria-label="More"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="2.1" fill="#fff"/><circle cx="12" cy="12" r="2.1" fill="#fff"/><circle cx="19" cy="12" r="2.1" fill="#fff"/></svg></button>
       <div class="bm3-lvl"></div>
       ${TEMPLATE.stats.map((s, i) => {
         const [l, t] = TEMPLATE.slots[i];
@@ -4402,7 +4434,7 @@
       if (typeof ResizeObserver !== 'undefined') { try { new ResizeObserver(fit).observe(R); } catch (e) {} }
       const tap = (el, fn) => el.addEventListener('click', (e) => { e.stopPropagation(); fn(e); });
       // v55: the cards are counts, not buttons — no tap wiring at all.
-      tap($('.bm3-close'), close); tap($('.bm3-more'), () => emit('more', { ant: cur }));
+      tap($('.bm3-close'), close);
       tap($('.bm3-idea'), () => emit('idea', { ant: cur, ideas: cur && cur.ideas }));
       tap($('.bm3-panel-x'), () => { const p = $('.bm3-panel'); if (p) p.hidden = true; });
       tap($('.bm3-hammer'), () => { emit('hammer', { ant: cur }); if (global.BuildShortcut) global.BuildShortcut.go('brain'); });
@@ -4507,7 +4539,6 @@
   BrainMenu3.on(function (t) {
     if (t === 'open') { updateSeedPill(); updateIdeaMeter(); }
     if (t === 'close') { UI.brain = null; restoreBuildMenu(); }
-    if (t === 'more') openRoster(); // "…" = the colony roster (NP5 #rosterWin)
     if (t === 'idea') openIdeas(); // Idea button = the ideas list, NOT the mini-game (cp6)
   });
   // ---- v55: the roster + ideas panels INSIDE the brain menu ----
@@ -4532,14 +4563,68 @@
     }
     p.hidden = false;
   }
-  function openRoster() { bmPanel('Colony', rosterRows(), 'No ants yet'); }
+  function openRoster() { openRosterWin(); }
   function openIdeas() {
     // v55: the colony has NO ideas yet in cp5 — the idea game (10th brain)
     // is checkpoint 6. Show that honestly; do NOT start a mini-game.
     bmPanel('Ideas', [{ n: 'Idea 0', v: 'None yet — the queen has her next idea at 10 brains (checkpoint 6)' }], '');
   }
-  var bmWasOpen = false, bmNoRestore = false; // build-menu state across the brain menu (v56)
-  window.BuildShortcut = { go: function () { bmNoRestore = true; BrainMenu3.close(); bmNoRestore = false; openBuildMenu(); } };
+  // ---- v57: the DESIGNED roster button (NP5 #rosterBtn) ----
+  // The roster (names + what each ant is doing) used to open from the brain
+  // menu's "…" button. Chris: he had a little designed button for that,
+  // "supposed to be at the upper left corner in the upper right corner".
+  // NP5's code position is top-LEFT (left 12px, top 12px) on the game
+  // screen, so that is where it goes. The button lives on #game (not inside
+  // the brain menu), and the panel is a game-screen overlay (NP5 .pwin.big
+  // geometry) reusing the .bm3-panel look. The "…" button is deleted.
+  var rosterBtn = document.createElement('button');
+  rosterBtn.id = 'rosterBtn'; rosterBtn.type = 'button'; rosterBtn.setAttribute('aria-label', 'Colony roster');
+  rosterBtn.innerHTML = '<svg viewBox="0 0 24 24"><g fill="#4a2c0e"><circle cx="5" cy="6" r="1.9"/><circle cx="5" cy="12" r="1.9"/><circle cx="5" cy="18" r="1.9"/><rect x="9" y="4.7" width="12" height="2.6" rx="1.3"/><rect x="9" y="10.7" width="12" height="2.6" rx="1.3"/><rect x="9" y="16.7" width="12" height="2.6" rx="1.3"/></g></svg>';
+  var rosterWin = document.createElement('div');
+  rosterWin.id = 'rosterWin'; rosterWin.className = 'bm3-panel'; rosterWin.hidden = true;
+  rosterWin.innerHTML = '<div class="bm3-panel-head"><span class="bm3-panel-title"></span><button class="bm3-panel-x" type="button" aria-label="Close">✕</button></div><div class="bm3-panel-body"></div>';
+  rosterWin.querySelector('.bm3-panel-title').textContent = 'Colony';
+  var gameRootEl = document.querySelector('#game');
+  if (gameRootEl) { gameRootEl.appendChild(rosterBtn); gameRootEl.appendChild(rosterWin); }
+  // NP5 pattern: the button + panel swallow their own gestures so a tap on
+  // them never reaches the canvas below.
+  ['pointerdown', 'click', 'touchstart', 'touchend', 'wheel'].forEach(function (ev) {
+    rosterBtn.addEventListener(ev, function (e) { e.stopPropagation(); });
+    rosterWin.addEventListener(ev, function (e) { e.stopPropagation(); });
+  });
+  function renderRosterWin() {
+    if (!rosterWin) return;
+    var body = rosterWin.querySelector('.bm3-panel-body'); if (!body) return;
+    while (body.children.length) body.removeChild(body.children[0]);
+    var rows = rosterRows();
+    if (!rows.length) {
+      var e = document.createElement('div'); e.className = 'bm3-empty'; e.textContent = 'No ants yet'; body.appendChild(e);
+    } else {
+      rows.forEach(function (r) {
+        var row = document.createElement('div'); row.className = 'bm3-row';
+        var b = document.createElement('b'); b.textContent = r.n; row.appendChild(b);
+        var s = document.createElement('span'); s.textContent = r.v; row.appendChild(s);
+        body.appendChild(row);
+      });
+    }
+  }
+  function openRosterWin() { renderRosterWin(); rosterWin.hidden = false; }
+  function closeRosterWin() { rosterWin.hidden = true; }
+  rosterBtn.addEventListener('click', function () { if (rosterWin.hidden) openRosterWin(); else closeRosterWin(); });
+  rosterWin.querySelector('.bm3-panel-x').addEventListener('click', closeRosterWin);
+  window.BASE_TEST.rosterBtnEl = rosterBtn; // harness handle
+  var bmWasOpen = false, bmNoRestore = false, bmAutoOpened = false; // build-menu state across the brain menu (v56; v57 adds bmAutoOpened)
+  // v57: index.html's begin('underground') calls this after the ARRIVAL
+  // auto-open (queenTarget.click()) so the close path knows the build menu
+  // opened by itself, not by the player. See closeBuildMenuForBrain.
+  window.__bmNoteAutoOpen = function () { bmAutoOpened = true; };
+  // v57: any trusted touch inside the build menu means the player is USING
+  // it — the menu is theirs from then on, so the auto-open flag clears and
+  // a later brain-menu close restores it. (Programmatic clicks do not fire
+  // pointerdown, so arrival/hammer/restore clicks never clear it.)
+  var bmElForAuto = document.querySelector('#buildMenu');
+  if (bmElForAuto) bmElForAuto.addEventListener('pointerdown', function () { bmAutoOpened = false; }, true);
+  window.BuildShortcut = { go: function () { bmNoRestore = true; bmAutoOpened = false; BrainMenu3.close(); bmNoRestore = false; openBuildMenu(); } };
   // ---- v56: the QUEEN opens the BRAIN MENU directly (Chris, Nov 21) ----
   // v55 made her tap open the GIANT ANT MENU first (head -> brain icon);
   // Chris: "that's actually not what I was requesting" — the giant menu is
@@ -4553,7 +4638,16 @@
   // programmatic queenTarget click), so the build sheet stays reachable.
   function closeBuildMenuForBrain() {
     var bm = document.querySelector('#buildMenu');
-    bmWasOpen = !!(bm && bm.classList.contains('open'));
+    // v57: restore ONLY a menu the player actually had open. The build
+    // menu auto-opens on arrival (locked cp1 behaviour: "the build menu
+    // opens by itself when she gets downstairs"), so plain
+    // classList.contains('open') is true even when the player never asked
+    // for it — and v56 restored it on every brain-menu close, which is how
+    // Chris got the build menu popping open after closing the brain menu
+    // (his 11:34 screenshot). bmAutoOpened is set by begin('underground')
+    // via __bmNoteAutoOpen and cleared by the first trusted touch inside
+    // the menu, so "was open" now means "open AND the player used it".
+    bmWasOpen = !!(bm && bm.classList.contains('open')) && !bmAutoOpened;
     if (bm) bm.classList.remove('open');
     if (typeof state !== 'undefined' && state === 'menu') { state = 'underground'; if (typeof pan !== 'undefined') pan = 0; if (typeof syncFloors === 'function') syncFloors(); }
   }
@@ -4617,6 +4711,14 @@
       return { name: c.name, lvl: c.lvl, ideas: c.ideas, counts: colonyCounts(), seedMoney: BR.coins, food: Math.round(MV.food), water: Math.round(MV.water), panel: panelRows };
     }
   });
+  // v57: the game-screen roster panel (NP5 #rosterWin) — null while closed.
+  Object.defineProperty(window.BASE_TEST, 'rosterWin', {
+    get: function () {
+      if (typeof rosterWin === 'undefined' || !rosterWin || rosterWin.hidden) return null;
+      var body = rosterWin.querySelector('.bm3-panel-body');
+      return { title: (rosterWin.querySelector('.bm3-panel-title') || {}).textContent || '', rows: Array.prototype.slice.call(body.querySelectorAll('.bm3-row')).map(function (r) { return { n: (r.querySelector('b') || {}).textContent || '', v: (r.querySelector('span') || {}).textContent || '' }; }) };
+    }
+  });
   Object.defineProperty(window.BASE_TEST, 'seedMoney', { get: function () { return BR.coins; } });
 
   renderMenu();
@@ -4649,6 +4751,16 @@
     bedGate = true; // she is settled on the bed
     parkUnlocked = true; schoolUnlocked = true; firstSlidePass = true; // the park and school tabs are open already
     tradeUnlocked = true;
+    queenFree = true; // v57 (Chris, Nov 21): the ?checkpoint=4/5 shortcut
+    // simulates the post-placement state (bed + desks already built), so the
+    // QN system must take over from load. Before this, queenFree stayed false
+    // until the player's FIRST placement — and index.html's drawUnderground
+    // overwrites queen.x/y to the spiral every frame while !BASE_QUEEN.free,
+    // and stepFrame (the brain timer) never runs. That is why the
+    // ?checkpoint=5 shortcut never started on his phone: the queen stood at
+    // the spiral, no countdown showed, and his first placement reset BR.t to
+    // 0 (brainReset), so a full 2:00 counter started. Test shortcuts only;
+    // normal play is untouched (queenFree still flips on first placement).
     var bed = { uid: nextUid++, id: 'leafbed', cx: 2790, floorY: 5050, w: 27.34, building: false, t0: 0, cost: 0 };
     placed.push(bed);
     QN.home = { x: 2790, y: 5050 - itemH(itemById('leafbed')) * 0.175 }; QN.homeUid = bed.uid; QN.settled = true;
