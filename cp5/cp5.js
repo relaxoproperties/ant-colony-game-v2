@@ -24,23 +24,27 @@
 //  * Everything else is v1 verbatim: trigger at 9 brains, preload at 8,
 //    the run-in / authored / run-out path (frames 7-13 sprint 2.4x, one 0.4 s
 //    held pause mid-screen, acorn set down ~frame 112 and settled by 118,
-//    lunge, exit left), the 1.2 s glide to the very far shot (CINE.FAR_K
-//    0.55, fit x0.94), the 1.0 s settle on the acorn, and STAYING above
-//    ground afterwards (player presses down).
+//    lunge, exit left), the 1.2 s glide to the FIXED plate-box framing
+//    (v61: the video's baked arc is the zoom, so the game camera holds one
+//    framing for the whole scene — the old FAR/NEAR/END arc is deleted),
+//    and STAYING above ground afterwards (player presses down).
 // Classic script, one global: window.cp5. No ES modules, no CDN.
 (function(){'use strict';
 // ==== THE squirrel trigger (Chris 12:13 PM ET: the 9th brain). Change this ONE number to move it. ====
 const SQUIRREL_AT_BRAINS=9;
 // NP5 dfc7b054 index.html line 1325-1326 (item 23), ported verbatim: 2+ hexes from the mound, diagonally up-right first, first FREE one wins.
 const SQ_HEXES=[[2,-2],[3,-3],[2,-3],[3,-2],[1,-2],[4,-3],[3,-4],[4,-4]];
-// NP4 note 19 framing (np4_block.js 222: whole squirrel+acorn scene, fit x0.94) x FAR_K = Chris 12:04 "zoom out very far"; END = the same NP4 framing on the acorn.
-const CINE={FAR_K:0.55,NEAR_K:0.8,END_K:0.65,ZOOM_S:1.2,END_S:1.0};// v57: NEAR_K — the
-// run-in/approach framing is CLOSER (Chris: "zoom in a little bit closer to
-// the squirrel so I could actually see the squirrel from closer"); END_K —
-// the settle framing is WIDER than the old acorn-only shot, a box holding
-// the mound hole + the acorn (Chris: "a nice view of the ant mound and
-// acorn when the squirrel leaves"). FAR_K (the zoom-out that shows it coming
-// in) and ZOOM_S/END_S are unchanged.
+// v61: FIXED camera on the plate box — the take8 video has its own camera
+// arc BAKED IN (post zoom 65% start -> 85% stand -> 60% exit), so the game
+// must NOT add its own arc or the zooms compound (double zoom). The old
+// v57 FAR_K/NEAR_K/END_K arc is DELETED: the camera glides once to the
+// plate-box framing (DATA.plate, fit x0.94 x FIX_K) and HOLDS it for the
+// whole scene, so what Chris sees on his phone is the approved video's own
+// framing (entry small and whole, stand close, acorn centred, exit wide).
+// FIX_K 1.1 fits the widest stand frame inside the view (the median stand
+// squirrel reads ~44% of screen width, the video's ~49% — fitting wins
+// over matching the fraction, so no tail is ever clipped).
+const CINE={FIX_K:1.1,ZOOM_S:1.2};
 const C5={ready:false,errs:{},log:[],cine:null,restore:null,done:false};
 const URLQ=new URLSearchParams(location.search);
 const _src=(document.currentScript&&document.currentScript.src)||'';
@@ -63,10 +67,10 @@ const S2S=720/390;   // v3 camera s is on a 390x844 screen; bv1 spp is on the 72
 function imOk(im){return !!(im&&(im.ok||((im.naturalWidth||im.width)>0))&&!im.bad)}
 function loadIm(src){const im=new Image();im.decoding='async';im.onload=()=>{im.ok=1;SQ.loaded++};im.onerror=()=>{im.bad=1;SQ.failed=(SQ.failed||0)+1;console.warn('[cp5] image failed: '+src)};im.src=src;SQ.want++;return im}
 function sqLoad(){if(SQ.preload||!DATA)return;SQ.preload=true;
- // v60: ?v=60 on the frame + REST urls (phone cache-bust — take6 frames
- // replace the v59 frames at the same filenames; the PLAIN is unchanged).
- for(let i=0;i<DATA.n;i++)SQ.IM[i]=loadIm(BASE+'sq_'+pad3(i)+'.webp?v=60');
- SQ.REST=loadIm(BASE+'acorn_runtime.png?v=60');SQ.PLAIN=loadIm(PLAIN_SRC)}
+ // v61: ?v=61 on the frame + REST urls (phone cache-bust — take8 frames
+ // replace the v60 frames at the same filenames; the PLAIN is unchanged).
+ for(let i=0;i<DATA.n;i++)SQ.IM[i]=loadIm(BASE+'sq_'+pad3(i)+'.webp?v=61');
+ SQ.REST=loadIm(BASE+'acorn_runtime.png?v=61');SQ.PLAIN=loadIm(PLAIN_SRC)}
 // v57: pre-DECODE the frames before the scene starts. The "skipping a beat"
 // on Chris's phone is a decode hitch, not missing art: the squirrel IS one
 // continuous 10 s take (150 frames @ 24 fps), but each frame's FIRST
@@ -107,7 +111,7 @@ function setHex(h){SQ.hex=h.slice();window.CP5_ACORN_HEX=h.slice();const c=hexCe
 //  2. the authored frames 7..140 unchanged: run in, acorn set down on the drop hex (~112, settled by 118 = rest), stand, turn, leap left;
 //  3. EXIT: from the 140 leap the same run cycle continues left (bottom-aligned to the leap) until it is past the screen's left edge.
 // The acorn rest sprite (acorn_runtime.png) is drawn from frame 118 on, centred on the hex: its final position = the bank position.
-const RUN={A:7,B:14,D:{x:-177,y:0},EXIT_FROM:140,EXIT_K:8,EXIT_OFF:{x:-688,y:54},MARGIN:120};   // EXIT_OFF: frame 8's nose/feet onto frame 140's (one step on)
+const RUN={A:7,B:14,D:{x:-49.3,y:0},EXIT_FROM:140,EXIT_K:8,EXIT_OFF:{x:-312.4,y:0},MARGIN:120};   // v61: D.x re-measured for take8 (head advance 7.05/frame x7; y stays 0 — the laps/exit keep feet on the ground, the head-anchor dy is the video's zoom growth, not a real rise). EXIT_OFF re-measured for take8 (frame 8's nose/feet onto frame 140's, one step on; v60's -688,54 did not follow this principle for take6 either).
 function screenX(){let L=lookX-1000/spp,R=lookX+1000/spp;try{const g=game.getBoundingClientRect(),a=canvasToWorld((0-view.x)/view.s,640),b=canvasToWorld((g.width-view.x)/view.s,640);L=a.x;R=b.x}catch(e){}return {L,R}}
 // r46 (Chris 8:15 PM ET): a SMOOTH fast run. The run cycle 7..13 (measured stride RUN.D) plays at an EVEN rate (SPRINT x 24 fps, every
 // entry the same duration, pose index from elapsed time) at the same ground speed as r45; no frame flicking anywhere. Exactly ONE still pause
@@ -117,7 +121,7 @@ const DASH={SPRINT:2.4,APPROACH_END:28,PAUSE:0.4,EASE:0.1};
 // r47 (Chris 8:20 PM ET): body-anchored run. HEAD anchor (centroid of the opaque pixels in the front 18% of each sprite, measured from the
 // v54 sq_007..013.webp alpha) moved so it advances exactly RUN.D/7 (25.3 px) per run frame; draw x offsets for frames 7..13 (code only, no art).
 // Removes the 12->13 hitch (+40 px) and the backward-ish wrap 13->7 (+5 px). Applied to the run-in laps, the authored 7..13 and the run-out laps.
-const RUNFIX=[0.0,-3.2,-4.6,-7.9,-8.4,-4.1,-1.8]; // v60: re-measured for take6 (take6-build_params.json); take6's head bobs less in the bound than take1's, so the corrections are smaller
+const RUNFIX=[0.0,-1.6,2.7,3.4,2.9,1.7,0.0]; // v61: re-measured for take8 (take8-build_params.json); take8's head bobs less in the bound than take6's, so the corrections are smaller
 // r48 (Chris 8:27 PM ET): LUNGE after the drop. Frames <=133 (set-down ~112, settled by 118, the stand) keep 24 fps. The clip's own crouch 134..137 plays
 // fast (0.10 s, squashed scaleY 0.93), the spring 138..140 fast (stretched 1.05), then a burst: the run-out stride stretched (2x -> 1x the
 // run step, ease-out over 0.30 s) with a small hop arc, flowing into the r47 run-out (same frames, same RUNFIX line-up).
@@ -191,7 +195,12 @@ function moundHole(){try{if(typeof MAP_RECT!=='undefined'&&typeof START_SPP!=='u
 // v57: the squirrel's current world position (centre of the frame being
 // drawn) — the camera tracks this during play.
 function sqPos(now){if(!SQ.path)return null;var i=pathIdx(now);if(i<0)i=0;if(i>=SQ.path.length)i=SQ.path.length-1;var e=SQ.path[i],f=DATA.frames[e.k];if(!f)return null;var o=SQ.off;return {x:f[0]+o.x+e.dx+f[2]/2,y:f[1]+o.y+e.dy+f[3]/2}}
-function cineStart(now){if(C5.cine)return;C5.restore=null;C5.nearS=null;C5.endBox=null;
+// v61: the FIXED framing — the plate box (DATA.plate, canonical world
+// coords) shifted by SQ.off, fit x0.94 x FIX_K. This is the whole scene's
+// framing for the entire squirrel scene: the video's baked arc does the
+// zooming, so the game camera does not move.
+function fixedShot(){const o=SQ.off,P=DATA.plate;const b={x0:P.x+o.x,y0:P.y+o.y,x1:P.x+P.w+o.x,y1:P.y+P.h+o.y};return {x:(b.x0+b.x1)/2,y:(b.y0+b.y1)/2,s:fitS(b,CINE.FIX_K)}}
+function cineStart(now){if(C5.cine)return;C5.restore=null;C5.fixed=null;
  C5.cine={t0:now,phase:'up',g:null};cineEl().style.display='block';plog('cine:start');
  try{if(typeof state!=='undefined'&&(state==='underground'||state==='menu')){if(typeof begin==='function')begin('ascending')}}catch(e){}}
 function setCam(x,y,s){lookX=x;lookY=y;spp=s;if(typeof cameraBounds==='function')cameraBounds();if(typeof positionTarget==='function')positionTarget();C5.camSet={x:lookX,y:lookY,s:spp}}
@@ -199,29 +208,13 @@ function setCam(x,y,s){lookX=x;lookY=y;spp=s;if(typeof cameraBounds==='function'
 function userCam(C){const k=C5.camSet;if(!C.user&&k&&(Math.abs(lookX-k.x)>.5||Math.abs(lookY-k.y)>.5||Math.abs(spp-k.s)>1e-4)){C.user=true;plog('cine: player camera')}return C.user}
 function glideStep(G,now){const u=ease(clamp((now-G.t0)/1000/G.dur));if(C5.cine&&C5.cine.user)return u>=1;setCam(G.a.x+(G.b.x-G.a.x)*u,G.a.y+(G.b.y-G.a.y)*u,G.a.s+(G.b.s-G.a.s)*u);return u>=1}
 function stepCine(now){const C=C5.cine;if(!C)return;const st=typeof state==='string'?state:'';userCam(C);
- if(C.phase==='up'){if(st!=='entered')return;const b=sceneBox();C5.far={x:(b.x0+b.x1)/2,y:(b.y0+b.y1)/2,s:fitS(b,CINE.FAR_K)};
-  C.g={t0:now,dur:CINE.ZOOM_S,a:{x:lookX,y:lookY,s:spp},b:C5.far};C.phase='zoom';plog('cine:far spp '+C5.far.s.toFixed(3))}
+ if(C.phase==='up'){if(st!=='entered')return;C5.fixed=fixedShot();
+  C.g={t0:now,dur:CINE.ZOOM_S,a:{x:lookX,y:lookY,s:spp},b:C5.fixed};C.phase='zoom';plog('cine:fixed spp '+C5.fixed.s.toFixed(3))}
  if(C.phase==='zoom'){warmFrames(); // v57: keep decoding during the glide
   if(glideStep(C.g,now)){C.phase='play';SQ.state='play';SQ.t0=now;SQ.path=null;buildPath();plog('squirrel play')}return}
- if(C.phase==='play'){if(!C.user){
-   // v57: track the squirrel at a CLOSER framing (NEAR_K) instead of
-   // holding the far shot — the camera follows him in, eased, so he stays
-   // near the centre and reads bigger. The player can still pinch/pan out
-   // (userCam stops the drive, as before).
-   if(C5.nearS==null)C5.nearS=fitS(sceneBox(),CINE.NEAR_K);
-   var sp=sqPos(now);
-   if(sp){var kk=0.12;setCam(lookX+(sp.x-lookX)*kk,lookY+(sp.y-lookY)*kk,spp+(C5.nearS-spp)*kk);}
-   else setCam(C5.far.x,C5.far.y,C5.far.s);
-  }
-  if(SQ.state==='done'){
-   // v57: settle on a WIDE box holding the mound hole + the acorn (not the
-   // acorn alone) — "a nice view of the ant mound and acorn when the
-   // squirrel leaves". The acorn position and restFrame are unchanged.
-   var mh=moundHole(),ap=acornWorld(),PD=400;
-   var wb={x0:Math.min(mh.x,ap.x)-PD,y0:Math.min(mh.y,ap.y)-PD,x1:Math.max(mh.x,ap.x)+PD,y1:Math.max(mh.y,ap.y)+PD};
-   C5.endBox=wb;
-   C.g={t0:now,dur:CINE.END_S,a:{x:lookX,y:lookY,s:spp},b:{x:(wb.x0+wb.x1)/2,y:(wb.y0+wb.y1)/2,s:fitS(wb,CINE.END_K)}};C.phase='settle'}return}
- if(C.phase==='settle'&&glideStep(C.g,now))cineEnd()}
+ if(C.phase==='play'){if(!C.user)setCam(C5.fixed.x,C5.fixed.y,C5.fixed.s); // v61: HOLD the fixed framing — the video's baked arc is the zoom; no tracking, no second zoom. The player can still pinch/pan out (userCam stops the drive, as before).
+  if(SQ.state==='done')C.phase='settle';return} // v61: no settle glide — the fixed framing already IS the final view (acorn centred, mound hole in frame). The next tick ends the cine.
+ if(C.phase==='settle')cineEnd()}
 function cineEnd(){const C=C5.cine;if(!C)return;C5.cine=null;cineEl().style.display='none';
  plog('cine:end, stays above ground ('+state+')')}   // no begin('descending'): the player presses the down arrow
 
@@ -251,9 +244,9 @@ function init(){if(C5.ready)return;if(!DATA){plog('missing CP5_DATA (load cp5-da
 function squirrelNow(){sqLoad();C5.force=true;plog('squirrelNow');return SQ.state}
 
 window.cp5={init:guard('init',init),tick:guard('tick',cp5Tick),get ready(){return C5.ready},bank:BANK,sq:SQ,SQUIRREL_AT_BRAINS,SQ_HEXES,pickAcornHex,get acornHex(){return SQ.hex&&SQ.hex.slice()},
- debug:{C5,SQ,BANK,DATA,CINE,RUN,buildPath,screenX,hexCenter,sqHexFree,pickAcornHex,sceneBox,acornWorld,squirrelNow,sqLoad,beginPlay,moundHole,sqPos,warmFrames,
+ debug:{C5,SQ,BANK,DATA,CINE,RUN,buildPath,screenX,hexCenter,sqHexFree,pickAcornHex,sceneBox,acornWorld,squirrelNow,sqLoad,beginPlay,moundHole,sqPos,warmFrames,fixedShot,
   get log(){return C5.log},get errs(){return Object.keys(C5.errs)},
-  state:()=>({sq:SQ.state,cine:!!C5.cine,phase:C5.cine&&C5.cine.phase,far:C5.far||null,nearS:C5.nearS||null,endBox:C5.endBox||null,warmed:SQ.BM.filter(Boolean).length,shared:window.CP5_ACORN_HEX||null,acorn:!!BANK.acorn,built:!!BANK.built,loaded:SQ.loaded,want:SQ.want,hex:SQ.hex,x:BANK.x,y:BANK.y,brains:brains()}),
+  state:()=>({sq:SQ.state,cine:!!C5.cine,phase:C5.cine&&C5.cine.phase,fixed:C5.fixed||null,warmed:SQ.BM.filter(Boolean).length,shared:window.CP5_ACORN_HEX||null,acorn:!!BANK.acorn,built:!!BANK.built,loaded:SQ.loaded,want:SQ.want,hex:SQ.hex,x:BANK.x,y:BANK.y,brains:brains()}),
   goUpstairs(){try{if(typeof begin==='function'&&state!=='entered')begin('entered');const h=SQ.hex||pickAcornHex(),c=hexCenter(h[0],h[1]);if(window.openingDemo&&openingDemo.setView)openingDemo.setView({spp:Math.min(MAX_SPP||4,2.4),lookX:c.cx,lookY:c.cy})}catch(e){}}}};
 init();
 })();
