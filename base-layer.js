@@ -4149,10 +4149,14 @@
   //
   // The six S.W.A.R.M.S. cards stay EXACTLY as they were (Chris: "the cards
   // are supposed to stay the same. It's supposed to spell the word swarms.
-  // It's an acronym."): Strength "Carries +5 items", Work "Builds faster",
+  // It's an acronym."): Soldier "Carries +5 items", Worker "Builds faster",
   // Attack "Wins in fewer hits", Rally (no effect line — undecided, blank),
-  // Mine "Digs faster", Scout "Finds more items", same icons, same coloured
-  // bottom strips, same two-rows-of-three layout. What changed is the NUMBER
+  // Minor "Digs faster", Scout "Finds more items", same icons, same coloured
+  // bottom strips, same two-rows-of-three layout. (v62, Chris Nov 22:
+  // "Instead of strength, it will be called soldier", "Instead of mine, it
+  // will be called minor", "Scout will remain scout", "Work will be
+  // worker" — the initials still spell S.W.A.R.M.S., so the acronym
+  // survives.) What changed is the NUMBER
   // on each card: it is the count of ants on that task RIGHT NOW, live —
   // cards are NOT spendable, there are NO skill points any more (the old
   // "You have N skill points to add" line is gone: it has no source in this
@@ -4207,20 +4211,20 @@
     return rec;
   }
   // ---- v55: job counts for the S.W.A.R.M.S. cards (one ant, one card, except
-  // Strength — see below). Live from ANTS, refreshed while the menu is open.
-  //   Mine     = ants with job 'miner' (training at the globe/microscope, or mining)
+  // Soldier — see below). Live from ANTS, refreshed while the menu is open.
+  //   Minor    = ants with job 'miner' (training at the globe/microscope, or mining)
   //   Scout    = ants with job 'scout' (training at an easel, or scouting)
   //   Attack   = ants with job 'soldier' (training in the gym, or patrolling)
-  //   Work     = grown, schooled ants with NO trade job yet AND actually
+  //   Worker   = grown, schooled ants with NO trade job yet AND actually
   //              free — not in trade training (a.train) and not sitting at
   //              a school desk (a.schoolDesk). v60 (Chris, Nov 21): the
   //              three grown ants in the ?checkpoint=5 shortcut sit at
-  //              desks waiting — students, not workers — so Work read 3
+  //              desks waiting — students, not workers — so Worker read 3
   //              and he said it should not be there. A desk-sitter or a
   //              trainee is not available workforce; a freed ant (trade
   //              item destroyed, no desk, no train, no job) still counts.
-  //   Strength = ants carrying a giant seed home (a scout on the carry counts
-  //              on Scout AND on Strength — he is doing both at once)
+  //   Soldier  = ants carrying a giant seed home (a scout on the carry counts
+  //              on Scout AND on Soldier — he is doing both at once)
   //   Rally    = 0, honestly: there is no rally system in checkpoints 1-5.
   // Kids still in the nursery / at school are not on any card — they show in
   // the roster instead.
@@ -4331,9 +4335,9 @@
 .bm3-fly.out{opacity:0;transform:translate(var(--tx),var(--ty)) scale(.15);transition:transform .6s ease-in,opacity .6s ease-in}
 .bm3-fly.gone{opacity:0;transform:scale(.6);transition:transform .5s ease-in,opacity .5s ease-in}
 .bm3-fly.q{filter:drop-shadow(0 calc(3*var(--u)) calc(6*var(--u)) rgba(0,0,0,.55))}
-.smRead{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:16px;background:rgba(40,30,20,.78);border:2px solid #f3cf82;color:#f3cf82;font:700 13px/1 'BM3 Sans','AntUI Sans','DejaVu Sans',sans-serif;white-space:nowrap}.smRead b{color:#fff3d6;font-size:17px}
+.smRead{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:16px;background:rgba(40,30,20,.78);border:2px solid #f3cf82;color:#f3cf82;font:700 13px/1 'BM3 Sans','AntUI Sans','DejaVu Sans',sans-serif;white-space:nowrap}.smRead b{color:#fff3d6;font-size:17px}.smRead .smCur{color:#58d64d}
 .bm3 .smBrain{position:absolute;right:calc(16*var(--u));bottom:calc(14*var(--u));height:calc(30*var(--u));z-index:2}
-.bm3 .bm3-meter{position:absolute;left:calc(16*var(--u));bottom:calc(70*var(--u));width:calc(128*var(--u));height:calc(22*var(--u));display:flex;align-items:center;gap:calc(5*var(--u));z-index:2;pointer-events:none}
+.bm3 .bm3-meter{position:absolute;left:calc(16*var(--u));top:max(calc((568 + var(--dy))*var(--u)),calc(100% - 92*var(--u)));width:calc(128*var(--u));height:calc(22*var(--u));display:flex;align-items:center;gap:calc(5*var(--u));z-index:2;pointer-events:none}
 .bm3 .bm3-meter[hidden]{display:none} .bm3 .bm3-pause{position:absolute;left:calc(16*var(--u));bottom:calc(98*var(--u));z-index:2;pointer-events:none;font:800 calc(12*var(--u))/1 'BM3 Sans','DejaVu Sans',sans-serif;color:#ffd0e6;text-shadow:0 1px 2px #000;white-space:nowrap} .bm3 .bm3-pause[hidden]{display:none}
 .bm3 .bm3-meter i{flex:none;width:calc(20*var(--u));height:calc(20*var(--u));background:url(assets/brain-v3/iBrain.webp) center/contain no-repeat}
 .bm3 .bm3-meter .bar{flex:1;height:calc(10*var(--u));border-radius:calc(6*var(--u));background:rgba(0,0,0,.45);border:1px solid #f3cf82;overflow:hidden}
@@ -4405,13 +4409,13 @@
     };
     const TEMPLATE = {
       cardW: 114, cardH: 100,
-      slots: [[10, 370], [138, 364], [266, 370], [10, 478], [138, 472], [266, 478]],
+      slots: [[10, 352], [138, 346], [266, 352], [10, 460], [138, 454], [266, 460]], // v62: up 18u — the brain meter below must clear the cards (Chris, Nov 22)
       stats: [
-        { key: 'str', label: 'Strength', art: 'strength', strip: '#8f5c25', desc: 'Carries +5 items' },
-        { key: 'work', label: 'Work', art: 'work', strip: '#467d39', desc: 'Builds faster' },
+        { key: 'str', label: 'Soldier', art: 'strength', strip: '#8f5c25', desc: 'Carries +5 items' },
+        { key: 'work', label: 'Worker', art: 'work', strip: '#467d39', desc: 'Builds faster' },
         { key: 'atk', label: 'Attack', art: 'attack', strip: '#b9342b', desc: 'Wins in fewer hits' },
         { key: 'rally', label: 'Rally', art: 'rally', strip: 'linear-gradient(90deg,#c99a3c,#edbe62 50%,#c99a3c)', desc: '' },
-        { key: 'mine', label: 'Mine', art: 'mine', strip: '#30609e', desc: 'Digs faster' },
+        { key: 'mine', label: 'Minor', art: 'mine', strip: '#30609e', desc: 'Digs faster' },
         { key: 'scout', label: 'Scout', art: 'scout', strip: '#60489e', desc: 'Finds more items' },
       ],
       levelText: (n) => `Level ${n}`, // v55: skillText is gone — no skill points in this design
@@ -4532,7 +4536,7 @@
   BrainMenu3.mount(document.querySelector('#game'));
   (function () {
     var r = BrainMenu3.root, d = document.createElement('div');
-    d.className = 'smRead smBrain'; d.setAttribute('aria-label', 'seed money'); d.innerHTML = 'seed money <b class="smAmt">0</b>'; r.appendChild(d);
+    d.className = 'smRead smBrain'; d.setAttribute('aria-label', 'seed money'); d.innerHTML = 'seed money <b class="smCur">$</b><b class="smAmt">0</b>'; r.appendChild(d); // v62: green $ in front of the amount (Chris, Nov 22)
     ['pointerdown', 'pointerup', 'click', 'touchstart', 'touchend', 'wheel'].forEach(function (k) { r.addEventListener(k, function (e) { e.stopPropagation(); }); });
   })();
   // Ideas meter (NP5 lines 1455-1466): the brain meter, bottom-left, queen
