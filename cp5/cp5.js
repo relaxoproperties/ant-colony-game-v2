@@ -45,7 +45,7 @@ const SQ_HEXES=[[2,-2],[3,-3],[2,-3],[3,-2],[1,-2],[4,-3],[3,-4],[4,-4]];
 // phone is the video's own framing (side view, entry from the right,
 // stand at the mound, acorn on the bank spot, exit left).
 // FIX_K 1.1 fits the widest stand frame inside the view (the median stand
-// squirrel reads ~76% of screen width — the video is a close side shot,
+// squirrel reads ~69% of screen width — the video is a close side shot,
 // fitting wins over matching the fraction, so no tail is ever clipped).
 const CINE={FIX_K:1.1,ZOOM_S:1.2};
 const C5={ready:false,errs:{},log:[],cine:null,restore:null,done:false};
