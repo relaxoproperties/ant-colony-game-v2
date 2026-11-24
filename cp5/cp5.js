@@ -22,29 +22,31 @@
 //    on the drop point — acorn -> bank is 1:1 in checkpoint 6.
 //  * No sound, no <video>, no skip button (v1 had none — do not add one).
 //  * Everything else is v1 verbatim: trigger at 9 brains, preload at 8,
-//    the 1:1 take8 path (v63: 240 frames @ 24 fps, 10 s, one entry per
-//    video frame, acorn set down video 145-170 and settled by 205, exit
+//    the 1:1 take1 path (v64: 240 frames @ 24 fps, 10 s, one entry per
+//    video frame, acorn set down video 145-165 and settled by 215, exit
 //    left — the v61 loop/sprint/pause/spring rebuild is deleted), the
-//    1.2 s glide to the FIXED plate-box framing (v61: the video's baked
-//    arc is the zoom, so the game camera holds one framing for the whole
-//    scene — the old FAR/NEAR/END arc is deleted), and STAYING above
-//    ground afterwards (player presses down).
+//    1.2 s glide to the FIXED plate-box framing (v61: the video's framing
+//    is the framing — the take1 video has a FIXED camera, no baked arc,
+//    so the game camera holds one framing for the whole scene — the old
+//    FAR/NEAR/END arc is deleted), and STAYING above ground afterwards
+//    (player presses down).
 // Classic script, one global: window.cp5. No ES modules, no CDN.
 (function(){'use strict';
 // ==== THE squirrel trigger (Chris 12:13 PM ET: the 9th brain). Change this ONE number to move it. ====
 const SQUIRREL_AT_BRAINS=9;
 // NP5 dfc7b054 index.html line 1325-1326 (item 23), ported verbatim: 2+ hexes from the mound, diagonally up-right first, first FREE one wins.
 const SQ_HEXES=[[2,-2],[3,-3],[2,-3],[3,-2],[1,-2],[4,-3],[3,-4],[4,-4]];
-// v61: FIXED camera on the plate box — the take8 video has its own camera
-// arc BAKED IN (post zoom 65% start -> 85% stand -> 60% exit), so the game
-// must NOT add its own arc or the zooms compound (double zoom). The old
-// v57 FAR_K/NEAR_K/END_K arc is DELETED: the camera glides once to the
-// plate-box framing (DATA.plate, fit x0.94 x FIX_K) and HOLDS it for the
-// whole scene, so what Chris sees on his phone is the approved video's own
-// framing (entry small and whole, stand close, acorn centred, exit wide).
+// v61: FIXED camera on the plate box — the take1 video has a FIXED
+// camera (no push-in, no zoom, no pan — the squirrel stays the same size
+// the whole time), so the game must NOT add its own arc or the zooms
+// compound (double zoom). The old v57 FAR_K/NEAR_K/END_K arc is DELETED:
+// the camera glides once to the plate-box framing (DATA.plate, fit x0.94
+// x FIX_K) and HOLDS it for the whole scene, so what Chris sees on his
+// phone is the video's own framing (side view, entry from the right,
+// stand at the mound, acorn on the bank spot, exit left).
 // FIX_K 1.1 fits the widest stand frame inside the view (the median stand
-// squirrel reads ~44% of screen width, the video's ~49% — fitting wins
-// over matching the fraction, so no tail is ever clipped).
+// squirrel reads ~76% of screen width — the video is a close side shot,
+// fitting wins over matching the fraction, so no tail is ever clipped).
 const CINE={FIX_K:1.1,ZOOM_S:1.2};
 const C5={ready:false,errs:{},log:[],cine:null,restore:null,done:false};
 const URLQ=new URLSearchParams(location.search);
@@ -68,11 +70,11 @@ const S2S=720/390;   // v3 camera s is on a 390x844 screen; bv1 spp is on the 72
 function imOk(im){return !!(im&&(im.ok||((im.naturalWidth||im.width)>0))&&!im.bad)}
 function loadIm(src){const im=new Image();im.decoding='async';im.onload=()=>{im.ok=1;SQ.loaded++};im.onerror=()=>{im.bad=1;SQ.failed=(SQ.failed||0)+1;console.warn('[cp5] image failed: '+src)};im.src=src;SQ.want++;return im}
 function sqLoad(){if(SQ.preload||!DATA)return;SQ.preload=true;
- // v63: ?v=63 on the frame + REST urls (phone cache-bust — the 240
- // 1:1 take8 frames replace the v61 150-frame set; 0..149 at the same
- // filenames, 150..239 new; the PLAIN is unchanged).
- for(let i=0;i<DATA.n;i++)SQ.IM[i]=loadIm(BASE+'sq_'+pad3(i)+'.webp?v=63');
- SQ.REST=loadIm(BASE+'acorn_runtime.png?v=63');SQ.PLAIN=loadIm(PLAIN_SRC)}// v57: pre-DECODE the frames before the scene starts. The "skipping a beat"
+ // v64: ?v=64 on the frame + REST urls (phone cache-bust — the 240
+ // 1:1 take1 frames replace the v63 take8 frame set; same filenames,
+ // all new art; the PLAIN is unchanged).
+ for(let i=0;i<DATA.n;i++)SQ.IM[i]=loadIm(BASE+'sq_'+pad3(i)+'.webp?v=64');
+ SQ.REST=loadIm(BASE+'acorn_runtime.png?v=64');SQ.PLAIN=loadIm(PLAIN_SRC)}// v57: pre-DECODE the frames before the scene starts. The "skipping a beat"
 // on Chris's phone is a decode hitch, not missing art: the squirrel IS one
 // continuous 10 s take (240 frames @ 24 fps), but each frame's FIRST
 // drawImage decodes its alpha WebP lazily — on phone-class hardware that
@@ -105,20 +107,21 @@ function sqHexFree(q,r){if(Math.abs(q)+Math.abs(r)+Math.abs(q+r)<4)return false;
 function pickAcornHex(){return (SQ_HEXES.find(([q,r])=>sqHexFree(q,r))||SQ_HEXES[0]).slice()}
 function setHex(h){SQ.hex=h.slice();window.CP5_ACORN_HEX=h.slice();const c=hexCenter(h[0],h[1]),A=DATA.acorn;SQ.off={x:c.cx-A.c[0],y:c.cy-A.c[1]};
  const p=acornWorld();BANK.hex=h.slice();BANK.x=p.x;BANK.y=p.y;return p}
-// ---- v63 (Chris Nov 24, "Sounds good. I will test it tonight"): the
-// squirrel scene plays the APPROVED take8 video STRAIGHT THROUGH, frame
+// ---- v64 (Chris Nov 24, "You're gonna need to create a new video"):
+// the squirrel scene plays the NEW take1 video STRAIGHT THROUGH, frame
 // for frame — 240 frames @ 24 fps, 10 s, one entry per video frame at
 // 1/24 s, dx=dy=0. The v61 rebuild is DELETED: no run-cycle loop, no
 // sprinted run-in, no held pause mid-screen, no launch spring, no
 // run-frames exit. Each frame is placed at its VIDEO position in the
-// plate (cp5-data.js, build_v63.py), so the video's own camera motion
-// (pan + baked zoom arc) IS the motion: the run-in grows smoothly with
-// real bob, the stand grows around its centre, the set-down plays at
-// full length (video 145-170), the exit is the video's own big bound
-// out (the squirrel fades away 193-204, gone by 205). restFrame 205:
-// the first fully acorn-only frame, where the video acorn has stopped
-// drifting and the PLAIN bank acorn takes over with no jump.
-// The acorn rest sprite (acorn_runtime.png) is drawn from frame 205 on,
+// plate (cp5-data.js, build_v64.py), so the video's own framing — a
+// FIXED camera, side view, constant size — IS the motion: the run-in
+// bounds in from the right and stops at the mound, the stand rears up
+// and looks at the acorn, the set-down plays at full length (video
+// 145-165), the exit is the video's own big bound out to the left
+// (gone by 215). restFrame 215: the first fully acorn-only frame, where
+// the pasted bank acorn takes over with no jump — the frame's acorn and
+// the PLAIN are the same canvas at the same centre and scale.
+// The acorn rest sprite (acorn_runtime.png) is drawn from frame 215 on,
 // centred on the hex: its final position = the bank position.
 function buildPath(){const T=[],fr=1/DATA.fps;
  for(let i=0;i<DATA.n;i++)T.push({k:i,dx:0,dy:0,d:fr});
@@ -197,7 +200,7 @@ function stepCine(now){const C=C5.cine;if(!C)return;const st=typeof state==='str
   C.g={t0:now,dur:CINE.ZOOM_S,a:{x:lookX,y:lookY,s:spp},b:C5.fixed};C.phase='zoom';plog('cine:fixed spp '+C5.fixed.s.toFixed(3))}
  if(C.phase==='zoom'){warmFrames(); // v57: keep decoding during the glide
   if(glideStep(C.g,now)){C.phase='play';SQ.state='play';SQ.t0=now;SQ.path=null;buildPath();plog('squirrel play')}return}
- if(C.phase==='play'){if(!C.user)setCam(C5.fixed.x,C5.fixed.y,C5.fixed.s); // v61: HOLD the fixed framing — the video's baked arc is the zoom; no tracking, no second zoom. The player can still pinch/pan out (userCam stops the drive, as before).
+ if(C.phase==='play'){if(!C.user)setCam(C5.fixed.x,C5.fixed.y,C5.fixed.s); // v61: HOLD the fixed framing — the video's framing is the framing; no tracking, no second zoom. The player can still pinch/pan out (userCam stops the drive, as before).
   if(SQ.state==='done')C.phase='settle';return} // v61: no settle glide — the fixed framing already IS the final view (acorn centred, mound hole in frame). The next tick ends the cine.
  if(C.phase==='settle')cineEnd()}
 function cineEnd(){const C=C5.cine;if(!C)return;C5.cine=null;cineEl().style.display='none';
@@ -222,7 +225,7 @@ function init(){if(C5.ready)return;if(!DATA){plog('missing CP5_DATA (load cp5-da
  // Wrap BASE_QUEEN.drawUp so the squirrel/acorn draw in the surface pass
  // (index.html drawSurface, state 'entered', world transform already applied).
  try{if(window.BASE_QUEEN&&typeof BASE_QUEEN.drawUp==='function'&&!BASE_QUEEN.__cp5Wrapped){const u0=BASE_QUEEN.drawUp;BASE_QUEEN.drawUp=guard('drawUp',function(now){drawUpCP5(now,u0)},u0);BASE_QUEEN.__cp5Wrapped=true}}catch(e){plog('drawUp wrap failed '+(e&&e.message))}
- sqLoad();C5.ready=true;plog('cp5 ready (v63 1:1 take8 art, '+SQ.want+' images)');
+ sqLoad();C5.ready=true;plog('cp5 ready (v64 1:1 take1 art, '+SQ.want+' images)');
  if(typeof requestAnimationFrame==='function')requestAnimationFrame(loop)}
 
 // ---- test helpers (QC / harness). squirrelNow = NP5 openingDemo.squirrelNow ----
