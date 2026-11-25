@@ -1,3 +1,14 @@
+// v65 — SAME take1 video, SAME geometry, HALF-SIZE images. Chris
+// tapped the v64 link on his iPhone (Nov 24, 19:11) and Safari showed
+// "A problem repeatedly occurred" — the tab was killed for memory:
+// v64's 240 frames totalled 28.2 MB (max frame 1268x631 = 800k px),
+// ~600 MB decoded, which jetsams iOS Safari; v63's 14.1 MB set loaded
+// fine. The frame IMAGES are now 0.5x (634x316 max, ~7 MB total,
+// ~150 MB decoded) while every rect, the plate, the plate origin and
+// the acorn calibration below are BYTE-IDENTICAL to v64 — cp5.js draws
+// each frame stretched to its rect, so the on-screen size, position,
+// feet, stop point and acorn landing do not move at all. Frame URLs
+// carry ?v=65 so the phone cannot serve cached full-size v64 frames.
 // Checkpoint 5 squirrel v64 — a NEW video made for the game (take1,
 // generated Nov 24), played STRAIGHT THROUGH, frame for frame. Chris,
 // testing v63 (Nov 24): "The squirrel does not look right. It looks
