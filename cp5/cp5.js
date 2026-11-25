@@ -22,9 +22,9 @@
 //    on the drop point — acorn -> bank is 1:1 in checkpoint 6.
 //  * No sound, no <video>, no skip button (v1 had none — do not add one).
 //  * Everything else is v1 verbatim: trigger at 9 brains, preload at 8,
-//    the 1:1 v3 path (v66: 143 frames @ 24 fps, 5.96 s, one entry per
-//    video frame, acorn pasted from video 56 and settled by 145, exit
-//    left — the v61 loop/sprint/pause/spring rebuild is deleted), the
+//    the 1:1 v67 path (325 frames @ 24 fps, 13.54 s, one entry per
+//    composite frame, acorn pasted from take2 f168 and settled by f206,
+//    exit left — the v61 loop/sprint/pause/spring rebuild is deleted), the
 //    1.2 s glide to the FIXED plate-box framing (v61: the video's framing
 //    is the framing — the take1 video has a FIXED camera, no baked arc,
 //    so the game camera holds one framing for the whole scene — the old
@@ -70,13 +70,13 @@ const S2S=720/390;   // v3 camera s is on a 390x844 screen; bv1 spp is on the 72
 function imOk(im){return !!(im&&(im.ok||((im.naturalWidth||im.width)>0))&&!im.bad)}
 function loadIm(src){const im=new Image();im.decoding='async';im.onload=()=>{im.ok=1;SQ.loaded++};im.onerror=()=>{im.bad=1;SQ.failed=(SQ.failed||0)+1;console.warn('[cp5] image failed: '+src)};im.src=src;SQ.want++;return im}
 function sqLoad(){if(SQ.preload||!DATA)return;SQ.preload=true;
- // v66: ?v=66 on the frame + REST urls (phone cache-bust — the 143
- // 1:1 v3 frames are 0.5x images, same filenames as v65's take1 set;
- // the v65 frames must never be served from cache).
- for(let i=0;i<DATA.n;i++)SQ.IM[i]=loadIm(BASE+'sq_'+pad3(i)+'.webp?v=66');
- SQ.REST=loadIm(BASE+'acorn_runtime.png?v=66');SQ.PLAIN=loadIm(PLAIN_SRC)}// v57: pre-DECODE the frames before the scene starts. The "skipping a beat"
+ // v67: ?v=67 on the frame + REST urls (phone cache-bust — the 325
+ // 1:1 composite frames are 0.5x images, same filenames as v66's v3 set;
+ // the v66 frames must never be served from cache).
+ for(let i=0;i<DATA.n;i++)SQ.IM[i]=loadIm(BASE+'sq_'+pad3(i)+'.webp?v=67');
+ SQ.REST=loadIm(BASE+'acorn_runtime.png?v=67');SQ.PLAIN=loadIm(PLAIN_SRC)}// v57: pre-DECODE the frames before the scene starts. The "skipping a beat"
 // on Chris's phone is a decode hitch, not missing art: the squirrel IS one
-// continuous take (v66: 143 frames @ 24 fps, 5.96 s), but each frame's FIRST
+// continuous take (v67: 325 frames @ 24 fps, 13.54 s), but each frame's FIRST
 // drawImage decodes its alpha WebP lazily — on phone-class hardware that
 // decode lands mid-scene and the wall-clock path index has already moved
 // on, so a beat visibly jumps. Warming decodes every frame once (into an
@@ -107,18 +107,23 @@ function sqHexFree(q,r){if(Math.abs(q)+Math.abs(r)+Math.abs(q+r)<4)return false;
 function pickAcornHex(){return (SQ_HEXES.find(([q,r])=>sqHexFree(q,r))||SQ_HEXES[0]).slice()}
 function setHex(h){SQ.hex=h.slice();window.CP5_ACORN_HEX=h.slice();const c=hexCenter(h[0],h[1]),A=DATA.acorn;SQ.off={x:c.cx-A.c[0],y:c.cy-A.c[1]};
  const p=acornWorld();BANK.hex=h.slice();BANK.x=p.x;BANK.y=p.y;return p}
-// ---- v66 (Chris Nov 25, "Look at my email, October 19"): the
-// squirrel scene plays the OCT 19 v3 video STRAIGHT THROUGH, frame for
-// frame — 143 frames @ 24 fps, 5.96 s, one entry per video frame at
-// 1/24 s, dx=dy=0. The v61 rebuild is DELETED: no run-cycle loop, no
-// sprinted run-in, no held pause mid-screen, no launch spring, no
-// run-frames exit. Each frame is placed at its VIDEO position in the
-// plate (cp5-data.js, build_v66.py), so the video's own framing — a
-// FIXED camera, side view, constant size — IS the motion: the run-in
-// bounds in from the right and stops at the mound, the stand rears up
-// and looks at the acorn, the acorn is pasted on the ground from video
-// 56, the exit is the video's own big bound out to the left
-// (gone by 145). restFrame 138 (video 145): the first fully acorn-only frame, where
+// ---- v67 (Chris Nov 25, testing v66: "Aren't you able to recreate a
+// squirrel video?"): a BRAND-NEW squirrel video made from scratch — two
+// NEW generations composited. The run-only take gives a genuine LONG run
+// (5.71 s, nose 1134 -> 546); take2 stands upright holding the acorn
+// and looks around, bends down and sets it on the mound (take2 f168),
+// then bounds off left (gone by take2 f206). The composite plays
+// STRAIGHT THROUGH, frame for frame — 325 frames @ 24 fps, 13.54 s,
+// one entry per composite frame at 1/24 s, dx=dy=0. The v61 rebuild is
+// DELETED: no run-cycle loop, no sprinted run-in, no held pause
+// mid-screen, no launch spring, no run-frames exit. Each frame is
+// placed at its COMPOSITE position in the plate (cp5-data.js,
+// build_v67.py), so the videos' own framing — FIXED cameras, side
+// view, constant size — IS the motion: the run-in bounds in from the
+// right and stops at the mound, the stand rears up and looks at the
+// acorn, the acorn is pasted on the ground from take2 f168, the exit
+// is take2's own big bound out to the left (gone by f206).
+// restFrame 311 (take2 f206): the first fully acorn-only frame, where
 // the pasted bank acorn takes over with no jump — the frame's acorn and
 // the PLAIN are the same canvas at the same centre and scale.
 // The acorn rest sprite (acorn_runtime.png) is drawn from frame 138 on,
