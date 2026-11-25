@@ -70,11 +70,11 @@ const S2S=720/390;   // v3 camera s is on a 390x844 screen; bv1 spp is on the 72
 function imOk(im){return !!(im&&(im.ok||((im.naturalWidth||im.width)>0))&&!im.bad)}
 function loadIm(src){const im=new Image();im.decoding='async';im.onload=()=>{im.ok=1;SQ.loaded++};im.onerror=()=>{im.bad=1;SQ.failed=(SQ.failed||0)+1;console.warn('[cp5] image failed: '+src)};im.src=src;SQ.want++;return im}
 function sqLoad(){if(SQ.preload||!DATA)return;SQ.preload=true;
- // v64: ?v=64 on the frame + REST urls (phone cache-bust — the 240
- // 1:1 take1 frames replace the v63 take8 frame set; same filenames,
- // all new art; the PLAIN is unchanged).
- for(let i=0;i<DATA.n;i++)SQ.IM[i]=loadIm(BASE+'sq_'+pad3(i)+'.webp?v=64');
- SQ.REST=loadIm(BASE+'acorn_runtime.png?v=64');SQ.PLAIN=loadIm(PLAIN_SRC)}// v57: pre-DECODE the frames before the scene starts. The "skipping a beat"
+ // v65: ?v=65 on the frame + REST urls (phone cache-bust — the 240
+ // 1:1 take1 frames are now 0.5x images, same filenames, same art, same
+ // rects; the full-size v64 frames must never be served from cache).
+ for(let i=0;i<DATA.n;i++)SQ.IM[i]=loadIm(BASE+'sq_'+pad3(i)+'.webp?v=65');
+ SQ.REST=loadIm(BASE+'acorn_runtime.png?v=65');SQ.PLAIN=loadIm(PLAIN_SRC)}// v57: pre-DECODE the frames before the scene starts. The "skipping a beat"
 // on Chris's phone is a decode hitch, not missing art: the squirrel IS one
 // continuous 10 s take (240 frames @ 24 fps), but each frame's FIRST
 // drawImage decodes its alpha WebP lazily — on phone-class hardware that
@@ -225,7 +225,7 @@ function init(){if(C5.ready)return;if(!DATA){plog('missing CP5_DATA (load cp5-da
  // Wrap BASE_QUEEN.drawUp so the squirrel/acorn draw in the surface pass
  // (index.html drawSurface, state 'entered', world transform already applied).
  try{if(window.BASE_QUEEN&&typeof BASE_QUEEN.drawUp==='function'&&!BASE_QUEEN.__cp5Wrapped){const u0=BASE_QUEEN.drawUp;BASE_QUEEN.drawUp=guard('drawUp',function(now){drawUpCP5(now,u0)},u0);BASE_QUEEN.__cp5Wrapped=true}}catch(e){plog('drawUp wrap failed '+(e&&e.message))}
- sqLoad();C5.ready=true;plog('cp5 ready (v64 1:1 take1 art, '+SQ.want+' images)');
+ sqLoad();C5.ready=true;plog('cp5 ready (v65 1:1 take1 art, 0.5x frames — Safari memory fix, '+SQ.want+' images)');
  if(typeof requestAnimationFrame==='function')requestAnimationFrame(loop)}
 
 // ---- test helpers (QC / harness). squirrelNow = NP5 openingDemo.squirrelNow ----
