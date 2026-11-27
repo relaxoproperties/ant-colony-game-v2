@@ -71,11 +71,11 @@ const S2S=720/390;   // v3 camera s is on a 390x844 screen; bv1 spp is on the 72
 function imOk(im){return !!(im&&(im.ok||((im.naturalWidth||im.width)>0))&&!im.bad)}
 function loadIm(src){const im=new Image();im.decoding='async';im.onload=()=>{im.ok=1;SQ.loaded++};im.onerror=()=>{im.bad=1;SQ.failed=(SQ.failed||0)+1;console.warn('[cp5] image failed: '+src)};im.src=src;SQ.want++;return im}
 function sqLoad(){if(SQ.preload||!DATA)return;SQ.preload=true;
- // v70: ?v=70 on the frame + REST urls (phone cache-bust — the 185
+ // v71: ?v=71 on the frame + REST urls (phone cache-bust — the 195
  // 1:1 composite frames are 0.5x images, same filenames as v69's set;
  // the v69 frames must never be served from cache).
- for(let i=0;i<DATA.n;i++)SQ.IM[i]=loadIm(BASE+'sq_'+pad3(i)+'.webp?v=70');
- SQ.REST=loadIm(BASE+'acorn_runtime.png?v=70');SQ.PLAIN=loadIm(PLAIN_SRC)}// v57: pre-DECODE the frames before the scene starts. The "skipping a beat"
+ for(let i=0;i<DATA.n;i++)SQ.IM[i]=loadIm(BASE+'sq_'+pad3(i)+'.webp?v=71');
+ SQ.REST=loadIm(BASE+'acorn_runtime.png?v=71');SQ.PLAIN=loadIm(PLAIN_SRC)}// v57: pre-DECODE the frames before the scene starts. The "skipping a beat"
 // on Chris's phone is a decode hitch, not missing art: the squirrel IS one
 // continuous take (v70: 185 frames @ 24 fps, 7.71 s), but each frame's FIRST
 // drawImage decodes its alpha WebP lazily — on phone-class hardware that
@@ -138,36 +138,31 @@ function setHex(h){SQ.hex=h.slice();window.CP5_ACORN_HEX=h.slice();const c=hexCe
 // the motion: the run-in bounds in fast from the right carrying the
 // acorn, stops at the mound and rears up, sets the acorn down, and
 // the exit is take1's clean bound out to the left (gone by f209).
-// ---- v70 (Chris Nov 26, 05:20, after watching v69: "You're almost
-// there. It starts off slow motion, so you have to fix that. Then it
-// glitches to his standing position. You have to blend that. And then
-// when he runs off, he doesn't run far enough. It's like getting cut
-// halfway, like if there was an invisible wall."): fix all three.
-// (1) SLOW START -> TRIMMED run. v69's nose speed was already ~204 px/s
-// — the "slow motion" was the REVEAL (squirrel only 136 px wide at idx
-// 0). Trim the run to runA f15 (squirrel 294 plate px, nose 987, tail
-// still off the right edge = still an entrance). Run f15..f53, 1.62 s,
-// first-second 188 px/s = cruising speed (172 px/s). No time-remap.
-// (2) JOIN GLITCH -> CROSS-DISSOLVE BLEND. runA f44..f53 cross-dissolved
-// into take2 f68..f77 over 10 frames, noses on an eased (decelerating)
-// path 762->693, so the tail curls up gradually and the squirrel
-// decelerates and rears up smoothly instead of snapping. The blend is
-// a TRUE linear cross-dissolve with un-premultiplied RGB (the weighted
-// sum is premultiplied — without the un-premultiply the fur renders
-// too dark mid-blend). Stand continues from take2 f78. (3) EXIT WALL
-// -> EXTRA TRANSLATION. take1's leap gets a ramping extra leftward
-// translation (0 -> 680 px over the 18 exit frames), so the squirrel's
-// nose reaches the plate's left edge and its tail is fully out before
-// the acorn-only rest frames. The graft alignment is unchanged (extra
-// = 0 at the graft). The composite plays STRAIGHT THROUGH — 185 frames
-// @ 24 fps, 7.71 s, one entry per composite frame at 1/24 s, dx=dy=0.
-// (The fresh exit-only take generated for v70 was REJECTED: its
-// squirrel is too big, its tail stretches across the whole frame, and
-// the tail lingers ~5 s. take1's leap is the right material.)
-// restFrame 196 (take1 f209 done): the first fully acorn-only frame,
+// ---- v71 (Chris Nov 26, 16:01, after watching v70: "it looked the
+// same as last time"): the v69-vs-v70 diff was 85% byte-identical — the
+// middle ~6 s are the SAME footage. Make the video VISIBLY different in
+// its main body: a NEW run take (takeB, one of three new generations),
+// a different squirrel bounding a LONGER stretch at high speed, acorn
+// in its mouth from frame 0, wider framing (squirrel smaller, more
+// ground visible — Chris: "wouldn't even mind if it zoomed out even
+// more"). Run f0..f48, 2.04 s, nose 1178 -> 698 at ~235 px/s; first 12
+// frames 371 px/s vs the last 12 of the pure run 164 px/s — it BURSTS
+// in, no slow start. take2's stand/set-down and take1's exit leap are
+// KEPT (byte-identical). The plate is TALLER (1440x490, crop y 150..640):
+// the first v71 build (y200 crop) SLICED takeB's tail plume (tip to
+// native y 4 at f48), so the plate now keeps the whole tail in frame
+// (min top 42 px inside). Feet stay on the ground row (composite y 600);
+// the paste/ORIGIN/acorn geometry are unchanged (acorn centre
+// byte-identical to v68, ~25.8 deg vs bank 25.9 deg). The 10-frame
+// cross-dissolve join (takeB f39..f48 x take2 f68..f77, noses on an eased
+// path 763->698) and take1's exit leap with the ramping extra translation
+// (0 -> 680 px, tail fully out by idx 177) are KEPT from v70. The
+// composite plays STRAIGHT THROUGH — 195 frames @ 24 fps, 8.12 s, one
+// entry per composite frame at 1/24 s, dx=dy=0.
+// restFrame 181 (take1 f209 done): the first fully acorn-only frame,
 // where the pasted bank acorn takes over with no jump — the frame's
 // acorn and the PLAIN are the same canvas at the same centre and scale.
-// The acorn rest sprite (acorn_runtime.png) is drawn from restFrame (196) on,
+// The acorn rest sprite (acorn_runtime.png) is drawn from restFrame (181) on,
 // centred on the hex: its final position = the bank position.
 function buildPath(){const T=[],fr=1/DATA.fps;
  for(let i=0;i<DATA.n;i++)T.push({k:i,dx:0,dy:0,d:fr});
