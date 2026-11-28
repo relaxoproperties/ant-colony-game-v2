@@ -29,8 +29,13 @@
 //    1.2 s glide to the FIXED plate-box framing (v61: the video's framing
 //    is the framing — the take1 video has a FIXED camera, no baked arc,
 //    so the game camera holds one framing for the whole scene — the old
-//    FAR/NEAR/END arc is deleted), and STAYING above ground afterwards
-//    (player presses down).
+//    FAR/NEAR/END arc is deleted), and AFTER the scene the camera goes
+//    back to where it was before it started (v73, Chris Nov 28: "It looks
+//    perfect. So when the squirrel leaves the scene, I want the camera to
+//    go back to where it was before it started." — the scene itself is
+//    approved, so frames/plate/acorn/timing are untouched; only the return
+//    is new: descend + a smooth glide back to the recorded pre-scene
+//    framing, input blocked until it finishes).
 // Classic script, one global: window.cp5. No ES modules, no CDN.
 (function(){'use strict';
 // ==== THE squirrel trigger (Chris 12:13 PM ET: the 9th brain). Change this ONE number to move it. ====
@@ -48,7 +53,7 @@ const SQ_HEXES=[[2,-2],[3,-3],[2,-3],[3,-2],[1,-2],[4,-3],[3,-4],[4,-4]];
 // FIX_K 1.1 fits the widest stand frame inside the view (the median stand
 // squirrel reads ~69% of screen width — the video is a close side shot,
 // fitting wins over matching the fraction, so no tail is ever clipped).
-const CINE={FIX_K:1.1,ZOOM_S:1.2};
+const CINE={FIX_K:1.1,ZOOM_S:1.2,RETURN_S:1.75};
 const C5={ready:false,errs:{},log:[],cine:null,restore:null,done:false};
 const URLQ=new URLSearchParams(location.search);
 const _src=(document.currentScript&&document.currentScript.src)||'';
@@ -71,11 +76,12 @@ const S2S=720/390;   // v3 camera s is on a 390x844 screen; bv1 spp is on the 72
 function imOk(im){return !!(im&&(im.ok||((im.naturalWidth||im.width)>0))&&!im.bad)}
 function loadIm(src){const im=new Image();im.decoding='async';im.onload=()=>{im.ok=1;SQ.loaded++};im.onerror=()=>{im.bad=1;SQ.failed=(SQ.failed||0)+1;console.warn('[cp5] image failed: '+src)};im.src=src;SQ.want++;return im}
 function sqLoad(){if(SQ.preload||!DATA)return;SQ.preload=true;
- // v72: ?v=72 on the frame + REST urls (phone cache-bust — the 240
- // 1:1 one-take frames are 0.5x images, same filenames as v71's set;
- // the v71 frames must never be served from cache).
- for(let i=0;i<DATA.n;i++)SQ.IM[i]=loadIm(BASE+'sq_'+pad3(i)+'.webp?v=72');
- SQ.REST=loadIm(BASE+'acorn_runtime.png?v=72');SQ.PLAIN=loadIm(PLAIN_SRC)}// v57: pre-DECODE the frames before the scene starts. The "skipping a beat"
+ // v72: ?v=73 on the frame + REST urls (phone cache-bust — the 240
+ // 1:1 one-take frames are 0.5x images, same filenames as v72's set;
+ // the v72 frames must never be served from cache; the frame FILES are
+ // byte-identical to v72 — only the runtime changed).
+ for(let i=0;i<DATA.n;i++)SQ.IM[i]=loadIm(BASE+'sq_'+pad3(i)+'.webp?v=73');
+ SQ.REST=loadIm(BASE+'acorn_runtime.png?v=73');SQ.PLAIN=loadIm(PLAIN_SRC)}// v57: pre-DECODE the frames before the scene starts. The "skipping a beat"
 // on Chris's phone is a decode hitch, not missing art: the squirrel IS one
 // continuous take (v70: 185 frames @ 24 fps, 7.71 s), but each frame's FIRST
 // drawImage decodes its alpha WebP lazily — on phone-class hardware that
@@ -193,6 +199,18 @@ function setHex(h){SQ.hex=h.slice();window.CP5_ACORN_HEX=h.slice();const c=hexCe
 // acorn and the PLAIN are the same canvas at the same centre and scale.
 // The acorn rest sprite (acorn_runtime.png) is drawn from restFrame (204) on,
 // centred on the hex: its final position = the bank position.
+// ---- v73 (Chris Nov 28, 07:09, after testing v72: "It looks perfect.
+// So when the squirrel leaves the scene, I want the camera to go back to
+// where it was before it started."): the scene above is APPROVED —
+// frames, plate, acorn and timing are UNTOUCHED (cp5-data.js is
+// byte-identical to v72, same 240 frames). The only change is the
+// return: cineStart records the pre-scene camera + stage; after the
+// scene fully plays (all 240 frames, rest included), the camera descends
+// (the normal floor change) and glides smoothly back to the recorded
+// framing over RETURN_S (1.75 s, same smoothstep ease as the zoom in) —
+// NO snap cut. Input stays blocked until the return finishes. If the
+// build menu was open when the scene triggered, it is reopened after the
+// return. The acorn stays drawn on the surface; the squirrel does not replay.
 function buildPath(){const T=[],fr=1/DATA.fps;
  for(let i=0;i<DATA.n;i++)T.push({k:i,dx:0,dy:0,d:fr});
  let c=0;SQ.cum=T.map(e=>(c+=e.d));SQ.path=T;SQ.restAt=DATA.restFrame;
@@ -258,23 +276,65 @@ function sqPos(now){if(!SQ.path)return null;var i=pathIdx(now);if(i<0)i=0;if(i>=
 // framing for the entire squirrel scene: the video's baked arc does the
 // zooming, so the game camera does not move.
 function fixedShot(){const o=SQ.off,P=DATA.plate;const b={x0:P.x+o.x,y0:P.y+o.y,x1:P.x+P.w+o.x,y1:P.y+P.h+o.y};return {x:(b.x0+b.x1)/2,y:(b.y0+b.y1)/2,s:fitS(b,CINE.FIX_K)}}
-function cineStart(now){if(C5.cine)return;C5.restore=null;C5.fixed=null;
- C5.cine={t0:now,phase:'up',g:null};cineEl().style.display='block';plog('cine:start');
- try{if(typeof state!=='undefined'&&(state==='underground'||state==='menu')){if(typeof begin==='function')begin('ascending')}}catch(e){}}
+// ---- v73 (Chris Nov 28, 07:09, after testing v72: "It looks perfect.
+// So when the squirrel leaves the scene, I want the camera to go back to
+// where it was before it started."): the scene itself is APPROVED —
+// frames, plate, acorn and timing are UNTOUCHED. The only change is what
+// happens AFTER the scene: the camera goes back to the exact position/zoom
+// it had before the cinematic started. The full rest frames (f205-f240,
+// 1.5 s of the acorn resting on the surface) still play first; then the
+// camera descends (the normal 1.4 s floor change, same as pressing down)
+// and glides smoothly back to the recorded pre-scene framing over
+// RETURN_S — NO snap cut. Input stays blocked until the camera has
+// finished returning. The acorn stays drawn on the surface afterwards
+// (it is the future bank position for cp6); the squirrel does not replay.
+function cineStart(now){if(C5.cine)return;
+ // v73: record the camera + stage BEFORE anything moves, so the return
+ // can put the camera back exactly where it was (the underground view,
+ // queen on her leaf bed).
+ const st=typeof state==='string'?state:'';
+ C5.restore={x:lookX,y:lookY,s:spp,state:st};
+ C5.fixed=null;
+ C5.cine={t0:now,phase:'up',g:null,downT0:0};cineEl().style.display='block';plog('cine:start restore '+st+' '+lookX.toFixed(1)+','+lookY.toFixed(1)+' @'+spp.toFixed(3));
+ try{if(st==='underground'||st==='menu'){if(typeof begin==='function')begin('ascending')}}catch(e){}}
 function setCam(x,y,s){lookX=x;lookY=y;spp=s;if(typeof cameraBounds==='function')cameraBounds();if(typeof positionTarget==='function')positionTarget();C5.camSet={x:lookX,y:lookY,s:spp}}
 // r49: once the player pinches/pans (camera no longer where the scene put it), the scene stops driving the camera for the rest of the scene
 function userCam(C){const k=C5.camSet;if(!C.user&&k&&(Math.abs(lookX-k.x)>.5||Math.abs(lookY-k.y)>.5||Math.abs(spp-k.s)>1e-4)){C.user=true;plog('cine: player camera')}return C.user}
 function glideStep(G,now){const u=ease(clamp((now-G.t0)/1000/G.dur));if(C5.cine&&C5.cine.user)return u>=1;setCam(G.a.x+(G.b.x-G.a.x)*u,G.a.y+(G.b.y-G.a.y)*u,G.a.s+(G.b.s-G.a.s)*u);return u>=1}
+// v73: the return glide — same smoothstep ease as the zoom glide, but it
+// ALWAYS drives the camera (the zoom glide stops driving once the player
+// takes the camera; the return is what Chris asked for, so it runs to the
+// recorded pre-scene framing regardless of C.user).
+function returnStep(G,now){const u=ease(clamp((now-G.t0)/1000/G.dur));setCam(G.a.x+(G.b.x-G.a.x)*u,G.a.y+(G.b.y-G.a.y)*u,G.a.s+(G.b.s-G.a.s)*u);return u>=1}
+function startReturn(now){const R=C5.restore;C5.cine.g={t0:now,dur:CINE.RETURN_S,a:{x:lookX,y:lookY,s:spp},b:{x:R?R.x:lookX,y:R?R.y:lookY,s:R?R.s:spp}};C5.cine.phase='return';plog('cine:return glide '+C5.cine.g.a.x.toFixed(1)+','+C5.cine.g.a.y.toFixed(1)+' @'+C5.cine.g.a.s.toFixed(3)+' -> '+C5.cine.g.b.x.toFixed(1)+','+C5.cine.g.b.y.toFixed(1)+' @'+C5.cine.g.b.s.toFixed(3))}
 function stepCine(now){const C=C5.cine;if(!C)return;const st=typeof state==='string'?state:'';userCam(C);
  if(C.phase==='up'){if(st!=='entered')return;C5.fixed=fixedShot();
   C.g={t0:now,dur:CINE.ZOOM_S,a:{x:lookX,y:lookY,s:spp},b:C5.fixed};C.phase='zoom';plog('cine:fixed spp '+C5.fixed.s.toFixed(3))}
  if(C.phase==='zoom'){warmFrames(); // v57: keep decoding during the glide
   if(glideStep(C.g,now)){C.phase='play';SQ.state='play';SQ.t0=now;SQ.path=null;buildPath();plog('squirrel play')}return}
  if(C.phase==='play'){if(!C.user)setCam(C5.fixed.x,C5.fixed.y,C5.fixed.s); // v61: HOLD the fixed framing — the video's framing is the framing; no tracking, no second zoom. The player can still pinch/pan out (userCam stops the drive, as before).
-  if(SQ.state==='done')C.phase='settle';return} // v61: no settle glide — the fixed framing already IS the final view (acorn centred, mound hole in frame). The next tick ends the cine.
- if(C.phase==='settle')cineEnd()}
-function cineEnd(){const C=C5.cine;if(!C)return;C5.cine=null;cineEl().style.display='none';
- plog('cine:end, stays above ground ('+state+')')}   // no begin('descending'): the player presses the down arrow
+  if(SQ.state==='done')C.phase='settle';return} // v61: no settle glide — the fixed framing already IS the final view (acorn centred, mound hole in frame). v73 takes over from here: the camera returns.
+ // v73: the scene has FULLY played — all 240 frames, including the 36
+ // acorn-only rest frames (SQ.state is 'done' only after the path's last
+ // entry). The camera goes back to where it was before the scene started:
+ // descend first (the normal floor change, same as pressing down), then
+ // glide the camera back to the recorded pre-scene framing. The return is
+ // a smooth glide, never a snap; input stays blocked until it finishes.
+ if(C.phase==='settle'){const R=C5.restore;
+  if(R&&(R.state==='underground'||R.state==='menu')&&typeof begin==='function'){try{begin('descending')}catch(e){}C.downT0=now;C.phase='down';plog('cine:return down')}
+  else startReturn(now);return}
+ if(C.phase==='down'){if(st!=='underground'&&st!=='menu'){if(now-C.downT0>3000){plog('cine:return down timeout, gliding anyway');startReturn(now)}return} // the render loop finishes the 1.4 s floor change and calls begin('underground'); the 3 s fallback covers a stuck descent
+  startReturn(now);return}
+ if(C.phase==='return'){if(returnStep(C.g,now)){const R=C5.restore;setCam(R.x,R.y,R.s);cineEnd()}return}}
+function cineEnd(){const C=C5.cine;if(!C)return;const R=C5.restore;C5.cine=null;cineEl().style.display='none';
+ // v73: the camera is back where it was before the scene started. If the
+ // build menu was open when the scene triggered, put it back too — the
+ // arrival auto-open click that begin('underground') fires during the
+ // descent is swallowed by the cineBlock while the cine is up, so the
+ // menu is reopened here, once, after input is restored (C5.cine is null,
+ // so the click passes through to the build menu).
+ if(R&&R.state==='menu'){try{const q=document.querySelector('#queenTarget');if(q)q.click()}catch(e){}}
+ plog('cine:end, camera returned ('+state+')')}
 
 // ---- draw (world transform; called from the BASE_QUEEN.drawUp wrapper, after the existing up pass) ----
 function drawAcorn(){if(!DATA||!imOk(SQ.REST)||BANK.built||SQ.state==='pre')return;if(SQ.state==='play'){if(!SQ.path||pathIdx(performance.now())<SQ.restAt)return}
@@ -304,7 +364,7 @@ function squirrelNow(){sqLoad();C5.force=true;plog('squirrelNow');return SQ.stat
 window.cp5={init:guard('init',init),tick:guard('tick',cp5Tick),get ready(){return C5.ready},bank:BANK,sq:SQ,SQUIRREL_AT_BRAINS,SQ_HEXES,pickAcornHex,get acornHex(){return SQ.hex&&SQ.hex.slice()},
  debug:{C5,SQ,BANK,DATA,CINE,buildPath,hexCenter,sqHexFree,pickAcornHex,sceneBox,acornWorld,squirrelNow,sqLoad,beginPlay,moundHole,sqPos,warmFrames,fixedShot,
   get log(){return C5.log},get errs(){return Object.keys(C5.errs)},
-  state:()=>({sq:SQ.state,cine:!!C5.cine,phase:C5.cine&&C5.cine.phase,fixed:C5.fixed||null,warmed:SQ.BM.filter(Boolean).length,shared:window.CP5_ACORN_HEX||null,acorn:!!BANK.acorn,built:!!BANK.built,loaded:SQ.loaded,want:SQ.want,hex:SQ.hex,x:BANK.x,y:BANK.y,brains:brains()}),
+  state:()=>({sq:SQ.state,cine:!!C5.cine,phase:C5.cine&&C5.cine.phase,fixed:C5.fixed||null,restore:C5.restore||null,warmed:SQ.BM.filter(Boolean).length,shared:window.CP5_ACORN_HEX||null,acorn:!!BANK.acorn,built:!!BANK.built,loaded:SQ.loaded,want:SQ.want,hex:SQ.hex,x:BANK.x,y:BANK.y,brains:brains()}),
   goUpstairs(){try{if(typeof begin==='function'&&state!=='entered')begin('entered');const h=SQ.hex||pickAcornHex(),c=hexCenter(h[0],h[1]);if(window.openingDemo&&openingDemo.setView)openingDemo.setView({spp:Math.min(MAX_SPP||4,2.4),lookX:c.cx,lookY:c.cy})}catch(e){}}}};
 init();
 })();
