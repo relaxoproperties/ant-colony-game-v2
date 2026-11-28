@@ -76,12 +76,12 @@ const S2S=720/390;   // v3 camera s is on a 390x844 screen; bv1 spp is on the 72
 function imOk(im){return !!(im&&(im.ok||((im.naturalWidth||im.width)>0))&&!im.bad)}
 function loadIm(src){const im=new Image();im.decoding='async';im.onload=()=>{im.ok=1;SQ.loaded++};im.onerror=()=>{im.bad=1;SQ.failed=(SQ.failed||0)+1;console.warn('[cp5] image failed: '+src)};im.src=src;SQ.want++;return im}
 function sqLoad(){if(SQ.preload||!DATA)return;SQ.preload=true;
- // v72: ?v=73 on the frame + REST urls (phone cache-bust — the 240
+ // v74: ?v=74 on the frame + REST urls (phone cache-bust — the 240
  // 1:1 one-take frames are 0.5x images, same filenames as v72's set;
  // the v72 frames must never be served from cache; the frame FILES are
  // byte-identical to v72 — only the runtime changed).
- for(let i=0;i<DATA.n;i++)SQ.IM[i]=loadIm(BASE+'sq_'+pad3(i)+'.webp?v=73');
- SQ.REST=loadIm(BASE+'acorn_runtime.png?v=73');SQ.PLAIN=loadIm(PLAIN_SRC)}// v57: pre-DECODE the frames before the scene starts. The "skipping a beat"
+ for(let i=0;i<DATA.n;i++)SQ.IM[i]=loadIm(BASE+'sq_'+pad3(i)+'.webp?v=74');
+ SQ.REST=loadIm(BASE+'acorn_runtime.png?v=74');SQ.PLAIN=loadIm(PLAIN_SRC)}// v57: pre-DECODE the frames before the scene starts. The "skipping a beat"
 // on Chris's phone is a decode hitch, not missing art: the squirrel IS one
 // continuous take (v70: 185 frames @ 24 fps, 7.71 s), but each frame's FIRST
 // drawImage decodes its alpha WebP lazily — on phone-class hardware that
@@ -211,6 +211,37 @@ function setHex(h){SQ.hex=h.slice();window.CP5_ACORN_HEX=h.slice();const c=hexCe
 // NO snap cut. Input stays blocked until the return finishes. If the
 // build menu was open when the scene triggered, it is reopened after the
 // return. The acorn stays drawn on the surface; the squirrel does not replay.
+// ---- v74 (Chris Nov 28, 10:55, after testing v73: "I love very much what
+// you did with this video and the way it is done, everything I love very
+// very much" — but the SEED beside the ant mound reads practically the size
+// of the squirrel's head; in real life it should be no bigger than the
+// squirrel's tooth. His call: SAVE v73 as Checkpoint 5 Attempt 1, then try
+// OPTION 2 before locking cp5 — zoom out even more + make the squirrel
+// bigger, so the seed reads tooth-sized; the squirrel must still come in
+// and leave off-screen, never cut off. The squirrel VIDEO work is DONE —
+// option 2 is a GAME-FRAMING change only, same 240 frames. DATA.S = 3.38:
+// every DATA rect (plate, all 240 frame rects, acorn.tl/wh) is scaled by
+// 3.38 around acorn.c (the bank position, unchanged). The frame IMAGES are
+// unchanged (same files, 0.5x of the v73 rects); cp5.js stretches each
+// image to its rect, so the on-screen squirrel is identical to v73. The
+// camera needs NO change: fixedShot/fitS read DATA.plate, so spp becomes
+// 0.5816/3.38 = 0.1721 automatically (above MIN_SPP 0.128). The resting
+// acorn is drawn at BANK.S * DATA.S (drawAcorn, below), so there is NO
+// size jump at set-down or at restFrame — the composite frames' baked
+// paste (157 plate px, stretched by S) and the rest drawing (157.385 * S
+// world) are the same size, as in v73. MEASURED (from the v73 cinematic
+// render): head 44 screen px, seed perceived 87x41 px (core 40x28) —
+// R = 0.51. At F = 3.38 the head stays 44 px, the seed shrinks to 26x12
+// px — head/seed = 1.7x long (3.6x short, core 3.7x long). NOT tooth-sized
+// (8x): the plate is pinned by the acorn on the bank hex [2,-2] and the
+// world is only 5625 wide, so 3.3845 is the largest F that fits — 3.38 is
+// the best this world allows, and the report says so plainly. The
+// seed-vs-mound ratio does not change (both fixed world objects); the
+// acorn on screen is unchanged (it scales with the plate). Enter/exit stay
+// off-screen (plate edges ~71 world beyond the view, as in v73); the stand
+// tail stays fully in frame. The v73 return (1.4 s descent + 1.75 s glide
+// back to the exact pre-scene framing) is UNCHANGED. v73 is saved as
+// Checkpoint 5 Attempt 1; v74 is Option 2, NOT locked.
 function buildPath(){const T=[],fr=1/DATA.fps;
  for(let i=0;i<DATA.n;i++)T.push({k:i,dx:0,dy:0,d:fr});
  let c=0;SQ.cum=T.map(e=>(c+=e.d));SQ.path=T;SQ.restAt=DATA.restFrame;
@@ -338,7 +369,7 @@ function cineEnd(){const C=C5.cine;if(!C)return;const R=C5.restore;C5.cine=null;
 
 // ---- draw (world transform; called from the BASE_QUEEN.drawUp wrapper, after the existing up pass) ----
 function drawAcorn(){if(!DATA||!imOk(SQ.REST)||BANK.built||SQ.state==='pre')return;if(SQ.state==='play'){if(!SQ.path||pathIdx(performance.now())<SQ.restAt)return}
- if(imOk(SQ.PLAIN)){const S=BANK.S;ctx.drawImage(SQ.BM_PLAIN||SQ.PLAIN,BANK.x-.52*S,BANK.y-.52*S,S,S);return}
+ if(imOk(SQ.PLAIN)){const S=BANK.S*(DATA.S||1);ctx.drawImage(SQ.BM_PLAIN||SQ.PLAIN,BANK.x-.52*S,BANK.y-.52*S,S,S);return} // v74: the resting acorn scales with the plate (DATA.S = 3.38), so it matches the composite frames' baked paste (157 plate px, stretched by S) — no size jump at set-down or at restFrame, as in v73 (where S was 1.0).
  const A=DATA.acorn,o=SQ.off;ctx.drawImage(SQ.BM_REST||SQ.REST,A.tl[0]+o.x,A.tl[1]+o.y,A.wh[0],A.wh[1])}
 function drawSquirrel(now){if(!DATA||(SQ.state!=='play'&&SQ.state!=='done'))return;
  if(SQ.state==='play'){if(!SQ.path)buildPath();const i=Math.max(0,pathIdx(now));drawAcorn();if(i>=SQ.path.length)return;
