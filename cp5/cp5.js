@@ -71,11 +71,11 @@ const S2S=720/390;   // v3 camera s is on a 390x844 screen; bv1 spp is on the 72
 function imOk(im){return !!(im&&(im.ok||((im.naturalWidth||im.width)>0))&&!im.bad)}
 function loadIm(src){const im=new Image();im.decoding='async';im.onload=()=>{im.ok=1;SQ.loaded++};im.onerror=()=>{im.bad=1;SQ.failed=(SQ.failed||0)+1;console.warn('[cp5] image failed: '+src)};im.src=src;SQ.want++;return im}
 function sqLoad(){if(SQ.preload||!DATA)return;SQ.preload=true;
- // v71: ?v=71 on the frame + REST urls (phone cache-bust — the 195
- // 1:1 composite frames are 0.5x images, same filenames as v69's set;
- // the v69 frames must never be served from cache).
- for(let i=0;i<DATA.n;i++)SQ.IM[i]=loadIm(BASE+'sq_'+pad3(i)+'.webp?v=71');
- SQ.REST=loadIm(BASE+'acorn_runtime.png?v=71');SQ.PLAIN=loadIm(PLAIN_SRC)}// v57: pre-DECODE the frames before the scene starts. The "skipping a beat"
+ // v72: ?v=72 on the frame + REST urls (phone cache-bust — the 240
+ // 1:1 one-take frames are 0.5x images, same filenames as v71's set;
+ // the v71 frames must never be served from cache).
+ for(let i=0;i<DATA.n;i++)SQ.IM[i]=loadIm(BASE+'sq_'+pad3(i)+'.webp?v=72');
+ SQ.REST=loadIm(BASE+'acorn_runtime.png?v=72');SQ.PLAIN=loadIm(PLAIN_SRC)}// v57: pre-DECODE the frames before the scene starts. The "skipping a beat"
 // on Chris's phone is a decode hitch, not missing art: the squirrel IS one
 // continuous take (v70: 185 frames @ 24 fps, 7.71 s), but each frame's FIRST
 // drawImage decodes its alpha WebP lazily — on phone-class hardware that
@@ -163,6 +163,35 @@ function setHex(h){SQ.hex=h.slice();window.CP5_ACORN_HEX=h.slice();const c=hexCe
 // where the pasted bank acorn takes over with no jump — the frame's
 // acorn and the PLAIN are the same canvas at the same centre and scale.
 // The acorn rest sprite (acorn_runtime.png) is drawn from restFrame (181) on,
+// centred on the hex: its final position = the bank position.
+// ---- v72 (Chris Nov 28, 05:49: "Squirrel video looks great. Now try
+// putting it in checkpoint five."): the APPROVED zoomed-out video, IN
+// THE GAME. The video is the zoomed-out take 1 (Nov 27, 23:00) — a
+// GENUINE ONE-TAKE, 1280x720, 24 fps, 10.00 s, 240 frames. No
+// stitching, no join, no blend, no dissolve, no graft, no extra
+// translation: the v69/v70/v71 failure class (composites that looked
+// stitched) does not apply, because there is only one take. The PLATE
+// IS THE TAKE FRAME (1280x720, S=1.0, DX=0, DY=0) — the take's framing
+// IS the framing Chris approved (stand 40.1% of plate height, 29.6% of
+// width), kept as-is, NOT rescaled to v71's size. Frames 1-4 empty
+// (off-screen entrance, squirrel first appears f5); run f5-f35 (nose
+// 1272 -> 504, ~595 px/s, fast from the first visible frame, acorn in
+// its mouth from f8 on); stand f36-f153 (sits up, looks around, alive,
+// constant size); bend f150-f154, set-down f154 (SET_DOWN idx 153);
+// exit bound f195-f204, fully out by f205; acorn-only rest f205-f240
+// (36 frames). The paste/ORIGIN/acorn geometry are unchanged in kind
+// (acorn centre byte-identical to v63-v71, paste ~25.8 deg vs bank
+// 25.9 deg) — only the plate and ORIGIN are new (ORIGIN =
+// acorn.c - PASTE_C, PASTE_C = the take's own rest acorn at 509.5,
+// 575.5). The take's own resting acorn (-25 deg, wrong diagonal) is
+// removed from SET_DOWN on (brown R-B>55 px in the ground box), so
+// only the pasted bank acorn shows at rest. The composite plays
+// STRAIGHT THROUGH — 240 frames @ 24 fps, 10.00 s, one entry per
+// composite frame at 1/24 s, dx=dy=0.
+// restFrame 204 (take f205 done): the first fully acorn-only frame,
+// where the pasted bank acorn takes over with no jump — the frame's
+// acorn and the PLAIN are the same canvas at the same centre and scale.
+// The acorn rest sprite (acorn_runtime.png) is drawn from restFrame (204) on,
 // centred on the hex: its final position = the bank position.
 function buildPath(){const T=[],fr=1/DATA.fps;
  for(let i=0;i<DATA.n;i++)T.push({k:i,dx:0,dy:0,d:fr});
